@@ -1,0 +1,17 @@
+﻿<?xml version="1.0"?>
+<configuration date="2014/03/13" author="e.World Technology Ltd.">
+<project id="{3246B9FA-4C51-4733-8040-34B188FCD87E}" file="E:\ofoq_tasks\project1.pmp" name="project1" product="PHPMaker" version="10.0" datetime="2014/03/13 01:46:30" languagefolder="phplang" userlevel="0,&quot;Default&quot;,0">
+<table id="command" name="command" caption="command" userlevel="0,&quot;Default&quot;,0" priv="1"/>
+<table id="function_group" name="function_group" caption="function group" userlevel="0,&quot;Default&quot;,0" priv="1"/>
+<table id="function_group_relation" name="function_group_relation" caption="function group relation" userlevel="0,&quot;Default&quot;,0" priv="1"/>
+<table id="parameter" name="parameter" caption="parameter" userlevel="0,&quot;Default&quot;,0" priv="1"/>
+<table id="script" name="script" caption="script" userlevel="0,&quot;Default&quot;,0" priv="1"/>
+<table id="script_function" name="script_function" caption="script function" userlevel="0,&quot;Default&quot;,0" priv="1"/>
+<table id="server" name="server" caption="server" userlevel="0,&quot;Default&quot;,0" priv="1"/>
+<table id="task" name="task" caption="task" userlevel="0,&quot;Default&quot;,0" priv="1"/>
+<table id="task_function_group" name="task_function_group" caption="task function group" userlevel="0,&quot;Default&quot;,0" priv="1"/>
+<table id="audittrail" name="audittrail" caption="audittrail" userlevel="0,&quot;Default&quot;,0" priv="1"/>
+<table id="_login" name="login" caption="login" userlevel="0,&quot;Default&quot;,0" priv="1"/>
+<table id="generator_report" name="generator report" caption="generator report" userlevel="0,&quot;Default&quot;,0" priv="1"/>
+<table id="Report_Grouping_by_Task" name="Report Grouping by Task" caption="Geport Report Grouping by Task" userlevel="0,&quot;Default&quot;,0" priv="1"/>
+</project></configuration>
