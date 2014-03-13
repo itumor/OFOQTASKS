@@ -1,0 +1,1 @@
+ALTER TABLE  `function_group_relation` ADD  `priority` INT NOT NULL AFTER  `script_function_id`;
