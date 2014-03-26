@@ -626,6 +626,21 @@ class cReport_Grouping_by_Task_report extends cReport_Grouping_by_Task {
 			$Security->SaveLastUrl();
 			$this->Page_Terminate("login.php");
 		}
+		$Security->TablePermission_Loading();
+		$Security->LoadCurrentUserLevel($this->ProjectID . $this->TableName);
+		$Security->TablePermission_Loaded();
+		if (!$Security->IsLoggedIn()) {
+			$Security->SaveLastUrl();
+			$this->Page_Terminate("login.php");
+		}
+		if (!$Security->CanReport()) {
+			$Security->SaveLastUrl();
+			$this->setFailureMessage($Language->Phrase("NoPermission")); // Set no permission
+			$this->Page_Terminate("login.php");
+		}
+		$Security->UserID_Loading();
+		if ($Security->IsLoggedIn()) $Security->LoadUserID();
+		$Security->UserID_Loaded();
 
 		// Get export parameters
 		if (@$_GET["export"] <> "") {
@@ -1081,6 +1096,10 @@ $Report_Grouping_by_Task_report->Page_Render();
 <?php
 $Report_Grouping_by_Task_report->DefaultFilter = "";
 $Report_Grouping_by_Task_report->ReportFilter = $Report_Grouping_by_Task_report->DefaultFilter;
+if (!$Security->CanReport()) {
+	if ($Report_Grouping_by_Task_report->ReportFilter <> "") $Report_Grouping_by_Task_report->ReportFilter .= " AND ";
+	$Report_Grouping_by_Task_report->ReportFilter .= "(0=1)";
+}
 if ($Report_Grouping_by_Task_report->DbDetailFilter <> "") {
 	if ($Report_Grouping_by_Task_report->ReportFilter <> "") $Report_Grouping_by_Task_report->ReportFilter .= " AND ";
 	$Report_Grouping_by_Task_report->ReportFilter .= "(" . $Report_Grouping_by_Task_report->DbDetailFilter . ")";
@@ -1142,6 +1161,10 @@ while (!$Report_Grouping_by_Task_report->Recordset->EOF) {
 		if ($Report_Grouping_by_Task_report->ReportFilter <> "")
 			$Report_Grouping_by_Task_report->ReportFilter .= " AND ";
 		$Report_Grouping_by_Task_report->ReportFilter .= "(" . $Report_Grouping_by_Task_report->DbDetailFilter . ")";
+	}
+	if (!$Security->CanReport()) {
+		if ($sFilter <> "") $sFilter .= " AND ";
+		$sFilter .= "(0=1)";
 	}
 
 	// Set up detail SQL

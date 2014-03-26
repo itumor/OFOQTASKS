@@ -209,6 +209,21 @@ class ccommand_add extends ccommand {
 			$Security->SaveLastUrl();
 			$this->Page_Terminate("login.php");
 		}
+		$Security->TablePermission_Loading();
+		$Security->LoadCurrentUserLevel($this->ProjectID . $this->TableName);
+		$Security->TablePermission_Loaded();
+		if (!$Security->IsLoggedIn()) {
+			$Security->SaveLastUrl();
+			$this->Page_Terminate("login.php");
+		}
+		if (!$Security->CanAdd()) {
+			$Security->SaveLastUrl();
+			$this->setFailureMessage($Language->Phrase("NoPermission")); // Set no permission
+			$this->Page_Terminate("commandlist.php");
+		}
+		$Security->UserID_Loading();
+		if ($Security->IsLoggedIn()) $Security->LoadUserID();
+		$Security->UserID_Loaded();
 
 		// Create form object
 		$objForm = new cFormObj();
@@ -779,29 +794,29 @@ class ccommand_add extends ccommand {
 		$rsnew = array();
 
 		// user_id
-		$this->user_id->SetDbValueDef($rsnew, CurrentUserID(), 0);
+		$this->user_id->SetDbValueDef($rsnew, CurrentUserID(), NULL);
 		$rsnew['user_id'] = &$this->user_id->DbValue;
 
 		// task_id
-		$this->task_id->SetDbValueDef($rsnew, $this->task_id->CurrentValue, 0, FALSE);
+		$this->task_id->SetDbValueDef($rsnew, $this->task_id->CurrentValue, NULL, FALSE);
 
 		// server_id
-		$this->server_id->SetDbValueDef($rsnew, $this->server_id->CurrentValue, 0, FALSE);
+		$this->server_id->SetDbValueDef($rsnew, $this->server_id->CurrentValue, NULL, FALSE);
 
 		// command_input
-		$this->command_input->SetDbValueDef($rsnew, $this->command_input->CurrentValue, "", FALSE);
+		$this->command_input->SetDbValueDef($rsnew, $this->command_input->CurrentValue, NULL, FALSE);
 
 		// command_output
-		$this->command_output->SetDbValueDef($rsnew, $this->command_output->CurrentValue, "", FALSE);
+		$this->command_output->SetDbValueDef($rsnew, $this->command_output->CurrentValue, NULL, FALSE);
 
 		// command_status
-		$this->command_status->SetDbValueDef($rsnew, $this->command_status->CurrentValue, "", FALSE);
+		$this->command_status->SetDbValueDef($rsnew, $this->command_status->CurrentValue, NULL, FALSE);
 
 		// command_log
-		$this->command_log->SetDbValueDef($rsnew, $this->command_log->CurrentValue, "", FALSE);
+		$this->command_log->SetDbValueDef($rsnew, $this->command_log->CurrentValue, NULL, FALSE);
 
 		// command_time
-		$this->command_time->SetDbValueDef($rsnew, ew_CurrentDateTime(), ew_CurrentDate());
+		$this->command_time->SetDbValueDef($rsnew, ew_CurrentDateTime(), NULL);
 		$rsnew['command_time'] = &$this->command_time->DbValue;
 
 		// Call Row Inserting event
@@ -854,7 +869,7 @@ class ccommand_add extends ccommand {
 	// Write Audit Trail start/end for grid update
 	function WriteAuditTrailDummy($typ) {
 		$table = 'command';
-	  $usr = CurrentUserName();
+	  $usr = CurrentUserID();
 		ew_WriteAuditTrail("log", ew_StdCurrentDateTime(), ew_ScriptName(), $usr, $typ, $table, "", "", "", "");
 	}
 
@@ -871,7 +886,7 @@ class ccommand_add extends ccommand {
 		// Write Audit Trail
 		$dt = ew_StdCurrentDateTime();
 		$id = ew_ScriptName();
-	  $usr = CurrentUserName();
+	  $usr = CurrentUserID();
 		foreach (array_keys($rs) as $fldname) {
 			if ($this->fields[$fldname]->FldDataType <> EW_DATATYPE_BLOB) { // Ignore BLOB fields
 				if ($this->fields[$fldname]->FldDataType == EW_DATATYPE_MEMO) {

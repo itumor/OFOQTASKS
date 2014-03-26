@@ -277,6 +277,21 @@ class cgenerator_report_list extends cgenerator_report {
 			$Security->SaveLastUrl();
 			$this->Page_Terminate("login.php");
 		}
+		$Security->TablePermission_Loading();
+		$Security->LoadCurrentUserLevel($this->ProjectID . $this->TableName);
+		$Security->TablePermission_Loaded();
+		if (!$Security->IsLoggedIn()) {
+			$Security->SaveLastUrl();
+			$this->Page_Terminate("login.php");
+		}
+		if (!$Security->CanList()) {
+			$Security->SaveLastUrl();
+			$this->setFailureMessage($Language->Phrase("NoPermission")); // Set no permission
+			$this->Page_Terminate("login.php");
+		}
+		$Security->UserID_Loading();
+		if ($Security->IsLoggedIn()) $Security->LoadUserID();
+		$Security->UserID_Loaded();
 
 		// Get export parameters
 		if (@$_GET["export"] <> "") {
@@ -485,6 +500,8 @@ class cgenerator_report_list extends cgenerator_report {
 
 		// Build filter
 		$sFilter = "";
+		if (!$Security->CanList())
+			$sFilter = "(0=1)"; // Filter all records
 		ew_AddFilter($sFilter, $this->DbDetailFilter);
 		ew_AddFilter($sFilter, $this->SearchWhere);
 
@@ -587,6 +604,7 @@ class cgenerator_report_list extends cgenerator_report {
 	function BasicSearchWhere() {
 		global $Security;
 		$sSearchStr = "";
+		if (!$Security->CanSearch()) return "";
 		$sSearchKeyword = $this->BasicSearch->Keyword;
 		$sSearchType = $this->BasicSearch->Type;
 		if ($sSearchKeyword <> "") {
@@ -1699,7 +1717,7 @@ if (fgenerator_reportlistsrch) fgenerator_reportlistsrch.InitSearchPanel = true;
 		$generator_report_list->Recordset = $generator_report_list->LoadRecordset($generator_report_list->StartRec-1, $generator_report_list->DisplayRecs);
 $generator_report_list->RenderOtherOptions();
 ?>
-<?php if ($Security->IsLoggedIn()) { ?>
+<?php if ($Security->CanSearch()) { ?>
 <?php if ($generator_report->Export == "" && $generator_report->CurrentAction == "") { ?>
 <form name="fgenerator_reportlistsrch" id="fgenerator_reportlistsrch" class="ewForm form-inline" action="<?php echo ew_CurrentPage() ?>">
 <table class="ewSearchTable"><tr><td>
@@ -1777,10 +1795,14 @@ $generator_report_list->ShowMessage();
 </td>
 </tr></tbody></table>
 <?php } else { ?>
+	<?php if ($Security->CanList()) { ?>
 	<?php if ($generator_report_list->SearchWhere == "0=101") { ?>
 	<p><?php echo $Language->Phrase("EnterSearchCriteria") ?></p>
 	<?php } else { ?>
 	<p><?php echo $Language->Phrase("NoRecord") ?></p>
+	<?php } ?>
+	<?php } else { ?>
+	<p><?php echo $Language->Phrase("NoPermission") ?></p>
 	<?php } ?>
 <?php } ?>
 </td>
@@ -2216,10 +2238,14 @@ if ($generator_report_list->Recordset)
 </td>
 </tr></tbody></table>
 <?php } else { ?>
+	<?php if ($Security->CanList()) { ?>
 	<?php if ($generator_report_list->SearchWhere == "0=101") { ?>
 	<p><?php echo $Language->Phrase("EnterSearchCriteria") ?></p>
 	<?php } else { ?>
 	<p><?php echo $Language->Phrase("NoRecord") ?></p>
+	<?php } ?>
+	<?php } else { ?>
+	<p><?php echo $Language->Phrase("NoPermission") ?></p>
 	<?php } ?>
 <?php } ?>
 </td>

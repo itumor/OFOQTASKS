@@ -255,6 +255,25 @@ class cp_login_view extends c_login {
 			$Security->SaveLastUrl();
 			$this->Page_Terminate("login.php");
 		}
+		$Security->TablePermission_Loading();
+		$Security->LoadCurrentUserLevel($this->ProjectID . $this->TableName);
+		$Security->TablePermission_Loaded();
+		if (!$Security->IsLoggedIn()) {
+			$Security->SaveLastUrl();
+			$this->Page_Terminate("login.php");
+		}
+		if (!$Security->CanView()) {
+			$Security->SaveLastUrl();
+			$this->setFailureMessage($Language->Phrase("NoPermission")); // Set no permission
+			$this->Page_Terminate("_loginlist.php");
+		}
+		$Security->UserID_Loading();
+		if ($Security->IsLoggedIn()) $Security->LoadUserID();
+		$Security->UserID_Loaded();
+		if ($Security->IsLoggedIn() && strval($Security->CurrentUserID()) == "") {
+			$this->setFailureMessage($Language->Phrase("NoPermission")); // Set no permission
+			$this->Page_Terminate("_loginlist.php");
+		}
 
 		// Get export parameters
 		if (@$_GET["export"] <> "") {
@@ -418,22 +437,22 @@ class cp_login_view extends c_login {
 		// Add
 		$item = &$option->Add("add");
 		$item->Body = "<a class=\"ewAction ewAdd\" href=\"" . ew_HtmlEncode($this->AddUrl) . "\">" . $Language->Phrase("ViewPageAddLink") . "</a>";
-		$item->Visible = ($this->AddUrl <> "" && $Security->IsLoggedIn());
+		$item->Visible = ($this->AddUrl <> "" && $Security->CanAdd());
 
 		// Edit
 		$item = &$option->Add("edit");
 		$item->Body = "<a class=\"ewAction ewEdit\" href=\"" . ew_HtmlEncode($this->EditUrl) . "\">" . $Language->Phrase("ViewPageEditLink") . "</a>";
-		$item->Visible = ($this->EditUrl <> "" && $Security->IsLoggedIn());
+		$item->Visible = ($this->EditUrl <> "" && $Security->CanEdit()&& $this->ShowOptionLink('edit'));
 
 		// Copy
 		$item = &$option->Add("copy");
 		$item->Body = "<a class=\"ewAction ewCopy\" href=\"" . ew_HtmlEncode($this->CopyUrl) . "\">" . $Language->Phrase("ViewPageCopyLink") . "</a>";
-		$item->Visible = ($this->CopyUrl <> "" && $Security->IsLoggedIn());
+		$item->Visible = ($this->CopyUrl <> "" && $Security->CanAdd() && $this->ShowOptionLink('add'));
 
 		// Delete
 		$item = &$option->Add("delete");
 		$item->Body = "<a onclick=\"return ew_Confirm(ewLanguage.Phrase('DeleteConfirmMsg'));\" class=\"ewAction ewDelete\" href=\"" . ew_HtmlEncode($this->DeleteUrl) . "\">" . $Language->Phrase("ViewPageDeleteLink") . "</a>";
-		$item->Visible = ($this->DeleteUrl <> "" && $Security->IsLoggedIn());
+		$item->Visible = ($this->DeleteUrl <> "" && $Security->CanDelete() && $this->ShowOptionLink('delete'));
 
 		// Set up options default
 		foreach ($options as &$option) {
@@ -538,6 +557,7 @@ class cp_login_view extends c_login {
 		$this->_Email->setDbValue($rs->fields('Email'));
 		$this->Activated->setDbValue($rs->fields('Activated'));
 		$this->Profile->setDbValue($rs->fields('Profile'));
+		$this->levels->setDbValue($rs->fields('levels'));
 	}
 
 	// Load DbValue from recordset
@@ -550,6 +570,7 @@ class cp_login_view extends c_login {
 		$this->_Email->DbValue = $row['Email'];
 		$this->Activated->DbValue = $row['Activated'];
 		$this->Profile->DbValue = $row['Profile'];
+		$this->levels->DbValue = $row['levels'];
 	}
 
 	// Render row values based on field settings
@@ -575,6 +596,7 @@ class cp_login_view extends c_login {
 		// Email
 		// Activated
 		// Profile
+		// levels
 
 		if ($this->RowType == EW_ROWTYPE_VIEW) { // View row
 
@@ -601,6 +623,34 @@ class cp_login_view extends c_login {
 			// Profile
 			$this->Profile->ViewValue = $this->Profile->CurrentValue;
 			$this->Profile->ViewCustomAttributes = "";
+
+			// levels
+			if ($Security->CanAdmin()) { // System admin
+			if (strval($this->levels->CurrentValue) <> "") {
+				$sFilterWrk = "`userlevelid`" . ew_SearchString("=", $this->levels->CurrentValue, EW_DATATYPE_NUMBER);
+			$sSqlWrk = "SELECT `userlevelid`, `userlevelname` AS `DispFld`, '' AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld` FROM `userlevels`";
+			$sWhereWrk = "";
+			if ($sFilterWrk <> "") {
+				ew_AddFilter($sWhereWrk, $sFilterWrk);
+			}
+
+			// Call Lookup selecting
+			$this->Lookup_Selecting($this->levels, $sWhereWrk);
+			if ($sWhereWrk <> "") $sSqlWrk .= " WHERE " . $sWhereWrk;
+				$rswrk = $conn->Execute($sSqlWrk);
+				if ($rswrk && !$rswrk->EOF) { // Lookup values found
+					$this->levels->ViewValue = $rswrk->fields('DispFld');
+					$rswrk->Close();
+				} else {
+					$this->levels->ViewValue = $this->levels->CurrentValue;
+				}
+			} else {
+				$this->levels->ViewValue = NULL;
+			}
+			} else {
+				$this->levels->ViewValue = "********";
+			}
+			$this->levels->ViewCustomAttributes = "";
 
 			// idlogin
 			$this->idlogin->LinkCustomAttributes = "";
@@ -631,6 +681,11 @@ class cp_login_view extends c_login {
 			$this->Profile->LinkCustomAttributes = "";
 			$this->Profile->HrefValue = "";
 			$this->Profile->TooltipValue = "";
+
+			// levels
+			$this->levels->LinkCustomAttributes = "";
+			$this->levels->HrefValue = "";
+			$this->levels->TooltipValue = "";
 		}
 
 		// Call Row Rendered event
@@ -862,6 +917,14 @@ class cp_login_view extends c_login {
 		return $sQry;
 	}
 
+	// Show link optionally based on User ID
+	function ShowOptionLink($id = "") {
+		global $Security;
+		if ($Security->IsLoggedIn() && !$Security->IsAdmin() && !$this->UserIDAllow($id))
+			return $Security->IsValidUserID($this->idlogin->CurrentValue);
+		return TRUE;
+	}
+
 	// Set up Breadcrumb
 	function SetupBreadcrumb() {
 		global $Breadcrumb, $Language;
@@ -979,8 +1042,9 @@ f_loginview.ValidateRequired = false;
 <?php } ?>
 
 // Dynamic selection lists
-// Form object for search
+f_loginview.Lists["x_levels"] = {"LinkField":"x_userlevelid","Ajax":null,"AutoFill":false,"DisplayFields":["x_userlevelname","","",""],"ParentFields":[],"FilterFields":[],"Options":[]};
 
+// Form object for search
 </script>
 <script type="text/javascript">
 
@@ -1106,6 +1170,17 @@ $p_login_view->ShowMessage();
 <span id="el__login_Profile" class="control-group">
 <span<?php echo $_login->Profile->ViewAttributes() ?>>
 <?php echo $_login->Profile->ViewValue ?></span>
+</span>
+</td>
+	</tr>
+<?php } ?>
+<?php if ($_login->levels->Visible) { // levels ?>
+	<tr id="r_levels">
+		<td><span id="elh__login_levels"><?php echo $_login->levels->FldCaption() ?></span></td>
+		<td<?php echo $_login->levels->CellAttributes() ?>>
+<span id="el__login_levels" class="control-group">
+<span<?php echo $_login->levels->ViewAttributes() ?>>
+<?php echo $_login->levels->ViewValue ?></span>
 </span>
 </td>
 	</tr>

@@ -171,6 +171,19 @@ class cserver_server_file_blobview extends cserver {
 			$Security->SaveLastUrl();
 			$this->Page_Terminate("login.php");
 		}
+		$Security->TablePermission_Loading();
+		$Security->LoadCurrentUserLevel(CurrentProjectID() . 'server');
+		$Security->TablePermission_Loaded();
+		if (!$Security->IsLoggedIn()) {
+			$Security->SaveLastUrl();
+			$this->Page_Terminate("login.php");
+		}
+		if (!$Security->CanList()) {
+			$this->Page_Terminate();
+		}
+		$Security->UserID_Loading();
+		if ($Security->IsLoggedIn()) $Security->LoadUserID();
+		$Security->UserID_Loaded();
 		$this->CurrentAction = (@$_GET["a"] <> "") ? $_GET["a"] : @$_POST["a_list"]; // Set up curent action
 
 		// Page Load event

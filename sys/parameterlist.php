@@ -277,6 +277,21 @@ class cparameter_list extends cparameter {
 			$Security->SaveLastUrl();
 			$this->Page_Terminate("login.php");
 		}
+		$Security->TablePermission_Loading();
+		$Security->LoadCurrentUserLevel($this->ProjectID . $this->TableName);
+		$Security->TablePermission_Loaded();
+		if (!$Security->IsLoggedIn()) {
+			$Security->SaveLastUrl();
+			$this->Page_Terminate("login.php");
+		}
+		if (!$Security->CanList()) {
+			$Security->SaveLastUrl();
+			$this->setFailureMessage($Language->Phrase("NoPermission")); // Set no permission
+			$this->Page_Terminate("login.php");
+		}
+		$Security->UserID_Loading();
+		if ($Security->IsLoggedIn()) $Security->LoadUserID();
+		$Security->UserID_Loaded();
 
 		// Get export parameters
 		if (@$_GET["export"] <> "") {
@@ -500,6 +515,8 @@ class cparameter_list extends cparameter {
 
 		// Build filter
 		$sFilter = "";
+		if (!$Security->CanList())
+			$sFilter = "(0=1)"; // Filter all records
 		ew_AddFilter($sFilter, $this->DbDetailFilter);
 		ew_AddFilter($sFilter, $this->SearchWhere);
 
@@ -578,6 +595,7 @@ class cparameter_list extends cparameter {
 	function AdvancedSearchWhere() {
 		global $Security;
 		$sWhere = "";
+		if (!$Security->CanSearch()) return "";
 		$this->BuildSearchSql($sWhere, $this->parameter_id, FALSE); // parameter_id
 		$this->BuildSearchSql($sWhere, $this->script_id, FALSE); // script_id
 		$this->BuildSearchSql($sWhere, $this->parameter_name, FALSE); // parameter_name
@@ -669,6 +687,7 @@ class cparameter_list extends cparameter {
 	function BasicSearchWhere() {
 		global $Security;
 		$sSearchStr = "";
+		if (!$Security->CanSearch()) return "";
 		$sSearchKeyword = $this->BasicSearch->Keyword;
 		$sSearchType = $this->BasicSearch->Type;
 		if ($sSearchKeyword <> "") {
@@ -818,24 +837,24 @@ class cparameter_list extends cparameter {
 		// "view"
 		$item = &$this->ListOptions->Add("view");
 		$item->CssStyle = "white-space: nowrap;";
-		$item->Visible = $Security->IsLoggedIn();
+		$item->Visible = $Security->CanView();
 		$item->OnLeft = TRUE;
 
 		// "edit"
 		$item = &$this->ListOptions->Add("edit");
 		$item->CssStyle = "white-space: nowrap;";
-		$item->Visible = $Security->IsLoggedIn();
+		$item->Visible = $Security->CanEdit();
 		$item->OnLeft = TRUE;
 
 		// "copy"
 		$item = &$this->ListOptions->Add("copy");
 		$item->CssStyle = "white-space: nowrap;";
-		$item->Visible = $Security->IsLoggedIn();
+		$item->Visible = $Security->CanAdd();
 		$item->OnLeft = TRUE;
 
 		// "checkbox"
 		$item = &$this->ListOptions->Add("checkbox");
-		$item->Visible = $Security->IsLoggedIn();
+		$item->Visible = $Security->CanDelete();
 		$item->OnLeft = TRUE;
 		$item->Header = "<label class=\"checkbox\"><input type=\"checkbox\" name=\"key\" id=\"key\" onclick=\"ew_SelectAllKey(this);\"></label>";
 		$item->MoveTo(0);
@@ -861,14 +880,14 @@ class cparameter_list extends cparameter {
 
 		// "view"
 		$oListOpt = &$this->ListOptions->Items["view"];
-		if ($Security->IsLoggedIn())
+		if ($Security->CanView())
 			$oListOpt->Body = "<a class=\"ewRowLink ewView\" data-caption=\"" . ew_HtmlTitle($Language->Phrase("ViewLink")) . "\" href=\"" . ew_HtmlEncode($this->ViewUrl) . "\">" . $Language->Phrase("ViewLink") . "</a>";
 		else
 			$oListOpt->Body = "";
 
 		// "edit"
 		$oListOpt = &$this->ListOptions->Items["edit"];
-		if ($Security->IsLoggedIn()) {
+		if ($Security->CanEdit()) {
 			$oListOpt->Body = "<a class=\"ewRowLink ewEdit\" data-caption=\"" . ew_HtmlTitle($Language->Phrase("EditLink")) . "\" href=\"" . ew_HtmlEncode($this->EditUrl) . "\">" . $Language->Phrase("EditLink") . "</a>";
 		} else {
 			$oListOpt->Body = "";
@@ -876,7 +895,7 @@ class cparameter_list extends cparameter {
 
 		// "copy"
 		$oListOpt = &$this->ListOptions->Items["copy"];
-		if ($Security->IsLoggedIn()) {
+		if ($Security->CanAdd()) {
 			$oListOpt->Body = "<a class=\"ewRowLink ewCopy\" data-caption=\"" . ew_HtmlTitle($Language->Phrase("CopyLink")) . "\" href=\"" . ew_HtmlEncode($this->CopyUrl) . "\">" . $Language->Phrase("CopyLink") . "</a>";
 		} else {
 			$oListOpt->Body = "";
@@ -900,13 +919,13 @@ class cparameter_list extends cparameter {
 		// Add
 		$item = &$option->Add("add");
 		$item->Body = "<a class=\"ewAddEdit ewAdd\" href=\"" . ew_HtmlEncode($this->AddUrl) . "\">" . $Language->Phrase("AddLink") . "</a>";
-		$item->Visible = ($this->AddUrl <> "" && $Security->IsLoggedIn());
+		$item->Visible = ($this->AddUrl <> "" && $Security->CanAdd());
 		$option = $options["action"];
 
 		// Add multi delete
 		$item = &$option->Add("multidelete");
 		$item->Body = "<a class=\"ewAction ewMultiDelete\" href=\"\" onclick=\"ew_SubmitSelected(document.fparameterlist, '" . $this->MultiDeleteUrl . "', ewLanguage.Phrase('DeleteMultiConfirmMsg'));return false;\">" . $Language->Phrase("DeleteSelectedLink") . "</a>";
-		$item->Visible = ($Security->IsLoggedIn());
+		$item->Visible = ($Security->CanDelete());
 
 		// Set up options default
 		foreach ($options as &$option) {
@@ -1520,7 +1539,7 @@ class cparameter_list extends cparameter {
 	// Write Audit Trail start/end for grid update
 	function WriteAuditTrailDummy($typ) {
 		$table = 'parameter';
-	  $usr = CurrentUserName();
+	  $usr = CurrentUserID();
 		ew_WriteAuditTrail("log", ew_StdCurrentDateTime(), ew_ScriptName(), $usr, $typ, $table, "", "", "", "");
 	}
 
@@ -1701,7 +1720,7 @@ if (fparameterlistsrch) fparameterlistsrch.InitSearchPanel = true;
 		$parameter_list->Recordset = $parameter_list->LoadRecordset($parameter_list->StartRec-1, $parameter_list->DisplayRecs);
 $parameter_list->RenderOtherOptions();
 ?>
-<?php if ($Security->IsLoggedIn()) { ?>
+<?php if ($Security->CanSearch()) { ?>
 <?php if ($parameter->Export == "" && $parameter->CurrentAction == "") { ?>
 <form name="fparameterlistsrch" id="fparameterlistsrch" class="ewForm form-inline" action="<?php echo ew_CurrentPage() ?>">
 <table class="ewSearchTable"><tr><td>
@@ -1784,10 +1803,14 @@ $parameter_list->ShowMessage();
 </td>
 </tr></tbody></table>
 <?php } else { ?>
+	<?php if ($Security->CanList()) { ?>
 	<?php if ($parameter_list->SearchWhere == "0=101") { ?>
 	<p><?php echo $Language->Phrase("EnterSearchCriteria") ?></p>
 	<?php } else { ?>
 	<p><?php echo $Language->Phrase("NoRecord") ?></p>
+	<?php } ?>
+	<?php } else { ?>
+	<p><?php echo $Language->Phrase("NoPermission") ?></p>
 	<?php } ?>
 <?php } ?>
 </td>
@@ -2000,10 +2023,14 @@ if ($parameter_list->Recordset)
 </td>
 </tr></tbody></table>
 <?php } else { ?>
+	<?php if ($Security->CanList()) { ?>
 	<?php if ($parameter_list->SearchWhere == "0=101") { ?>
 	<p><?php echo $Language->Phrase("EnterSearchCriteria") ?></p>
 	<?php } else { ?>
 	<p><?php echo $Language->Phrase("NoRecord") ?></p>
+	<?php } ?>
+	<?php } else { ?>
+	<p><?php echo $Language->Phrase("NoPermission") ?></p>
 	<?php } ?>
 <?php } ?>
 </td>

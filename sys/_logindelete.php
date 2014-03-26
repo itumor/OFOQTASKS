@@ -205,6 +205,25 @@ class cp_login_delete extends c_login {
 			$Security->SaveLastUrl();
 			$this->Page_Terminate("login.php");
 		}
+		$Security->TablePermission_Loading();
+		$Security->LoadCurrentUserLevel($this->ProjectID . $this->TableName);
+		$Security->TablePermission_Loaded();
+		if (!$Security->IsLoggedIn()) {
+			$Security->SaveLastUrl();
+			$this->Page_Terminate("login.php");
+		}
+		if (!$Security->CanDelete()) {
+			$Security->SaveLastUrl();
+			$this->setFailureMessage($Language->Phrase("NoPermission")); // Set no permission
+			$this->Page_Terminate("_loginlist.php");
+		}
+		$Security->UserID_Loading();
+		if ($Security->IsLoggedIn()) $Security->LoadUserID();
+		$Security->UserID_Loaded();
+		if ($Security->IsLoggedIn() && strval($Security->CurrentUserID()) == "") {
+			$this->setFailureMessage($Language->Phrase("NoPermission")); // Set no permission
+			$this->Page_Terminate("_loginlist.php");
+		}
 		$this->CurrentAction = (@$_GET["a"] <> "") ? $_GET["a"] : @$_POST["a_list"]; // Set up curent action
 		$this->idlogin->Visible = !$this->IsAdd() && !$this->IsCopy() && !$this->IsGridAdd();
 
@@ -265,6 +284,24 @@ class cp_login_delete extends c_login {
 		// SQL constructor in _login class, _logininfo.php
 
 		$this->CurrentFilter = $sFilter;
+
+		// Check if valid user id
+		$sql = $this->GetSQL($this->CurrentFilter, "");
+		if ($this->Recordset = ew_LoadRecordset($sql)) {
+			$res = TRUE;
+			while (!$this->Recordset->EOF) {
+				$this->LoadRowValues($this->Recordset);
+				if (!$this->ShowOptionLink('delete')) {
+					$sUserIdMsg = $Language->Phrase("NoDeletePermission");
+					$this->setFailureMessage($sUserIdMsg);
+					$res = FALSE;
+					break;
+				}
+				$this->Recordset->MoveNext();
+			}
+			$this->Recordset->Close();
+			if (!$res) $this->Page_Terminate("_loginlist.php"); // Return to list
+		}
 
 		// Get action
 		if (@$_POST["a_delete"] <> "") {
@@ -339,6 +376,7 @@ class cp_login_delete extends c_login {
 		$this->_Email->setDbValue($rs->fields('Email'));
 		$this->Activated->setDbValue($rs->fields('Activated'));
 		$this->Profile->setDbValue($rs->fields('Profile'));
+		$this->levels->setDbValue($rs->fields('levels'));
 	}
 
 	// Load DbValue from recordset
@@ -351,6 +389,7 @@ class cp_login_delete extends c_login {
 		$this->_Email->DbValue = $row['Email'];
 		$this->Activated->DbValue = $row['Activated'];
 		$this->Profile->DbValue = $row['Profile'];
+		$this->levels->DbValue = $row['levels'];
 	}
 
 	// Render row values based on field settings
@@ -370,6 +409,7 @@ class cp_login_delete extends c_login {
 		// Email
 		// Activated
 		// Profile
+		// levels
 
 		if ($this->RowType == EW_ROWTYPE_VIEW) { // View row
 
@@ -396,6 +436,34 @@ class cp_login_delete extends c_login {
 			// Profile
 			$this->Profile->ViewValue = $this->Profile->CurrentValue;
 			$this->Profile->ViewCustomAttributes = "";
+
+			// levels
+			if ($Security->CanAdmin()) { // System admin
+			if (strval($this->levels->CurrentValue) <> "") {
+				$sFilterWrk = "`userlevelid`" . ew_SearchString("=", $this->levels->CurrentValue, EW_DATATYPE_NUMBER);
+			$sSqlWrk = "SELECT `userlevelid`, `userlevelname` AS `DispFld`, '' AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld` FROM `userlevels`";
+			$sWhereWrk = "";
+			if ($sFilterWrk <> "") {
+				ew_AddFilter($sWhereWrk, $sFilterWrk);
+			}
+
+			// Call Lookup selecting
+			$this->Lookup_Selecting($this->levels, $sWhereWrk);
+			if ($sWhereWrk <> "") $sSqlWrk .= " WHERE " . $sWhereWrk;
+				$rswrk = $conn->Execute($sSqlWrk);
+				if ($rswrk && !$rswrk->EOF) { // Lookup values found
+					$this->levels->ViewValue = $rswrk->fields('DispFld');
+					$rswrk->Close();
+				} else {
+					$this->levels->ViewValue = $this->levels->CurrentValue;
+				}
+			} else {
+				$this->levels->ViewValue = NULL;
+			}
+			} else {
+				$this->levels->ViewValue = "********";
+			}
+			$this->levels->ViewCustomAttributes = "";
 
 			// idlogin
 			$this->idlogin->LinkCustomAttributes = "";
@@ -426,6 +494,11 @@ class cp_login_delete extends c_login {
 			$this->Profile->LinkCustomAttributes = "";
 			$this->Profile->HrefValue = "";
 			$this->Profile->TooltipValue = "";
+
+			// levels
+			$this->levels->LinkCustomAttributes = "";
+			$this->levels->HrefValue = "";
+			$this->levels->TooltipValue = "";
 		}
 
 		// Call Row Rendered event
@@ -438,6 +511,10 @@ class cp_login_delete extends c_login {
 	//
 	function DeleteRows() {
 		global $conn, $Language, $Security;
+		if (!$Security->CanDelete()) {
+			$this->setFailureMessage($Language->Phrase("NoDeletePermission")); // No delete permission
+			return FALSE;
+		}
 		$DeleteRows = TRUE;
 		$sSql = $this->SQL();
 		$conn->raiseErrorFn = 'ew_ErrorFn';
@@ -518,6 +595,14 @@ class cp_login_delete extends c_login {
 		return $DeleteRows;
 	}
 
+	// Show link optionally based on User ID
+	function ShowOptionLink($id = "") {
+		global $Security;
+		if ($Security->IsLoggedIn() && !$Security->IsAdmin() && !$this->UserIDAllow($id))
+			return $Security->IsValidUserID($this->idlogin->CurrentValue);
+		return TRUE;
+	}
+
 	// Set up Breadcrumb
 	function SetupBreadcrumb() {
 		global $Breadcrumb, $Language;
@@ -531,7 +616,7 @@ class cp_login_delete extends c_login {
 	// Write Audit Trail start/end for grid update
 	function WriteAuditTrailDummy($typ) {
 		$table = 'login';
-	  $usr = CurrentUserName();
+	  $usr = CurrentUserID();
 		ew_WriteAuditTrail("log", ew_StdCurrentDateTime(), ew_ScriptName(), $usr, $typ, $table, "", "", "", "");
 	}
 
@@ -549,7 +634,7 @@ class cp_login_delete extends c_login {
 		// Write Audit Trail
 		$dt = ew_StdCurrentDateTime();
 		$id = ew_ScriptName();
-	  $curUser = CurrentUserName();
+	  $curUser = CurrentUserID();
 		foreach (array_keys($rs) as $fldname) {
 			if (array_key_exists($fldname, $this->fields) && $this->fields[$fldname]->FldDataType <> EW_DATATYPE_BLOB) { // Ignore BLOB fields
 				if ($this->fields[$fldname]->FldDataType == EW_DATATYPE_MEMO) {
@@ -673,8 +758,9 @@ f_logindelete.ValidateRequired = false;
 <?php } ?>
 
 // Dynamic selection lists
-// Form object for search
+f_logindelete.Lists["x_levels"] = {"LinkField":"x_userlevelid","Ajax":null,"AutoFill":false,"DisplayFields":["x_userlevelname","","",""],"ParentFields":[],"FilterFields":[],"Options":[]};
 
+// Form object for search
 </script>
 <script type="text/javascript">
 
@@ -726,6 +812,9 @@ $p_login_delete->ShowMessage();
 <?php } ?>
 <?php if ($_login->Profile->Visible) { // Profile ?>
 		<td><span id="elh__login_Profile" class="_login_Profile"><?php echo $_login->Profile->FldCaption() ?></span></td>
+<?php } ?>
+<?php if ($_login->levels->Visible) { // levels ?>
+		<td><span id="elh__login_levels" class="_login_levels"><?php echo $_login->levels->FldCaption() ?></span></td>
 <?php } ?>
 	</tr>
 	</thead>
@@ -793,6 +882,14 @@ while (!$p_login_delete->Recordset->EOF) {
 <span id="el<?php echo $p_login_delete->RowCnt ?>__login_Profile" class="control-group _login_Profile">
 <span<?php echo $_login->Profile->ViewAttributes() ?>>
 <?php echo $_login->Profile->ListViewValue() ?></span>
+</span>
+</td>
+<?php } ?>
+<?php if ($_login->levels->Visible) { // levels ?>
+		<td<?php echo $_login->levels->CellAttributes() ?>>
+<span id="el<?php echo $p_login_delete->RowCnt ?>__login_levels" class="control-group _login_levels">
+<span<?php echo $_login->levels->ViewAttributes() ?>>
+<?php echo $_login->levels->ListViewValue() ?></span>
 </span>
 </td>
 <?php } ?>

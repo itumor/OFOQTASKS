@@ -18,4 +18,5 @@ function Page_Unloaded() {
 
 	//echo "Page Unloaded";
 }
+include_once "ofoq_tasks/func_tasks.php";
 ?>

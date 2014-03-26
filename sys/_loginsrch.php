@@ -204,6 +204,25 @@ class cp_login_search extends c_login {
 			$Security->SaveLastUrl();
 			$this->Page_Terminate("login.php");
 		}
+		$Security->TablePermission_Loading();
+		$Security->LoadCurrentUserLevel($this->ProjectID . $this->TableName);
+		$Security->TablePermission_Loaded();
+		if (!$Security->IsLoggedIn()) {
+			$Security->SaveLastUrl();
+			$this->Page_Terminate("login.php");
+		}
+		if (!$Security->CanSearch()) {
+			$Security->SaveLastUrl();
+			$this->setFailureMessage($Language->Phrase("NoPermission")); // Set no permission
+			$this->Page_Terminate("_loginlist.php");
+		}
+		$Security->UserID_Loading();
+		if ($Security->IsLoggedIn()) $Security->LoadUserID();
+		$Security->UserID_Loaded();
+		if ($Security->IsLoggedIn() && strval($Security->CurrentUserID()) == "") {
+			$this->setFailureMessage($Language->Phrase("NoPermission")); // Set no permission
+			$this->Page_Terminate("_loginlist.php");
+		}
 
 		// Create form object
 		$objForm = new cFormObj();
@@ -291,6 +310,7 @@ class cp_login_search extends c_login {
 		$this->BuildSearchUrl($sSrchUrl, $this->_Email); // Email
 		$this->BuildSearchUrl($sSrchUrl, $this->Activated); // Activated
 		$this->BuildSearchUrl($sSrchUrl, $this->Profile); // Profile
+		$this->BuildSearchUrl($sSrchUrl, $this->levels); // levels
 		if ($sSrchUrl <> "") $sSrchUrl .= "&";
 		$sSrchUrl .= "cmd=search";
 		return $sSrchUrl;
@@ -380,6 +400,10 @@ class cp_login_search extends c_login {
 		// Profile
 		$this->Profile->AdvancedSearch->SearchValue = ew_StripSlashes($objForm->GetValue("x_Profile"));
 		$this->Profile->AdvancedSearch->SearchOperator = $objForm->GetValue("z_Profile");
+
+		// levels
+		$this->levels->AdvancedSearch->SearchValue = ew_StripSlashes($objForm->GetValue("x_levels"));
+		$this->levels->AdvancedSearch->SearchOperator = $objForm->GetValue("z_levels");
 	}
 
 	// Render row values based on field settings
@@ -399,6 +423,7 @@ class cp_login_search extends c_login {
 		// Email
 		// Activated
 		// Profile
+		// levels
 
 		if ($this->RowType == EW_ROWTYPE_VIEW) { // View row
 
@@ -425,6 +450,34 @@ class cp_login_search extends c_login {
 			// Profile
 			$this->Profile->ViewValue = $this->Profile->CurrentValue;
 			$this->Profile->ViewCustomAttributes = "";
+
+			// levels
+			if ($Security->CanAdmin()) { // System admin
+			if (strval($this->levels->CurrentValue) <> "") {
+				$sFilterWrk = "`userlevelid`" . ew_SearchString("=", $this->levels->CurrentValue, EW_DATATYPE_NUMBER);
+			$sSqlWrk = "SELECT `userlevelid`, `userlevelname` AS `DispFld`, '' AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld` FROM `userlevels`";
+			$sWhereWrk = "";
+			if ($sFilterWrk <> "") {
+				ew_AddFilter($sWhereWrk, $sFilterWrk);
+			}
+
+			// Call Lookup selecting
+			$this->Lookup_Selecting($this->levels, $sWhereWrk);
+			if ($sWhereWrk <> "") $sSqlWrk .= " WHERE " . $sWhereWrk;
+				$rswrk = $conn->Execute($sSqlWrk);
+				if ($rswrk && !$rswrk->EOF) { // Lookup values found
+					$this->levels->ViewValue = $rswrk->fields('DispFld');
+					$rswrk->Close();
+				} else {
+					$this->levels->ViewValue = $this->levels->CurrentValue;
+				}
+			} else {
+				$this->levels->ViewValue = NULL;
+			}
+			} else {
+				$this->levels->ViewValue = "********";
+			}
+			$this->levels->ViewCustomAttributes = "";
 
 			// idlogin
 			$this->idlogin->LinkCustomAttributes = "";
@@ -455,12 +508,23 @@ class cp_login_search extends c_login {
 			$this->Profile->LinkCustomAttributes = "";
 			$this->Profile->HrefValue = "";
 			$this->Profile->TooltipValue = "";
+
+			// levels
+			$this->levels->LinkCustomAttributes = "";
+			$this->levels->HrefValue = "";
+			$this->levels->TooltipValue = "";
 		} elseif ($this->RowType == EW_ROWTYPE_SEARCH) { // Search row
 
 			// idlogin
 			$this->idlogin->EditCustomAttributes = "";
+			if (!$Security->IsAdmin() && $Security->IsLoggedIn() && !$this->UserIDAllow("search")) { // Non system admin
+				$this->idlogin->AdvancedSearch->SearchValue = CurrentUserID();
+			$this->idlogin->EditValue = $this->idlogin->AdvancedSearch->SearchValue;
+			$this->idlogin->ViewCustomAttributes = "";
+			} else {
 			$this->idlogin->EditValue = ew_HtmlEncode($this->idlogin->AdvancedSearch->SearchValue);
 			$this->idlogin->PlaceHolder = ew_HtmlEncode(ew_RemoveHtml($this->idlogin->FldCaption()));
+			}
 
 			// loginname
 			$this->loginname->EditCustomAttributes = "";
@@ -485,6 +549,28 @@ class cp_login_search extends c_login {
 			$this->Profile->EditCustomAttributes = "";
 			$this->Profile->EditValue = $this->Profile->AdvancedSearch->SearchValue;
 			$this->Profile->PlaceHolder = ew_HtmlEncode(ew_RemoveHtml($this->Profile->FldCaption()));
+
+			// levels
+			$this->levels->EditCustomAttributes = "";
+			if (!$Security->CanAdmin()) { // System admin
+				$this->levels->EditValue = "********";
+			} else {
+			$sFilterWrk = "";
+			$sSqlWrk = "SELECT `userlevelid`, `userlevelname` AS `DispFld`, '' AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld`, '' AS `SelectFilterFld`, '' AS `SelectFilterFld2`, '' AS `SelectFilterFld3`, '' AS `SelectFilterFld4` FROM `userlevels`";
+			$sWhereWrk = "";
+			if ($sFilterWrk <> "") {
+				ew_AddFilter($sWhereWrk, $sFilterWrk);
+			}
+
+			// Call Lookup selecting
+			$this->Lookup_Selecting($this->levels, $sWhereWrk);
+			if ($sWhereWrk <> "") $sSqlWrk .= " WHERE " . $sWhereWrk;
+			$rswrk = $conn->Execute($sSqlWrk);
+			$arwrk = ($rswrk) ? $rswrk->GetRows() : array();
+			if ($rswrk) $rswrk->Close();
+			array_unshift($arwrk, array("", $Language->Phrase("PleaseSelect"), "", "", "", "", "", "", ""));
+			$this->levels->EditValue = $arwrk;
+			}
 		}
 		if ($this->RowType == EW_ROWTYPE_ADD ||
 			$this->RowType == EW_ROWTYPE_EDIT ||
@@ -531,6 +617,7 @@ class cp_login_search extends c_login {
 		$this->_Email->AdvancedSearch->Load();
 		$this->Activated->AdvancedSearch->Load();
 		$this->Profile->AdvancedSearch->Load();
+		$this->levels->AdvancedSearch->Load();
 	}
 
 	// Set up Breadcrumb
@@ -656,6 +743,8 @@ f_loginsearch.ValidateRequired = false;
 <?php } ?>
 
 // Dynamic selection lists
+f_loginsearch.Lists["x_levels"] = {"LinkField":"x_userlevelid","Ajax":null,"AutoFill":false,"DisplayFields":["x_userlevelname","","",""],"ParentFields":[],"FilterFields":[],"Options":[]};
+
 // Form object for search
 // Validate function for search
 
@@ -716,7 +805,13 @@ $p_login_search->ShowMessage();
 		<td<?php echo $_login->idlogin->CellAttributes() ?>>
 			<div style="white-space: nowrap;">
 				<span id="el__login_idlogin" class="control-group">
+<?php if (!$Security->IsAdmin() && $Security->IsLoggedIn() && !$_login->UserIDAllow("search")) { // Non system admin ?>
+<span<?php echo $_login->idlogin->ViewAttributes() ?>>
+<?php echo $_login->idlogin->EditValue ?></span>
+<input type="hidden" data-field="x_idlogin" name="x_idlogin" id="x_idlogin" value="<?php echo ew_HtmlEncode($_login->idlogin->AdvancedSearch->SearchValue) ?>">
+<?php } else { ?>
 <input type="text" data-field="x_idlogin" name="x_idlogin" id="x_idlogin" size="30" placeholder="<?php echo $_login->idlogin->PlaceHolder ?>" value="<?php echo $_login->idlogin->EditValue ?>"<?php echo $_login->idlogin->EditAttributes() ?>>
+<?php } ?>
 </span>
 			</div>
 		</td>
@@ -782,6 +877,43 @@ $p_login_search->ShowMessage();
 			<div style="white-space: nowrap;">
 				<span id="el__login_Profile" class="control-group">
 <input type="text" data-field="x_Profile" name="x_Profile" id="x_Profile" size="30" maxlength="255" placeholder="<?php echo $_login->Profile->PlaceHolder ?>" value="<?php echo $_login->Profile->EditValue ?>"<?php echo $_login->Profile->EditAttributes() ?>>
+</span>
+			</div>
+		</td>
+	</tr>
+<?php } ?>
+<?php if ($_login->levels->Visible) { // levels ?>
+	<tr id="r_levels">
+		<td><span id="elh__login_levels"><?php echo $_login->levels->FldCaption() ?></span></td>
+		<td><span class="ewSearchOperator"><?php echo $Language->Phrase("=") ?><input type="hidden" name="z_levels" id="z_levels" value="="></span></td>
+		<td<?php echo $_login->levels->CellAttributes() ?>>
+			<div style="white-space: nowrap;">
+				<span id="el__login_levels" class="control-group">
+<?php if (!$Security->IsAdmin() && $Security->IsLoggedIn()) { // Non system admin ?>
+<?php echo $_login->levels->EditValue ?>
+<?php } else { ?>
+<select data-field="x_levels" id="x_levels" name="x_levels"<?php echo $_login->levels->EditAttributes() ?>>
+<?php
+if (is_array($_login->levels->EditValue)) {
+	$arwrk = $_login->levels->EditValue;
+	$rowswrk = count($arwrk);
+	$emptywrk = TRUE;
+	for ($rowcntwrk = 0; $rowcntwrk < $rowswrk; $rowcntwrk++) {
+		$selwrk = (strval($_login->levels->AdvancedSearch->SearchValue) == strval($arwrk[$rowcntwrk][0])) ? " selected=\"selected\"" : "";
+		if ($selwrk <> "") $emptywrk = FALSE;
+?>
+<option value="<?php echo ew_HtmlEncode($arwrk[$rowcntwrk][0]) ?>"<?php echo $selwrk ?>>
+<?php echo $arwrk[$rowcntwrk][1] ?>
+</option>
+<?php
+	}
+}
+?>
+</select>
+<script type="text/javascript">
+f_loginsearch.Lists["x_levels"].Options = <?php echo (is_array($_login->levels->EditValue)) ? ew_ArrayToJson($_login->levels->EditValue, 1) : "[]" ?>;
+</script>
+<?php } ?>
 </span>
 			</div>
 		</td>

@@ -277,6 +277,21 @@ class ccommand_list extends ccommand {
 			$Security->SaveLastUrl();
 			$this->Page_Terminate("login.php");
 		}
+		$Security->TablePermission_Loading();
+		$Security->LoadCurrentUserLevel($this->ProjectID . $this->TableName);
+		$Security->TablePermission_Loaded();
+		if (!$Security->IsLoggedIn()) {
+			$Security->SaveLastUrl();
+			$this->Page_Terminate("login.php");
+		}
+		if (!$Security->CanList()) {
+			$Security->SaveLastUrl();
+			$this->setFailureMessage($Language->Phrase("NoPermission")); // Set no permission
+			$this->Page_Terminate("login.php");
+		}
+		$Security->UserID_Loading();
+		if ($Security->IsLoggedIn()) $Security->LoadUserID();
+		$Security->UserID_Loaded();
 
 		// Get export parameters
 		if (@$_GET["export"] <> "") {
@@ -433,6 +448,9 @@ class ccommand_list extends ccommand {
 					$option->HideAllOptions();
 			}
 
+			// Get basic search values
+			$this->LoadBasicSearchValues();
+
 			// Get and validate search values for advanced search
 			$this->LoadSearchValues(); // Get search values
 			if (!$this->ValidateSearch())
@@ -447,6 +465,10 @@ class ccommand_list extends ccommand {
 
 			// Set up sorting order
 			$this->SetUpSortOrder();
+
+			// Get basic search criteria
+			if ($gsSearchError == "")
+				$sSrchBasic = $this->BasicSearchWhere();
 
 			// Get search criteria for advanced search
 			if ($gsSearchError == "")
@@ -465,6 +487,11 @@ class ccommand_list extends ccommand {
 
 		// Load search default if no existing search criteria
 		if (!$this->CheckSearchParms()) {
+
+			// Load basic search from default
+			$this->BasicSearch->LoadDefault();
+			if ($this->BasicSearch->Keyword != "")
+				$sSrchBasic = $this->BasicSearchWhere();
 
 			// Load advanced search from default
 			if ($this->LoadAdvancedSearchDefault()) {
@@ -490,6 +517,8 @@ class ccommand_list extends ccommand {
 
 		// Build filter
 		$sFilter = "";
+		if (!$Security->CanList())
+			$sFilter = "(0=1)"; // Filter all records
 		ew_AddFilter($sFilter, $this->DbDetailFilter);
 		ew_AddFilter($sFilter, $this->SearchWhere);
 
@@ -568,6 +597,7 @@ class ccommand_list extends ccommand {
 	function AdvancedSearchWhere() {
 		global $Security;
 		$sWhere = "";
+		if (!$Security->CanSearch()) return "";
 		$this->BuildSearchSql($sWhere, $this->command_id, FALSE); // command_id
 		$this->BuildSearchSql($sWhere, $this->user_id, FALSE); // user_id
 		$this->BuildSearchSql($sWhere, $this->task_id, FALSE); // task_id
@@ -645,8 +675,66 @@ class ccommand_list extends ccommand {
 		return $Value;
 	}
 
+	// Return basic search SQL
+	function BasicSearchSQL($Keyword) {
+		$sKeyword = ew_AdjustSql($Keyword);
+		$sWhere = "";
+		$this->BuildBasicSearchSQL($sWhere, $this->command_input, $Keyword);
+		$this->BuildBasicSearchSQL($sWhere, $this->command_output, $Keyword);
+		$this->BuildBasicSearchSQL($sWhere, $this->command_status, $Keyword);
+		$this->BuildBasicSearchSQL($sWhere, $this->command_log, $Keyword);
+		return $sWhere;
+	}
+
+	// Build basic search SQL
+	function BuildBasicSearchSql(&$Where, &$Fld, $Keyword) {
+		if ($Keyword == EW_NULL_VALUE) {
+			$sWrk = $Fld->FldExpression . " IS NULL";
+		} elseif ($Keyword == EW_NOT_NULL_VALUE) {
+			$sWrk = $Fld->FldExpression . " IS NOT NULL";
+		} else {
+			$sFldExpression = ($Fld->FldVirtualExpression <> $Fld->FldExpression) ? $Fld->FldVirtualExpression : $Fld->FldBasicSearchExpression;
+			$sWrk = $sFldExpression . ew_Like(ew_QuotedValue("%" . $Keyword . "%", EW_DATATYPE_STRING));
+		}
+		if ($Where <> "") $Where .= " OR ";
+		$Where .= $sWrk;
+	}
+
+	// Return basic search WHERE clause based on search keyword and type
+	function BasicSearchWhere() {
+		global $Security;
+		$sSearchStr = "";
+		if (!$Security->CanSearch()) return "";
+		$sSearchKeyword = $this->BasicSearch->Keyword;
+		$sSearchType = $this->BasicSearch->Type;
+		if ($sSearchKeyword <> "") {
+			$sSearch = trim($sSearchKeyword);
+			if ($sSearchType <> "=") {
+				while (strpos($sSearch, "  ") !== FALSE)
+					$sSearch = str_replace("  ", " ", $sSearch);
+				$arKeyword = explode(" ", trim($sSearch));
+				foreach ($arKeyword as $sKeyword) {
+					if ($sSearchStr <> "") $sSearchStr .= " " . $sSearchType . " ";
+					$sSearchStr .= "(" . $this->BasicSearchSQL($sKeyword) . ")";
+				}
+			} else {
+				$sSearchStr = $this->BasicSearchSQL($sSearch);
+			}
+			$this->Command = "search";
+		}
+		if ($this->Command == "search") {
+			$this->BasicSearch->setKeyword($sSearchKeyword);
+			$this->BasicSearch->setType($sSearchType);
+		}
+		return $sSearchStr;
+	}
+
 	// Check if search parm exists
 	function CheckSearchParms() {
+
+		// Check basic search
+		if ($this->BasicSearch->IssetSession())
+			return TRUE;
 		if ($this->command_id->AdvancedSearch->IssetSession())
 			return TRUE;
 		if ($this->user_id->AdvancedSearch->IssetSession())
@@ -675,6 +763,9 @@ class ccommand_list extends ccommand {
 		$this->SearchWhere = "";
 		$this->setSearchWhere($this->SearchWhere);
 
+		// Clear basic search parameters
+		$this->ResetBasicSearchParms();
+
 		// Clear advanced search parameters
 		$this->ResetAdvancedSearchParms();
 	}
@@ -682,6 +773,11 @@ class ccommand_list extends ccommand {
 	// Load advanced search default values
 	function LoadAdvancedSearchDefault() {
 		return FALSE;
+	}
+
+	// Clear all basic search parameters
+	function ResetBasicSearchParms() {
+		$this->BasicSearch->UnsetSession();
 	}
 
 	// Clear all advanced search parameters
@@ -700,6 +796,9 @@ class ccommand_list extends ccommand {
 	// Restore all search parameters
 	function RestoreSearchParms() {
 		$this->RestoreSearch = TRUE;
+
+		// Restore basic search values
+		$this->BasicSearch->Load();
 
 		// Restore advanced search values
 		$this->command_id->AdvancedSearch->Load();
@@ -724,6 +823,10 @@ class ccommand_list extends ccommand {
 			$this->UpdateSort($this->user_id); // user_id
 			$this->UpdateSort($this->task_id); // task_id
 			$this->UpdateSort($this->server_id); // server_id
+			$this->UpdateSort($this->command_input); // command_input
+			$this->UpdateSort($this->command_output); // command_output
+			$this->UpdateSort($this->command_status); // command_status
+			$this->UpdateSort($this->command_log); // command_log
 			$this->UpdateSort($this->command_time); // command_time
 			$this->setStartRecordNumber(1); // Reset start position
 		}
@@ -761,6 +864,10 @@ class ccommand_list extends ccommand {
 				$this->user_id->setSort("");
 				$this->task_id->setSort("");
 				$this->server_id->setSort("");
+				$this->command_input->setSort("");
+				$this->command_output->setSort("");
+				$this->command_status->setSort("");
+				$this->command_log->setSort("");
 				$this->command_time->setSort("");
 			}
 
@@ -783,24 +890,24 @@ class ccommand_list extends ccommand {
 		// "view"
 		$item = &$this->ListOptions->Add("view");
 		$item->CssStyle = "white-space: nowrap;";
-		$item->Visible = $Security->IsLoggedIn();
+		$item->Visible = $Security->CanView();
 		$item->OnLeft = TRUE;
 
 		// "edit"
 		$item = &$this->ListOptions->Add("edit");
 		$item->CssStyle = "white-space: nowrap;";
-		$item->Visible = $Security->IsLoggedIn();
+		$item->Visible = $Security->CanEdit();
 		$item->OnLeft = TRUE;
 
 		// "copy"
 		$item = &$this->ListOptions->Add("copy");
 		$item->CssStyle = "white-space: nowrap;";
-		$item->Visible = $Security->IsLoggedIn();
+		$item->Visible = $Security->CanAdd();
 		$item->OnLeft = TRUE;
 
 		// "checkbox"
 		$item = &$this->ListOptions->Add("checkbox");
-		$item->Visible = $Security->IsLoggedIn();
+		$item->Visible = $Security->CanDelete();
 		$item->OnLeft = TRUE;
 		$item->Header = "<label class=\"checkbox\"><input type=\"checkbox\" name=\"key\" id=\"key\" onclick=\"ew_SelectAllKey(this);\"></label>";
 		$item->MoveTo(0);
@@ -826,14 +933,14 @@ class ccommand_list extends ccommand {
 
 		// "view"
 		$oListOpt = &$this->ListOptions->Items["view"];
-		if ($Security->IsLoggedIn())
+		if ($Security->CanView())
 			$oListOpt->Body = "<a class=\"ewRowLink ewView\" data-caption=\"" . ew_HtmlTitle($Language->Phrase("ViewLink")) . "\" href=\"" . ew_HtmlEncode($this->ViewUrl) . "\">" . $Language->Phrase("ViewLink") . "</a>";
 		else
 			$oListOpt->Body = "";
 
 		// "edit"
 		$oListOpt = &$this->ListOptions->Items["edit"];
-		if ($Security->IsLoggedIn()) {
+		if ($Security->CanEdit()) {
 			$oListOpt->Body = "<a class=\"ewRowLink ewEdit\" data-caption=\"" . ew_HtmlTitle($Language->Phrase("EditLink")) . "\" href=\"" . ew_HtmlEncode($this->EditUrl) . "\">" . $Language->Phrase("EditLink") . "</a>";
 		} else {
 			$oListOpt->Body = "";
@@ -841,7 +948,7 @@ class ccommand_list extends ccommand {
 
 		// "copy"
 		$oListOpt = &$this->ListOptions->Items["copy"];
-		if ($Security->IsLoggedIn()) {
+		if ($Security->CanAdd()) {
 			$oListOpt->Body = "<a class=\"ewRowLink ewCopy\" data-caption=\"" . ew_HtmlTitle($Language->Phrase("CopyLink")) . "\" href=\"" . ew_HtmlEncode($this->CopyUrl) . "\">" . $Language->Phrase("CopyLink") . "</a>";
 		} else {
 			$oListOpt->Body = "";
@@ -865,13 +972,13 @@ class ccommand_list extends ccommand {
 		// Add
 		$item = &$option->Add("add");
 		$item->Body = "<a class=\"ewAddEdit ewAdd\" href=\"" . ew_HtmlEncode($this->AddUrl) . "\">" . $Language->Phrase("AddLink") . "</a>";
-		$item->Visible = ($this->AddUrl <> "" && $Security->IsLoggedIn());
+		$item->Visible = ($this->AddUrl <> "" && $Security->CanAdd());
 		$option = $options["action"];
 
 		// Add multi delete
 		$item = &$option->Add("multidelete");
 		$item->Body = "<a class=\"ewAction ewMultiDelete\" href=\"\" onclick=\"ew_SubmitSelected(document.fcommandlist, '" . $this->MultiDeleteUrl . "', ewLanguage.Phrase('DeleteMultiConfirmMsg'));return false;\">" . $Language->Phrase("DeleteSelectedLink") . "</a>";
-		$item->Visible = ($Security->IsLoggedIn());
+		$item->Visible = ($Security->CanDelete());
 
 		// Set up options default
 		foreach ($options as &$option) {
@@ -994,6 +1101,13 @@ class ccommand_list extends ccommand {
 			$this->StartRec = intval(($this->StartRec-1)/$this->DisplayRecs)*$this->DisplayRecs+1; // Point to page boundary
 			$this->setStartRecordNumber($this->StartRec);
 		}
+	}
+
+	// Load basic search values
+	function LoadBasicSearchValues() {
+		$this->BasicSearch->Keyword = @$_GET[EW_TABLE_BASIC_SEARCH];
+		if ($this->BasicSearch->Keyword <> "") $this->Command = "search";
+		$this->BasicSearch->Type = @$_GET[EW_TABLE_BASIC_SEARCH_TYPE];
 	}
 
 	//  Load search values for validation
@@ -1230,6 +1344,22 @@ class ccommand_list extends ccommand {
 			}
 			$this->server_id->ViewCustomAttributes = "";
 
+			// command_input
+			$this->command_input->ViewValue = $this->command_input->CurrentValue;
+			$this->command_input->ViewCustomAttributes = "";
+
+			// command_output
+			$this->command_output->ViewValue = $this->command_output->CurrentValue;
+			$this->command_output->ViewCustomAttributes = "";
+
+			// command_status
+			$this->command_status->ViewValue = $this->command_status->CurrentValue;
+			$this->command_status->ViewCustomAttributes = "";
+
+			// command_log
+			$this->command_log->ViewValue = $this->command_log->CurrentValue;
+			$this->command_log->ViewCustomAttributes = "";
+
 			// command_time
 			$this->command_time->ViewValue = $this->command_time->CurrentValue;
 			$this->command_time->ViewValue = ew_FormatDateTime($this->command_time->ViewValue, 11);
@@ -1254,6 +1384,34 @@ class ccommand_list extends ccommand {
 			$this->server_id->LinkCustomAttributes = "";
 			$this->server_id->HrefValue = "";
 			$this->server_id->TooltipValue = "";
+
+			// command_input
+			$this->command_input->LinkCustomAttributes = "";
+			$this->command_input->HrefValue = "";
+			$this->command_input->TooltipValue = "";
+			if ($this->Export == "")
+				$this->command_input->ViewValue = ew_Highlight($this->HighlightName(), $this->command_input->ViewValue, $this->BasicSearch->getKeyword(), $this->BasicSearch->getType(), $this->command_input->AdvancedSearch->getValue("x"), "");
+
+			// command_output
+			$this->command_output->LinkCustomAttributes = "";
+			$this->command_output->HrefValue = "";
+			$this->command_output->TooltipValue = "";
+			if ($this->Export == "")
+				$this->command_output->ViewValue = ew_Highlight($this->HighlightName(), $this->command_output->ViewValue, $this->BasicSearch->getKeyword(), $this->BasicSearch->getType(), $this->command_output->AdvancedSearch->getValue("x"), "");
+
+			// command_status
+			$this->command_status->LinkCustomAttributes = "";
+			$this->command_status->HrefValue = "";
+			$this->command_status->TooltipValue = "";
+			if ($this->Export == "")
+				$this->command_status->ViewValue = ew_Highlight($this->HighlightName(), $this->command_status->ViewValue, $this->BasicSearch->getKeyword(), $this->BasicSearch->getType(), $this->command_status->AdvancedSearch->getValue("x"), "");
+
+			// command_log
+			$this->command_log->LinkCustomAttributes = "";
+			$this->command_log->HrefValue = "";
+			$this->command_log->TooltipValue = "";
+			if ($this->Export == "")
+				$this->command_log->ViewValue = ew_Highlight($this->HighlightName(), $this->command_log->ViewValue, $this->BasicSearch->getKeyword(), $this->BasicSearch->getType(), $this->command_log->AdvancedSearch->getValue("x"), "");
 
 			// command_time
 			$this->command_time->LinkCustomAttributes = "";
@@ -1528,6 +1686,9 @@ class ccommand_list extends ccommand {
 		$sQry = "export=html";
 
 		// Build QueryString for search
+		if ($this->BasicSearch->getKeyword() <> "") {
+			$sQry .= "&" . EW_TABLE_BASIC_SEARCH . "=" . urlencode($this->BasicSearch->getKeyword()) . "&" . EW_TABLE_BASIC_SEARCH_TYPE . "=" . urlencode($this->BasicSearch->getType());
+		}
 		$this->AddSearchQueryString($sQry, $this->command_id); // command_id
 		$this->AddSearchQueryString($sQry, $this->user_id); // user_id
 		$this->AddSearchQueryString($sQry, $this->task_id); // task_id
@@ -1572,7 +1733,7 @@ class ccommand_list extends ccommand {
 	// Write Audit Trail start/end for grid update
 	function WriteAuditTrailDummy($typ) {
 		$table = 'command';
-	  $usr = CurrentUserName();
+	  $usr = CurrentUserID();
 		ew_WriteAuditTrail("log", ew_StdCurrentDateTime(), ew_ScriptName(), $usr, $typ, $table, "", "", "", "");
 	}
 
@@ -1754,7 +1915,7 @@ if (fcommandlistsrch) fcommandlistsrch.InitSearchPanel = true;
 		$command_list->Recordset = $command_list->LoadRecordset($command_list->StartRec-1, $command_list->DisplayRecs);
 $command_list->RenderOtherOptions();
 ?>
-<?php if ($Security->IsLoggedIn()) { ?>
+<?php if ($Security->CanSearch()) { ?>
 <?php if ($command->Export == "" && $command->CurrentAction == "") { ?>
 <form name="fcommandlistsrch" id="fcommandlistsrch" class="ewForm form-inline" action="<?php echo ew_CurrentPage() ?>">
 <table class="ewSearchTable"><tr><td>
@@ -1771,12 +1932,23 @@ $command_list->RenderOtherOptions();
 <div class="ewBasicSearch">
 <div id="xsr_1" class="ewRow">
 	<div class="btn-group ewButtonGroup">
+	<div class="input-append">
+	<input type="text" name="<?php echo EW_TABLE_BASIC_SEARCH ?>" id="<?php echo EW_TABLE_BASIC_SEARCH ?>" class="input-large" value="<?php echo ew_HtmlEncode($command_list->BasicSearch->getKeyword()) ?>" placeholder="<?php echo $Language->Phrase("Search") ?>">
+	<button class="btn btn-primary ewButton" name="btnsubmit" id="btnsubmit" type="submit"><?php echo $Language->Phrase("QuickSearchBtn") ?></button>
+	</div>
+	</div>
+	<div class="btn-group ewButtonGroup">
 	<a class="btn ewShowAll" href="<?php echo $command_list->PageUrl() ?>cmd=reset"><?php echo $Language->Phrase("ShowAll") ?></a>
 	<a class="btn ewAdvancedSearch" href="commandsrch.php"><?php echo $Language->Phrase("AdvancedSearch") ?></a>
 	<?php if ($command_list->SearchWhere <> "" && $command_list->TotalRecs > 0) { ?>
 	<a class="btn ewHideHighlight" href="javascript:void(0);" onclick="ewForms(this).ToggleHighlight(this, '<?php echo $command->HighlightName() ?>');"><?php echo $Language->Phrase("HideHighlight") ?></a>
 	<?php } ?>
 	</div>
+</div>
+<div id="xsr_2" class="ewRow">
+	<label class="inline radio ewRadio" style="white-space: nowrap;"><input type="radio" name="<?php echo EW_TABLE_BASIC_SEARCH_TYPE ?>" value="="<?php if ($command_list->BasicSearch->getType() == "=") { ?> checked="checked"<?php } ?>><?php echo $Language->Phrase("ExactPhrase") ?></label>
+	<label class="inline radio ewRadio" style="white-space: nowrap;"><input type="radio" name="<?php echo EW_TABLE_BASIC_SEARCH_TYPE ?>" value="AND"<?php if ($command_list->BasicSearch->getType() == "AND") { ?> checked="checked"<?php } ?>><?php echo $Language->Phrase("AllWord") ?></label>
+	<label class="inline radio ewRadio" style="white-space: nowrap;"><input type="radio" name="<?php echo EW_TABLE_BASIC_SEARCH_TYPE ?>" value="OR"<?php if ($command_list->BasicSearch->getType() == "OR") { ?> checked="checked"<?php } ?>><?php echo $Language->Phrase("AnyWord") ?></label>
 </div>
 </div>
 </div>
@@ -1826,10 +1998,14 @@ $command_list->ShowMessage();
 </td>
 </tr></tbody></table>
 <?php } else { ?>
+	<?php if ($Security->CanList()) { ?>
 	<?php if ($command_list->SearchWhere == "0=101") { ?>
 	<p><?php echo $Language->Phrase("EnterSearchCriteria") ?></p>
 	<?php } else { ?>
 	<p><?php echo $Language->Phrase("NoRecord") ?></p>
+	<?php } ?>
+	<?php } else { ?>
+	<p><?php echo $Language->Phrase("NoPermission") ?></p>
 	<?php } ?>
 <?php } ?>
 </td>
@@ -1906,6 +2082,42 @@ $command_list->ListOptions->Render("header", "left");
 	<?php } else { ?>
 		<td><div class="ewPointer" onclick="ew_Sort(event,'<?php echo $command->SortUrl($command->server_id) ?>',1);"><div id="elh_command_server_id" class="command_server_id">
 			<div class="ewTableHeaderBtn"><span class="ewTableHeaderCaption"><?php echo $command->server_id->FldCaption() ?></span><span class="ewTableHeaderSort"><?php if ($command->server_id->getSort() == "ASC") { ?><span class="caret ewSortUp"></span><?php } elseif ($command->server_id->getSort() == "DESC") { ?><span class="caret"></span><?php } ?></span></div>
+        </div></div></td>
+	<?php } ?>
+<?php } ?>		
+<?php if ($command->command_input->Visible) { // command_input ?>
+	<?php if ($command->SortUrl($command->command_input) == "") { ?>
+		<td><div id="elh_command_command_input" class="command_command_input"><div class="ewTableHeaderCaption"><?php echo $command->command_input->FldCaption() ?></div></div></td>
+	<?php } else { ?>
+		<td><div class="ewPointer" onclick="ew_Sort(event,'<?php echo $command->SortUrl($command->command_input) ?>',1);"><div id="elh_command_command_input" class="command_command_input">
+			<div class="ewTableHeaderBtn"><span class="ewTableHeaderCaption"><?php echo $command->command_input->FldCaption() ?><?php echo $Language->Phrase("SrchLegend") ?></span><span class="ewTableHeaderSort"><?php if ($command->command_input->getSort() == "ASC") { ?><span class="caret ewSortUp"></span><?php } elseif ($command->command_input->getSort() == "DESC") { ?><span class="caret"></span><?php } ?></span></div>
+        </div></div></td>
+	<?php } ?>
+<?php } ?>		
+<?php if ($command->command_output->Visible) { // command_output ?>
+	<?php if ($command->SortUrl($command->command_output) == "") { ?>
+		<td><div id="elh_command_command_output" class="command_command_output"><div class="ewTableHeaderCaption"><?php echo $command->command_output->FldCaption() ?></div></div></td>
+	<?php } else { ?>
+		<td><div class="ewPointer" onclick="ew_Sort(event,'<?php echo $command->SortUrl($command->command_output) ?>',1);"><div id="elh_command_command_output" class="command_command_output">
+			<div class="ewTableHeaderBtn"><span class="ewTableHeaderCaption"><?php echo $command->command_output->FldCaption() ?><?php echo $Language->Phrase("SrchLegend") ?></span><span class="ewTableHeaderSort"><?php if ($command->command_output->getSort() == "ASC") { ?><span class="caret ewSortUp"></span><?php } elseif ($command->command_output->getSort() == "DESC") { ?><span class="caret"></span><?php } ?></span></div>
+        </div></div></td>
+	<?php } ?>
+<?php } ?>		
+<?php if ($command->command_status->Visible) { // command_status ?>
+	<?php if ($command->SortUrl($command->command_status) == "") { ?>
+		<td><div id="elh_command_command_status" class="command_command_status"><div class="ewTableHeaderCaption"><?php echo $command->command_status->FldCaption() ?></div></div></td>
+	<?php } else { ?>
+		<td><div class="ewPointer" onclick="ew_Sort(event,'<?php echo $command->SortUrl($command->command_status) ?>',1);"><div id="elh_command_command_status" class="command_command_status">
+			<div class="ewTableHeaderBtn"><span class="ewTableHeaderCaption"><?php echo $command->command_status->FldCaption() ?><?php echo $Language->Phrase("SrchLegend") ?></span><span class="ewTableHeaderSort"><?php if ($command->command_status->getSort() == "ASC") { ?><span class="caret ewSortUp"></span><?php } elseif ($command->command_status->getSort() == "DESC") { ?><span class="caret"></span><?php } ?></span></div>
+        </div></div></td>
+	<?php } ?>
+<?php } ?>		
+<?php if ($command->command_log->Visible) { // command_log ?>
+	<?php if ($command->SortUrl($command->command_log) == "") { ?>
+		<td><div id="elh_command_command_log" class="command_command_log"><div class="ewTableHeaderCaption"><?php echo $command->command_log->FldCaption() ?></div></div></td>
+	<?php } else { ?>
+		<td><div class="ewPointer" onclick="ew_Sort(event,'<?php echo $command->SortUrl($command->command_log) ?>',1);"><div id="elh_command_command_log" class="command_command_log">
+			<div class="ewTableHeaderBtn"><span class="ewTableHeaderCaption"><?php echo $command->command_log->FldCaption() ?><?php echo $Language->Phrase("SrchLegend") ?></span><span class="ewTableHeaderSort"><?php if ($command->command_log->getSort() == "ASC") { ?><span class="caret ewSortUp"></span><?php } elseif ($command->command_log->getSort() == "DESC") { ?><span class="caret"></span><?php } ?></span></div>
         </div></div></td>
 	<?php } ?>
 <?php } ?>		
@@ -2006,6 +2218,30 @@ $command_list->ListOptions->Render("body", "left", $command_list->RowCnt);
 <?php echo $command->server_id->ListViewValue() ?></span>
 <a id="<?php echo $command_list->PageObjName . "_row_" . $command_list->RowCnt ?>"></a></td>
 	<?php } ?>
+	<?php if ($command->command_input->Visible) { // command_input ?>
+		<td<?php echo $command->command_input->CellAttributes() ?>>
+<span<?php echo $command->command_input->ViewAttributes() ?>>
+<?php echo $command->command_input->ListViewValue() ?></span>
+<a id="<?php echo $command_list->PageObjName . "_row_" . $command_list->RowCnt ?>"></a></td>
+	<?php } ?>
+	<?php if ($command->command_output->Visible) { // command_output ?>
+		<td<?php echo $command->command_output->CellAttributes() ?>>
+<span<?php echo $command->command_output->ViewAttributes() ?>>
+<?php echo $command->command_output->ListViewValue() ?></span>
+<a id="<?php echo $command_list->PageObjName . "_row_" . $command_list->RowCnt ?>"></a></td>
+	<?php } ?>
+	<?php if ($command->command_status->Visible) { // command_status ?>
+		<td<?php echo $command->command_status->CellAttributes() ?>>
+<span<?php echo $command->command_status->ViewAttributes() ?>>
+<?php echo $command->command_status->ListViewValue() ?></span>
+<a id="<?php echo $command_list->PageObjName . "_row_" . $command_list->RowCnt ?>"></a></td>
+	<?php } ?>
+	<?php if ($command->command_log->Visible) { // command_log ?>
+		<td<?php echo $command->command_log->CellAttributes() ?>>
+<span<?php echo $command->command_log->ViewAttributes() ?>>
+<?php echo $command->command_log->ListViewValue() ?></span>
+<a id="<?php echo $command_list->PageObjName . "_row_" . $command_list->RowCnt ?>"></a></td>
+	<?php } ?>
 	<?php if ($command->command_time->Visible) { // command_time ?>
 		<td<?php echo $command->command_time->CellAttributes() ?>>
 <span<?php echo $command->command_time->ViewAttributes() ?>>
@@ -2072,10 +2308,14 @@ if ($command_list->Recordset)
 </td>
 </tr></tbody></table>
 <?php } else { ?>
+	<?php if ($Security->CanList()) { ?>
 	<?php if ($command_list->SearchWhere == "0=101") { ?>
 	<p><?php echo $Language->Phrase("EnterSearchCriteria") ?></p>
 	<?php } else { ?>
 	<p><?php echo $Language->Phrase("NoRecord") ?></p>
+	<?php } ?>
+	<?php } else { ?>
+	<p><?php echo $Language->Phrase("NoPermission") ?></p>
 	<?php } ?>
 <?php } ?>
 </td>

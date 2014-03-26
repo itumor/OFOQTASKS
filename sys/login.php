@@ -245,6 +245,7 @@ class clogin extends c_login {
 		} else {
 			if (!$Security->IsLoggedIn())
 				$Security->AutoLogin();
+			$Security->LoadUserLevel(); // Load user level
 			$this->Username = ""; // Initialize
 			if (@$_POST["username"] <> "") {
 

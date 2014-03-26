@@ -412,6 +412,7 @@ class cregister extends c_login {
 		$this->_Email->setDbValue($rs->fields('Email'));
 		$this->Activated->setDbValue($rs->fields('Activated'));
 		$this->Profile->setDbValue($rs->fields('Profile'));
+		$this->levels->setDbValue($rs->fields('levels'));
 	}
 
 	// Load DbValue from recordset
@@ -424,6 +425,7 @@ class cregister extends c_login {
 		$this->_Email->DbValue = $row['Email'];
 		$this->Activated->DbValue = $row['Activated'];
 		$this->Profile->DbValue = $row['Profile'];
+		$this->levels->DbValue = $row['levels'];
 	}
 
 	// Render row values based on field settings
@@ -443,6 +445,7 @@ class cregister extends c_login {
 		// Email
 		// Activated
 		// Profile
+		// levels
 
 		if ($this->RowType == EW_ROWTYPE_VIEW) { // View row
 
@@ -469,6 +472,34 @@ class cregister extends c_login {
 			// Profile
 			$this->Profile->ViewValue = $this->Profile->CurrentValue;
 			$this->Profile->ViewCustomAttributes = "";
+
+			// levels
+			if ($Security->CanAdmin()) { // System admin
+			if (strval($this->levels->CurrentValue) <> "") {
+				$sFilterWrk = "`userlevelid`" . ew_SearchString("=", $this->levels->CurrentValue, EW_DATATYPE_NUMBER);
+			$sSqlWrk = "SELECT `userlevelid`, `userlevelname` AS `DispFld`, '' AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld` FROM `userlevels`";
+			$sWhereWrk = "";
+			if ($sFilterWrk <> "") {
+				ew_AddFilter($sWhereWrk, $sFilterWrk);
+			}
+
+			// Call Lookup selecting
+			$this->Lookup_Selecting($this->levels, $sWhereWrk);
+			if ($sWhereWrk <> "") $sSqlWrk .= " WHERE " . $sWhereWrk;
+				$rswrk = $conn->Execute($sSqlWrk);
+				if ($rswrk && !$rswrk->EOF) { // Lookup values found
+					$this->levels->ViewValue = $rswrk->fields('DispFld');
+					$rswrk->Close();
+				} else {
+					$this->levels->ViewValue = $this->levels->CurrentValue;
+				}
+			} else {
+				$this->levels->ViewValue = NULL;
+			}
+			} else {
+				$this->levels->ViewValue = "********";
+			}
+			$this->levels->ViewCustomAttributes = "";
 
 			// idlogin
 			$this->idlogin->LinkCustomAttributes = "";
@@ -570,6 +601,18 @@ class cregister extends c_login {
 	// Add record
 	function AddRow($rsold = NULL) {
 		global $conn, $Language, $Security;
+
+		// Check if valid User ID
+		$bValidUser = FALSE;
+		if ($Security->CurrentUserID() <> "" && !$Security->IsAdmin()) { // Non system admin
+			$bValidUser = $Security->IsValidUserID($this->idlogin->CurrentValue);
+			if (!$bValidUser) {
+				$sUserIdMsg = str_replace("%c", CurrentUserID(), $Language->Phrase("UnAuthorizedUserID"));
+				$sUserIdMsg = str_replace("%u", $this->idlogin->CurrentValue, $sUserIdMsg);
+				$this->setFailureMessage($sUserIdMsg);
+				return FALSE;
+			}
+		}
 		if ($this->loginname->CurrentValue <> "") { // Check field with unique index
 			$sFilter = "(loginname = '" . ew_AdjustSql($this->loginname->CurrentValue) . "')";
 			$rsChk = $this->LoadRs($sFilter);
@@ -657,7 +700,7 @@ class cregister extends c_login {
 	// Write Audit Trail start/end for grid update
 	function WriteAuditTrailDummy($typ) {
 		$table = 'login';
-	  $usr = CurrentUserName();
+	  $usr = CurrentUserID();
 		ew_WriteAuditTrail("log", ew_StdCurrentDateTime(), ew_ScriptName(), $usr, $typ, $table, "", "", "", "");
 	}
 
@@ -674,7 +717,7 @@ class cregister extends c_login {
 		// Write Audit Trail
 		$dt = ew_StdCurrentDateTime();
 		$id = ew_ScriptName();
-	  $usr = CurrentUserName();
+	  $usr = CurrentUserID();
 		foreach (array_keys($rs) as $fldname) {
 			if ($this->fields[$fldname]->FldDataType <> EW_DATATYPE_BLOB) { // Ignore BLOB fields
 				if ($this->fields[$fldname]->FldDataType == EW_DATATYPE_MEMO) {

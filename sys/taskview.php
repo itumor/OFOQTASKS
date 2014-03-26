@@ -259,6 +259,21 @@ class ctask_view extends ctask {
 			$Security->SaveLastUrl();
 			$this->Page_Terminate("login.php");
 		}
+		$Security->TablePermission_Loading();
+		$Security->LoadCurrentUserLevel($this->ProjectID . $this->TableName);
+		$Security->TablePermission_Loaded();
+		if (!$Security->IsLoggedIn()) {
+			$Security->SaveLastUrl();
+			$this->Page_Terminate("login.php");
+		}
+		if (!$Security->CanView()) {
+			$Security->SaveLastUrl();
+			$this->setFailureMessage($Language->Phrase("NoPermission")); // Set no permission
+			$this->Page_Terminate("tasklist.php");
+		}
+		$Security->UserID_Loading();
+		if ($Security->IsLoggedIn()) $Security->LoadUserID();
+		$Security->UserID_Loaded();
 
 		// Get export parameters
 		if (@$_GET["export"] <> "") {
@@ -422,22 +437,22 @@ class ctask_view extends ctask {
 		// Add
 		$item = &$option->Add("add");
 		$item->Body = "<a class=\"ewAction ewAdd\" href=\"" . ew_HtmlEncode($this->AddUrl) . "\">" . $Language->Phrase("ViewPageAddLink") . "</a>";
-		$item->Visible = ($this->AddUrl <> "" && $Security->IsLoggedIn());
+		$item->Visible = ($this->AddUrl <> "" && $Security->CanAdd());
 
 		// Edit
 		$item = &$option->Add("edit");
 		$item->Body = "<a class=\"ewAction ewEdit\" href=\"" . ew_HtmlEncode($this->EditUrl) . "\">" . $Language->Phrase("ViewPageEditLink") . "</a>";
-		$item->Visible = ($this->EditUrl <> "" && $Security->IsLoggedIn());
+		$item->Visible = ($this->EditUrl <> "" && $Security->CanEdit());
 
 		// Copy
 		$item = &$option->Add("copy");
 		$item->Body = "<a class=\"ewAction ewCopy\" href=\"" . ew_HtmlEncode($this->CopyUrl) . "\">" . $Language->Phrase("ViewPageCopyLink") . "</a>";
-		$item->Visible = ($this->CopyUrl <> "" && $Security->IsLoggedIn());
+		$item->Visible = ($this->CopyUrl <> "" && $Security->CanAdd());
 
 		// Delete
 		$item = &$option->Add("delete");
 		$item->Body = "<a onclick=\"return ew_Confirm(ewLanguage.Phrase('DeleteConfirmMsg'));\" class=\"ewAction ewDelete\" href=\"" . ew_HtmlEncode($this->DeleteUrl) . "\">" . $Language->Phrase("ViewPageDeleteLink") . "</a>";
-		$item->Visible = ($this->DeleteUrl <> "" && $Security->IsLoggedIn());
+		$item->Visible = ($this->DeleteUrl <> "" && $Security->CanDelete());
 
 		// Set up options default
 		foreach ($options as &$option) {
@@ -538,6 +553,8 @@ class ctask_view extends ctask {
 		$this->Row_Selected($row);
 		$this->task_id->setDbValue($rs->fields('task_id'));
 		$this->task_name->setDbValue($rs->fields('task_name'));
+		$this->sqlscript->setDbValue($rs->fields('sqlscript'));
+		$this->phpscript->setDbValue($rs->fields('phpscript'));
 	}
 
 	// Load DbValue from recordset
@@ -546,6 +563,8 @@ class ctask_view extends ctask {
 		$row = is_array($rs) ? $rs : $rs->fields;
 		$this->task_id->DbValue = $row['task_id'];
 		$this->task_name->DbValue = $row['task_name'];
+		$this->sqlscript->DbValue = $row['sqlscript'];
+		$this->phpscript->DbValue = $row['phpscript'];
 	}
 
 	// Render row values based on field settings
@@ -567,6 +586,8 @@ class ctask_view extends ctask {
 		// Common render codes for all row types
 		// task_id
 		// task_name
+		// sqlscript
+		// phpscript
 
 		if ($this->RowType == EW_ROWTYPE_VIEW) { // View row
 
@@ -578,6 +599,14 @@ class ctask_view extends ctask {
 			$this->task_name->ViewValue = $this->task_name->CurrentValue;
 			$this->task_name->ViewCustomAttributes = "";
 
+			// sqlscript
+			$this->sqlscript->ViewValue = $this->sqlscript->CurrentValue;
+			$this->sqlscript->ViewCustomAttributes = "";
+
+			// phpscript
+			$this->phpscript->ViewValue = $this->phpscript->CurrentValue;
+			$this->phpscript->ViewCustomAttributes = "";
+
 			// task_id
 			$this->task_id->LinkCustomAttributes = "";
 			$this->task_id->HrefValue = "";
@@ -587,6 +616,16 @@ class ctask_view extends ctask {
 			$this->task_name->LinkCustomAttributes = "";
 			$this->task_name->HrefValue = "";
 			$this->task_name->TooltipValue = "";
+
+			// sqlscript
+			$this->sqlscript->LinkCustomAttributes = "";
+			$this->sqlscript->HrefValue = "";
+			$this->sqlscript->TooltipValue = "";
+
+			// phpscript
+			$this->phpscript->LinkCustomAttributes = "";
+			$this->phpscript->HrefValue = "";
+			$this->phpscript->TooltipValue = "";
 		}
 
 		// Call Row Rendered event
@@ -1018,6 +1057,28 @@ $task_view->ShowMessage();
 <span id="el_task_task_name" class="control-group">
 <span<?php echo $task->task_name->ViewAttributes() ?>>
 <?php echo $task->task_name->ViewValue ?></span>
+</span>
+</td>
+	</tr>
+<?php } ?>
+<?php if ($task->sqlscript->Visible) { // sqlscript ?>
+	<tr id="r_sqlscript">
+		<td><span id="elh_task_sqlscript"><?php echo $task->sqlscript->FldCaption() ?></span></td>
+		<td<?php echo $task->sqlscript->CellAttributes() ?>>
+<span id="el_task_sqlscript" class="control-group">
+<span<?php echo $task->sqlscript->ViewAttributes() ?>>
+<?php echo $task->sqlscript->ViewValue ?></span>
+</span>
+</td>
+	</tr>
+<?php } ?>
+<?php if ($task->phpscript->Visible) { // phpscript ?>
+	<tr id="r_phpscript">
+		<td><span id="elh_task_phpscript"><?php echo $task->phpscript->FldCaption() ?></span></td>
+		<td<?php echo $task->phpscript->CellAttributes() ?>>
+<span id="el_task_phpscript" class="control-group">
+<span<?php echo $task->phpscript->ViewAttributes() ?>>
+<?php echo $task->phpscript->ViewValue ?></span>
 </span>
 </td>
 	</tr>

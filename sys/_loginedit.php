@@ -205,6 +205,25 @@ class cp_login_edit extends c_login {
 			$Security->SaveLastUrl();
 			$this->Page_Terminate("login.php");
 		}
+		$Security->TablePermission_Loading();
+		$Security->LoadCurrentUserLevel($this->ProjectID . $this->TableName);
+		$Security->TablePermission_Loaded();
+		if (!$Security->IsLoggedIn()) {
+			$Security->SaveLastUrl();
+			$this->Page_Terminate("login.php");
+		}
+		if (!$Security->CanEdit()) {
+			$Security->SaveLastUrl();
+			$this->setFailureMessage($Language->Phrase("NoPermission")); // Set no permission
+			$this->Page_Terminate("_loginlist.php");
+		}
+		$Security->UserID_Loading();
+		if ($Security->IsLoggedIn()) $Security->LoadUserID();
+		$Security->UserID_Loaded();
+		if ($Security->IsLoggedIn() && strval($Security->CurrentUserID()) == "") {
+			$this->setFailureMessage($Language->Phrase("NoPermission")); // Set no permission
+			$this->Page_Terminate("_loginlist.php");
+		}
 
 		// Create form object
 		$objForm = new cFormObj();
@@ -422,6 +441,9 @@ class cp_login_edit extends c_login {
 		if (!$this->Profile->FldIsDetailKey) {
 			$this->Profile->setFormValue($objForm->GetValue("x_Profile"));
 		}
+		if (!$this->levels->FldIsDetailKey) {
+			$this->levels->setFormValue($objForm->GetValue("x_levels"));
+		}
 	}
 
 	// Restore form values
@@ -434,6 +456,7 @@ class cp_login_edit extends c_login {
 		$this->_Email->CurrentValue = $this->_Email->FormValue;
 		$this->Activated->CurrentValue = $this->Activated->FormValue;
 		$this->Profile->CurrentValue = $this->Profile->FormValue;
+		$this->levels->CurrentValue = $this->levels->FormValue;
 	}
 
 	// Load recordset
@@ -474,6 +497,15 @@ class cp_login_edit extends c_login {
 			$this->LoadRowValues($rs); // Load row values
 			$rs->Close();
 		}
+
+		// Check if valid user id
+		if ($res) {
+			$res = $this->ShowOptionLink('edit');
+			if (!$res) {
+				$sUserIdMsg = $Language->Phrase("NoPermission");
+				$this->setFailureMessage($sUserIdMsg);
+			}
+		}
 		return $res;
 	}
 
@@ -491,6 +523,7 @@ class cp_login_edit extends c_login {
 		$this->_Email->setDbValue($rs->fields('Email'));
 		$this->Activated->setDbValue($rs->fields('Activated'));
 		$this->Profile->setDbValue($rs->fields('Profile'));
+		$this->levels->setDbValue($rs->fields('levels'));
 	}
 
 	// Load DbValue from recordset
@@ -503,6 +536,7 @@ class cp_login_edit extends c_login {
 		$this->_Email->DbValue = $row['Email'];
 		$this->Activated->DbValue = $row['Activated'];
 		$this->Profile->DbValue = $row['Profile'];
+		$this->levels->DbValue = $row['levels'];
 	}
 
 	// Render row values based on field settings
@@ -522,6 +556,7 @@ class cp_login_edit extends c_login {
 		// Email
 		// Activated
 		// Profile
+		// levels
 
 		if ($this->RowType == EW_ROWTYPE_VIEW) { // View row
 
@@ -548,6 +583,34 @@ class cp_login_edit extends c_login {
 			// Profile
 			$this->Profile->ViewValue = $this->Profile->CurrentValue;
 			$this->Profile->ViewCustomAttributes = "";
+
+			// levels
+			if ($Security->CanAdmin()) { // System admin
+			if (strval($this->levels->CurrentValue) <> "") {
+				$sFilterWrk = "`userlevelid`" . ew_SearchString("=", $this->levels->CurrentValue, EW_DATATYPE_NUMBER);
+			$sSqlWrk = "SELECT `userlevelid`, `userlevelname` AS `DispFld`, '' AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld` FROM `userlevels`";
+			$sWhereWrk = "";
+			if ($sFilterWrk <> "") {
+				ew_AddFilter($sWhereWrk, $sFilterWrk);
+			}
+
+			// Call Lookup selecting
+			$this->Lookup_Selecting($this->levels, $sWhereWrk);
+			if ($sWhereWrk <> "") $sSqlWrk .= " WHERE " . $sWhereWrk;
+				$rswrk = $conn->Execute($sSqlWrk);
+				if ($rswrk && !$rswrk->EOF) { // Lookup values found
+					$this->levels->ViewValue = $rswrk->fields('DispFld');
+					$rswrk->Close();
+				} else {
+					$this->levels->ViewValue = $this->levels->CurrentValue;
+				}
+			} else {
+				$this->levels->ViewValue = NULL;
+			}
+			} else {
+				$this->levels->ViewValue = "********";
+			}
+			$this->levels->ViewCustomAttributes = "";
 
 			// idlogin
 			$this->idlogin->LinkCustomAttributes = "";
@@ -578,6 +641,11 @@ class cp_login_edit extends c_login {
 			$this->Profile->LinkCustomAttributes = "";
 			$this->Profile->HrefValue = "";
 			$this->Profile->TooltipValue = "";
+
+			// levels
+			$this->levels->LinkCustomAttributes = "";
+			$this->levels->HrefValue = "";
+			$this->levels->TooltipValue = "";
 		} elseif ($this->RowType == EW_ROWTYPE_EDIT) { // Edit row
 
 			// idlogin
@@ -609,6 +677,28 @@ class cp_login_edit extends c_login {
 			$this->Profile->EditValue = $this->Profile->CurrentValue;
 			$this->Profile->PlaceHolder = ew_HtmlEncode(ew_RemoveHtml($this->Profile->FldCaption()));
 
+			// levels
+			$this->levels->EditCustomAttributes = "";
+			if (!$Security->CanAdmin()) { // System admin
+				$this->levels->EditValue = "********";
+			} else {
+			$sFilterWrk = "";
+			$sSqlWrk = "SELECT `userlevelid`, `userlevelname` AS `DispFld`, '' AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld`, '' AS `SelectFilterFld`, '' AS `SelectFilterFld2`, '' AS `SelectFilterFld3`, '' AS `SelectFilterFld4` FROM `userlevels`";
+			$sWhereWrk = "";
+			if ($sFilterWrk <> "") {
+				ew_AddFilter($sWhereWrk, $sFilterWrk);
+			}
+
+			// Call Lookup selecting
+			$this->Lookup_Selecting($this->levels, $sWhereWrk);
+			if ($sWhereWrk <> "") $sSqlWrk .= " WHERE " . $sWhereWrk;
+			$rswrk = $conn->Execute($sSqlWrk);
+			$arwrk = ($rswrk) ? $rswrk->GetRows() : array();
+			if ($rswrk) $rswrk->Close();
+			array_unshift($arwrk, array("", $Language->Phrase("PleaseSelect"), "", "", "", "", "", "", ""));
+			$this->levels->EditValue = $arwrk;
+			}
+
 			// Edit refer script
 			// idlogin
 
@@ -628,6 +718,9 @@ class cp_login_edit extends c_login {
 
 			// Profile
 			$this->Profile->HrefValue = "";
+
+			// levels
+			$this->levels->HrefValue = "";
 		}
 		if ($this->RowType == EW_ROWTYPE_ADD ||
 			$this->RowType == EW_ROWTYPE_EDIT ||
@@ -751,6 +844,11 @@ class cp_login_edit extends c_login {
 			// Profile
 			$this->Profile->SetDbValueDef($rsnew, $this->Profile->CurrentValue, NULL, $this->Profile->ReadOnly);
 
+			// levels
+			if ($Security->CanAdmin()) { // System admin
+			$this->levels->SetDbValueDef($rsnew, $this->levels->CurrentValue, NULL, $this->levels->ReadOnly);
+			}
+
 			// Call Row Updating event
 			$bUpdateRow = $this->Row_Updating($rsold, $rsnew);
 			if ($bUpdateRow) {
@@ -786,6 +884,14 @@ class cp_login_edit extends c_login {
 		return $EditRow;
 	}
 
+	// Show link optionally based on User ID
+	function ShowOptionLink($id = "") {
+		global $Security;
+		if ($Security->IsLoggedIn() && !$Security->IsAdmin() && !$this->UserIDAllow($id))
+			return $Security->IsValidUserID($this->idlogin->CurrentValue);
+		return TRUE;
+	}
+
 	// Set up Breadcrumb
 	function SetupBreadcrumb() {
 		global $Breadcrumb, $Language;
@@ -799,7 +905,7 @@ class cp_login_edit extends c_login {
 	// Write Audit Trail start/end for grid update
 	function WriteAuditTrailDummy($typ) {
 		$table = 'login';
-	  $usr = CurrentUserName();
+	  $usr = CurrentUserID();
 		ew_WriteAuditTrail("log", ew_StdCurrentDateTime(), ew_ScriptName(), $usr, $typ, $table, "", "", "", "");
 	}
 
@@ -816,7 +922,7 @@ class cp_login_edit extends c_login {
 		// Write Audit Trail
 		$dt = ew_StdCurrentDateTime();
 		$id = ew_ScriptName();
-	  $usr = CurrentUserName();
+	  $usr = CurrentUserID();
 		foreach (array_keys($rsnew) as $fldname) {
 			if ($this->fields[$fldname]->FldDataType <> EW_DATATYPE_BLOB) { // Ignore BLOB fields
 				if ($this->fields[$fldname]->FldDataType == EW_DATATYPE_DATE) { // DateTime field
@@ -1010,8 +1116,9 @@ f_loginedit.ValidateRequired = false;
 <?php } ?>
 
 // Dynamic selection lists
-// Form object for search
+f_loginedit.Lists["x_levels"] = {"LinkField":"x_userlevelid","Ajax":null,"AutoFill":false,"DisplayFields":["x_userlevelname","","",""],"ParentFields":[],"FilterFields":[],"Options":[]};
 
+// Form object for search
 </script>
 <script type="text/javascript">
 
@@ -1169,6 +1276,50 @@ $p_login_edit->ShowMessage();
 <input type="hidden" data-field="x_Profile" name="x_Profile" id="x_Profile" value="<?php echo ew_HtmlEncode($_login->Profile->FormValue) ?>">
 <?php } ?>
 <?php echo $_login->Profile->CustomMsg ?></td>
+	</tr>
+<?php } ?>
+<?php if ($_login->levels->Visible) { // levels ?>
+	<tr id="r_levels">
+		<td><span id="elh__login_levels"><?php echo $_login->levels->FldCaption() ?></span></td>
+		<td<?php echo $_login->levels->CellAttributes() ?>>
+<?php if ($_login->CurrentAction <> "F") { ?>
+<?php if (!$Security->IsAdmin() && $Security->IsLoggedIn()) { // Non system admin ?>
+<span id="el__login_levels" class="control-group">
+<?php echo $_login->levels->EditValue ?>
+</span>
+<?php } else { ?>
+<span id="el__login_levels" class="control-group">
+<select data-field="x_levels" id="x_levels" name="x_levels"<?php echo $_login->levels->EditAttributes() ?>>
+<?php
+if (is_array($_login->levels->EditValue)) {
+	$arwrk = $_login->levels->EditValue;
+	$rowswrk = count($arwrk);
+	$emptywrk = TRUE;
+	for ($rowcntwrk = 0; $rowcntwrk < $rowswrk; $rowcntwrk++) {
+		$selwrk = (strval($_login->levels->CurrentValue) == strval($arwrk[$rowcntwrk][0])) ? " selected=\"selected\"" : "";
+		if ($selwrk <> "") $emptywrk = FALSE;
+?>
+<option value="<?php echo ew_HtmlEncode($arwrk[$rowcntwrk][0]) ?>"<?php echo $selwrk ?>>
+<?php echo $arwrk[$rowcntwrk][1] ?>
+</option>
+<?php
+	}
+}
+?>
+</select>
+<script type="text/javascript">
+f_loginedit.Lists["x_levels"].Options = <?php echo (is_array($_login->levels->EditValue)) ? ew_ArrayToJson($_login->levels->EditValue, 1) : "[]" ?>;
+</script>
+</span>
+<?php } ?>
+<?php } else { ?>
+<span id="el__login_levels" class="control-group">
+<span<?php echo $_login->levels->ViewAttributes() ?>>
+<?php echo $_login->levels->ViewValue ?></span>
+</span>
+<input type="hidden" data-field="x_levels" name="x_levels" id="x_levels" value="<?php echo ew_HtmlEncode($_login->levels->FormValue) ?>">
+<?php } ?>
+<?php echo $_login->levels->CustomMsg ?></td>
 	</tr>
 <?php } ?>
 </table>

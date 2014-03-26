@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0"?>
-<configuration date="2014/03/13" author="e.World Technology Ltd.">
-<project id="{3246B9FA-4C51-4733-8040-34B188FCD87E}" file="E:\ofoq_tasks\project1.pmp" name="project1" product="PHPMaker" version="10.0" datetime="2014/03/13 01:46:30" languagefolder="phplang" userlevel="0,&quot;Default&quot;,0">
+<configuration date="2014/03/26" author="e.World Technology Ltd.">
+<project id="{3246B9FA-4C51-4733-8040-34B188FCD87E}" file="E:\ofoq_tasks\OFOQTASKS\project1.pmp" name="project1" product="PHPMaker" version="10.0" datetime="2014/03/26 23:14:41" languagefolder="phplang" userlevel="0,&quot;Default&quot;,0">
 <table id="command" name="command" caption="command" userlevel="0,&quot;Default&quot;,0" priv="1"/>
 <table id="function_group" name="function_group" caption="function group" userlevel="0,&quot;Default&quot;,0" priv="1"/>
 <table id="function_group_relation" name="function_group_relation" caption="function group relation" userlevel="0,&quot;Default&quot;,0" priv="1"/>
@@ -14,4 +14,9 @@
 <table id="_login" name="login" caption="login" userlevel="0,&quot;Default&quot;,0" priv="1"/>
 <table id="generator_report" name="generator report" caption="generator report" userlevel="0,&quot;Default&quot;,0" priv="1"/>
 <table id="Report_Grouping_by_Task" name="Report Grouping by Task" caption="Geport Report Grouping by Task" userlevel="0,&quot;Default&quot;,0" priv="1"/>
+<table id="userlevelpermissions" name="userlevelpermissions" caption="userlevelpermissions" userlevel="0,&quot;Default&quot;,0" priv="1"/>
+<table id="userlevels" name="userlevels" caption="userlevels" userlevel="0,&quot;Default&quot;,0" priv="1"/>
+<table id="start_task" name="start_task" caption="start task" userlevel="0,&quot;Default&quot;,0" priv="1"/>
+<table id="restart_task" name="restart_task" caption="restart task" userlevel="0,&quot;Default&quot;,0" priv="1"/>
+<table id="listandstart_task" name="listandstart_task" caption="listandstart task" userlevel="0,&quot;Default&quot;,0" priv="1"/>
 </project></configuration>

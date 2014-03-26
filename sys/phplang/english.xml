@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" standalone="yes"?>
-<ew-language date="2014/3/13" version="10.0.1" id="en" name="English" desc="English" author="e.World Technology Ltd.">
+<ew-language date="2014/3/26" version="10.0.1" id="en" name="English" desc="English" author="e.World Technology Ltd.">
 	<locale>
 		<phrase id="locale" value=""/><!-- *** system locale for this language -->
 		<phrase id="use_system_locale" value="1"/><!-- *** change to "0" to disable system locale and use the following settings *** -->
@@ -373,6 +373,10 @@
 	</global>
 	<project><phrase id="bodytitle" value="System Automation"/>
 <phrase id="footertext" value="&amp;copy;2014 UnitedOFOQ System Automation . All rights reserved."/>
+<menu id="66"><phrase id="menutext" value="restart task"/>
+</menu>
+<menu id="67"><phrase id="menutext" value="listandstart task"/>
+</menu>
 <menu id="37"><phrase id="menutext" value="Generator Report Menu "/>
 </menu>
 <menu id="18"><phrase id="menutext" value="Generator report"/>
@@ -382,6 +386,10 @@
 <menu id="38"><phrase id="menutext" value="Setup Menu"/>
 </menu>
 <menu id="17"><phrase id="menutext" value="login"/>
+</menu>
+<menu id="40"><phrase id="menutext" value="User Levels"/>
+</menu>
+<menu id="39"><phrase id="menutext" value="User Level Permissions"/>
 </menu>
 <menu id="16"><phrase id="menutext" value="System Generator Menu"/>
 </menu>
@@ -407,7 +415,11 @@
 </menu>
 <menu id="15"><phrase id="menutext" value="Daily Transaction Menu"/>
 </menu>
+<menu id="41"><phrase id="menutext" value="start task"/>
+</menu>
 <menu id="7"><phrase id="menutext" value="Server"/>
+</menu>
+<menu id="65"><phrase id="menutext" value="Do tasks"/>
 </menu>
 <menu id="13"><phrase id="menutext" value="Logs &amp; Audittrail Menu "/>
 </menu>
@@ -512,6 +524,10 @@
 </field>
 <field id="task_name"><phrase id="fldcaption" value="task name"/>
 </field>
+<field id="sqlscript"><phrase id="fldcaption" value="sqlscript"/>
+</field>
+<field id="phpscript"><phrase id="fldcaption" value="phpscript"/>
+</field>
 </table>
 <table id="task_function_group"><phrase id="tblcaption" value="task function group"/>
 <field id="task_function_group_id"><phrase id="fldcaption" value="task function group id"/>
@@ -555,6 +571,8 @@
 <field id="activated"><phrase id="fldcaption" value="Activated"/>
 </field>
 <field id="profile"><phrase id="fldcaption" value="logincol"/>
+</field>
+<field id="levels"><phrase id="fldcaption" value="levels"/>
 </field>
 </table>
 <table id="generator_report"><phrase id="tblcaption" value="generator report"/>
@@ -627,6 +645,44 @@
 <field id="parameter_name"><phrase id="fldcaption" value="parameter name"/>
 </field>
 <field id="function_group_id1"><phrase id="fldcaption" value="function group id"/>
+</field>
+</table>
+<table id="userlevelpermissions"><phrase id="tblcaption" value="userlevelpermissions"/>
+<field id="userlevelid"><phrase id="fldcaption" value="userlevelid"/>
+</field>
+<field id="_tablename"><phrase id="fldcaption" value="tablename"/>
+</field>
+<field id="permission"><phrase id="fldcaption" value="permission"/>
+</field>
+</table>
+<table id="userlevels"><phrase id="tblcaption" value="userlevels"/>
+<field id="userlevelid"><phrase id="fldcaption" value="userlevelid"/>
+</field>
+<field id="userlevelname"><phrase id="fldcaption" value="userlevelname"/>
+</field>
+</table>
+<table id="start_task"><phrase id="tblcaption" value="start task"/>
+<field id="id"><phrase id="fldcaption" value="id"/>
+</field>
+<field id="server_id_mysqladmin"><phrase id="fldcaption" value="server id mysqladmin"/>
+</field>
+</table>
+<table id="restart_task"><phrase id="tblcaption" value="restart task"/>
+<field id="id"><phrase id="fldcaption" value="id"/>
+</field>
+<field id="server_id_mysqladmin"><phrase id="fldcaption" value="server id mysqladmin"/>
+</field>
+</table>
+<table id="listandstart_task"><phrase id="tblcaption" value="listandstart task"/>
+<field id="id"><phrase id="fldcaption" value="id"/>
+</field>
+<field id="server_id_mysqladmin"><phrase id="fldcaption" value="server id mysqladmin"/>
+</field>
+<field id="hostname"><phrase id="fldcaption" value="HOSTNAME"/>
+</field>
+<field id="username"><phrase id="fldcaption" value="USERNAME"/>
+</field>
+<field id="password"><phrase id="fldcaption" value="PASSWORD"/>
 </field>
 </table>
 </project>

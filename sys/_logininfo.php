@@ -13,6 +13,7 @@ class c_login extends cTable {
 	var $_Email;
 	var $Activated;
 	var $Profile;
+	var $levels;
 
 	//
 	// Table class constructor
@@ -62,6 +63,11 @@ class c_login extends cTable {
 		// Profile
 		$this->Profile = new cField('_login', 'login', 'x_Profile', 'Profile', '`Profile`', '`Profile`', 201, -1, FALSE, '`Profile`', FALSE, FALSE, FALSE, 'FORMATTED TEXT');
 		$this->fields['Profile'] = &$this->Profile;
+
+		// levels
+		$this->levels = new cField('_login', 'login', 'x_levels', 'levels', '`levels`', '`levels`', 3, -1, FALSE, '`levels`', FALSE, FALSE, FALSE, 'FORMATTED TEXT');
+		$this->levels->FldDefaultErrMsg = $Language->Phrase("IncorrectInteger");
+		$this->fields['levels'] = &$this->levels;
 	}
 
 	// Single column sort
@@ -134,12 +140,18 @@ class c_login extends cTable {
 
 	// Apply User ID filters
 	function ApplyUserIDFilters($sFilter) {
+		global $Security;
+
+		// Add User ID filter
+		if (!$this->AllowAnonymousUser() && $Security->CurrentUserID() <> "" && !$Security->IsAdmin()) { // Non system admin
+			$sFilter = $this->AddUserIDFilter($sFilter);
+		}
 		return $sFilter;
 	}
 
 	// Check if User ID security allows view all
 	function UserIDAllow($id = "") {
-		$allow = EW_USER_ID_ALLOW;
+		$allow = $this->UserIDAllowSecurity;
 		switch ($id) {
 			case "add":
 			case "copy":
@@ -491,6 +503,7 @@ class c_login extends cTable {
 		$this->_Email->setDbValue($rs->fields('Email'));
 		$this->Activated->setDbValue($rs->fields('Activated'));
 		$this->Profile->setDbValue($rs->fields('Profile'));
+		$this->levels->setDbValue($rs->fields('levels'));
 	}
 
 	// Render list row values
@@ -507,6 +520,7 @@ class c_login extends cTable {
 		// Email
 		// Activated
 		// Profile
+		// levels
 		// idlogin
 
 		$this->idlogin->ViewValue = $this->idlogin->CurrentValue;
@@ -531,6 +545,34 @@ class c_login extends cTable {
 		// Profile
 		$this->Profile->ViewValue = $this->Profile->CurrentValue;
 		$this->Profile->ViewCustomAttributes = "";
+
+		// levels
+		if ($Security->CanAdmin()) { // System admin
+		if (strval($this->levels->CurrentValue) <> "") {
+			$sFilterWrk = "`userlevelid`" . ew_SearchString("=", $this->levels->CurrentValue, EW_DATATYPE_NUMBER);
+		$sSqlWrk = "SELECT `userlevelid`, `userlevelname` AS `DispFld`, '' AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld` FROM `userlevels`";
+		$sWhereWrk = "";
+		if ($sFilterWrk <> "") {
+			ew_AddFilter($sWhereWrk, $sFilterWrk);
+		}
+
+		// Call Lookup selecting
+		$this->Lookup_Selecting($this->levels, $sWhereWrk);
+		if ($sWhereWrk <> "") $sSqlWrk .= " WHERE " . $sWhereWrk;
+			$rswrk = $conn->Execute($sSqlWrk);
+			if ($rswrk && !$rswrk->EOF) { // Lookup values found
+				$this->levels->ViewValue = $rswrk->fields('DispFld');
+				$rswrk->Close();
+			} else {
+				$this->levels->ViewValue = $this->levels->CurrentValue;
+			}
+		} else {
+			$this->levels->ViewValue = NULL;
+		}
+		} else {
+			$this->levels->ViewValue = "********";
+		}
+		$this->levels->ViewCustomAttributes = "";
 
 		// idlogin
 		$this->idlogin->LinkCustomAttributes = "";
@@ -562,6 +604,11 @@ class c_login extends cTable {
 		$this->Profile->HrefValue = "";
 		$this->Profile->TooltipValue = "";
 
+		// levels
+		$this->levels->LinkCustomAttributes = "";
+		$this->levels->HrefValue = "";
+		$this->levels->TooltipValue = "";
+
 		// Call Row Rendered event
 		$this->Row_Rendered();
 	}
@@ -590,6 +637,7 @@ class c_login extends cTable {
 				if ($this->_Email->Exportable) $Doc->ExportCaption($this->_Email);
 				if ($this->Activated->Exportable) $Doc->ExportCaption($this->Activated);
 				if ($this->Profile->Exportable) $Doc->ExportCaption($this->Profile);
+				if ($this->levels->Exportable) $Doc->ExportCaption($this->levels);
 			} else {
 				if ($this->idlogin->Exportable) $Doc->ExportCaption($this->idlogin);
 				if ($this->loginname->Exportable) $Doc->ExportCaption($this->loginname);
@@ -597,6 +645,7 @@ class c_login extends cTable {
 				if ($this->_Email->Exportable) $Doc->ExportCaption($this->_Email);
 				if ($this->Activated->Exportable) $Doc->ExportCaption($this->Activated);
 				if ($this->Profile->Exportable) $Doc->ExportCaption($this->Profile);
+				if ($this->levels->Exportable) $Doc->ExportCaption($this->levels);
 			}
 			$Doc->EndExportRow();
 		}
@@ -632,6 +681,7 @@ class c_login extends cTable {
 					if ($this->_Email->Exportable) $Doc->ExportField($this->_Email);
 					if ($this->Activated->Exportable) $Doc->ExportField($this->Activated);
 					if ($this->Profile->Exportable) $Doc->ExportField($this->Profile);
+					if ($this->levels->Exportable) $Doc->ExportField($this->levels);
 				} else {
 					if ($this->idlogin->Exportable) $Doc->ExportField($this->idlogin);
 					if ($this->loginname->Exportable) $Doc->ExportField($this->loginname);
@@ -639,12 +689,65 @@ class c_login extends cTable {
 					if ($this->_Email->Exportable) $Doc->ExportField($this->_Email);
 					if ($this->Activated->Exportable) $Doc->ExportField($this->Activated);
 					if ($this->Profile->Exportable) $Doc->ExportField($this->Profile);
+					if ($this->levels->Exportable) $Doc->ExportField($this->levels);
 				}
 				$Doc->EndExportRow();
 			}
 			$Recordset->MoveNext();
 		}
 		$Doc->ExportTableFooter();
+	}
+
+	// User ID filter
+	function UserIDFilter($userid) {
+		$sUserIDFilter = '`idlogin` = ' . ew_QuotedValue($userid, EW_DATATYPE_NUMBER);
+		return $sUserIDFilter;
+	}
+
+	// Add User ID filter
+	function AddUserIDFilter($sFilter) {
+		global $Security;
+		$sFilterWrk = "";
+		$id = (CurrentPageID() == "list") ? $this->CurrentAction : CurrentPageID();
+		if (!$this->UserIDAllow($id) && !$Security->IsAdmin()) {
+			$sFilterWrk = $Security->UserIDList();
+			if ($sFilterWrk <> "")
+				$sFilterWrk = '`idlogin` IN (' . $sFilterWrk . ')';
+		}
+
+		// Call Row Rendered event
+		$this->UserID_Filtering($sFilterWrk);
+		ew_AddFilter($sFilter, $sFilterWrk);
+		return $sFilter;
+	}
+
+	// User ID subquery
+	function GetUserIDSubquery(&$fld, &$masterfld) {
+		global $conn;
+		$sWrk = "";
+		$sSql = "SELECT " . $masterfld->FldExpression . " FROM `login`";
+		$sFilter = $this->AddUserIDFilter("");
+		if ($sFilter <> "") $sSql .= " WHERE " . $sFilter;
+
+		// Use subquery
+		if (EW_USE_SUBQUERY_FOR_MASTER_USER_ID) {
+			$sWrk = $sSql;
+		} else {
+
+			// List all values
+			if ($rs = $conn->Execute($sSql)) {
+				while (!$rs->EOF) {
+					if ($sWrk <> "") $sWrk .= ",";
+					$sWrk .= ew_QuotedValue($rs->fields[0], $masterfld->FldDataType);
+					$rs->MoveNext();
+				}
+				$rs->Close();
+			}
+		}
+		if ($sWrk <> "") {
+			$sWrk = $fld->FldExpression . " IN (" . $sWrk . ")";
+		}
+		return $sWrk;
 	}
 
 	// Table level events

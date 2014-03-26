@@ -686,6 +686,10 @@ class ccommand extends cTable {
 				if ($this->user_id->Exportable) $Doc->ExportCaption($this->user_id);
 				if ($this->task_id->Exportable) $Doc->ExportCaption($this->task_id);
 				if ($this->server_id->Exportable) $Doc->ExportCaption($this->server_id);
+				if ($this->command_input->Exportable) $Doc->ExportCaption($this->command_input);
+				if ($this->command_output->Exportable) $Doc->ExportCaption($this->command_output);
+				if ($this->command_status->Exportable) $Doc->ExportCaption($this->command_status);
+				if ($this->command_log->Exportable) $Doc->ExportCaption($this->command_log);
 				if ($this->command_time->Exportable) $Doc->ExportCaption($this->command_time);
 			}
 			$Doc->EndExportRow();
@@ -730,6 +734,10 @@ class ccommand extends cTable {
 					if ($this->user_id->Exportable) $Doc->ExportField($this->user_id);
 					if ($this->task_id->Exportable) $Doc->ExportField($this->task_id);
 					if ($this->server_id->Exportable) $Doc->ExportField($this->server_id);
+					if ($this->command_input->Exportable) $Doc->ExportField($this->command_input);
+					if ($this->command_output->Exportable) $Doc->ExportField($this->command_output);
+					if ($this->command_status->Exportable) $Doc->ExportField($this->command_status);
+					if ($this->command_log->Exportable) $Doc->ExportField($this->command_log);
 					if ($this->command_time->Exportable) $Doc->ExportField($this->command_time);
 				}
 				$Doc->EndExportRow();

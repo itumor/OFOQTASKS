@@ -209,6 +209,21 @@ class ctask_edit extends ctask {
 			$Security->SaveLastUrl();
 			$this->Page_Terminate("login.php");
 		}
+		$Security->TablePermission_Loading();
+		$Security->LoadCurrentUserLevel($this->ProjectID . $this->TableName);
+		$Security->TablePermission_Loaded();
+		if (!$Security->IsLoggedIn()) {
+			$Security->SaveLastUrl();
+			$this->Page_Terminate("login.php");
+		}
+		if (!$Security->CanEdit()) {
+			$Security->SaveLastUrl();
+			$this->setFailureMessage($Language->Phrase("NoPermission")); // Set no permission
+			$this->Page_Terminate("tasklist.php");
+		}
+		$Security->UserID_Loading();
+		if ($Security->IsLoggedIn()) $Security->LoadUserID();
+		$Security->UserID_Loaded();
 
 		// Create form object
 		$objForm = new cFormObj();
@@ -414,6 +429,12 @@ class ctask_edit extends ctask {
 		if (!$this->task_name->FldIsDetailKey) {
 			$this->task_name->setFormValue($objForm->GetValue("x_task_name"));
 		}
+		if (!$this->sqlscript->FldIsDetailKey) {
+			$this->sqlscript->setFormValue($objForm->GetValue("x_sqlscript"));
+		}
+		if (!$this->phpscript->FldIsDetailKey) {
+			$this->phpscript->setFormValue($objForm->GetValue("x_phpscript"));
+		}
 	}
 
 	// Restore form values
@@ -422,6 +443,8 @@ class ctask_edit extends ctask {
 		$this->LoadRow();
 		$this->task_id->CurrentValue = $this->task_id->FormValue;
 		$this->task_name->CurrentValue = $this->task_name->FormValue;
+		$this->sqlscript->CurrentValue = $this->sqlscript->FormValue;
+		$this->phpscript->CurrentValue = $this->phpscript->FormValue;
 	}
 
 	// Load recordset
@@ -475,6 +498,8 @@ class ctask_edit extends ctask {
 		$this->Row_Selected($row);
 		$this->task_id->setDbValue($rs->fields('task_id'));
 		$this->task_name->setDbValue($rs->fields('task_name'));
+		$this->sqlscript->setDbValue($rs->fields('sqlscript'));
+		$this->phpscript->setDbValue($rs->fields('phpscript'));
 	}
 
 	// Load DbValue from recordset
@@ -483,6 +508,8 @@ class ctask_edit extends ctask {
 		$row = is_array($rs) ? $rs : $rs->fields;
 		$this->task_id->DbValue = $row['task_id'];
 		$this->task_name->DbValue = $row['task_name'];
+		$this->sqlscript->DbValue = $row['sqlscript'];
+		$this->phpscript->DbValue = $row['phpscript'];
 	}
 
 	// Render row values based on field settings
@@ -498,6 +525,8 @@ class ctask_edit extends ctask {
 		// Common render codes for all row types
 		// task_id
 		// task_name
+		// sqlscript
+		// phpscript
 
 		if ($this->RowType == EW_ROWTYPE_VIEW) { // View row
 
@@ -509,6 +538,14 @@ class ctask_edit extends ctask {
 			$this->task_name->ViewValue = $this->task_name->CurrentValue;
 			$this->task_name->ViewCustomAttributes = "";
 
+			// sqlscript
+			$this->sqlscript->ViewValue = $this->sqlscript->CurrentValue;
+			$this->sqlscript->ViewCustomAttributes = "";
+
+			// phpscript
+			$this->phpscript->ViewValue = $this->phpscript->CurrentValue;
+			$this->phpscript->ViewCustomAttributes = "";
+
 			// task_id
 			$this->task_id->LinkCustomAttributes = "";
 			$this->task_id->HrefValue = "";
@@ -518,6 +555,16 @@ class ctask_edit extends ctask {
 			$this->task_name->LinkCustomAttributes = "";
 			$this->task_name->HrefValue = "";
 			$this->task_name->TooltipValue = "";
+
+			// sqlscript
+			$this->sqlscript->LinkCustomAttributes = "";
+			$this->sqlscript->HrefValue = "";
+			$this->sqlscript->TooltipValue = "";
+
+			// phpscript
+			$this->phpscript->LinkCustomAttributes = "";
+			$this->phpscript->HrefValue = "";
+			$this->phpscript->TooltipValue = "";
 		} elseif ($this->RowType == EW_ROWTYPE_EDIT) { // Edit row
 
 			// task_id
@@ -530,6 +577,16 @@ class ctask_edit extends ctask {
 			$this->task_name->EditValue = ew_HtmlEncode($this->task_name->CurrentValue);
 			$this->task_name->PlaceHolder = ew_HtmlEncode(ew_RemoveHtml($this->task_name->FldCaption()));
 
+			// sqlscript
+			$this->sqlscript->EditCustomAttributes = "";
+			$this->sqlscript->EditValue = $this->sqlscript->CurrentValue;
+			$this->sqlscript->PlaceHolder = ew_HtmlEncode(ew_RemoveHtml($this->sqlscript->FldCaption()));
+
+			// phpscript
+			$this->phpscript->EditCustomAttributes = "";
+			$this->phpscript->EditValue = $this->phpscript->CurrentValue;
+			$this->phpscript->PlaceHolder = ew_HtmlEncode(ew_RemoveHtml($this->phpscript->FldCaption()));
+
 			// Edit refer script
 			// task_id
 
@@ -537,6 +594,12 @@ class ctask_edit extends ctask {
 
 			// task_name
 			$this->task_name->HrefValue = "";
+
+			// sqlscript
+			$this->sqlscript->HrefValue = "";
+
+			// phpscript
+			$this->phpscript->HrefValue = "";
 		}
 		if ($this->RowType == EW_ROWTYPE_ADD ||
 			$this->RowType == EW_ROWTYPE_EDIT ||
@@ -561,6 +624,12 @@ class ctask_edit extends ctask {
 			return ($gsFormError == "");
 		if (!$this->task_name->FldIsDetailKey && !is_null($this->task_name->FormValue) && $this->task_name->FormValue == "") {
 			ew_AddMessage($gsFormError, $Language->Phrase("EnterRequiredField") . " - " . $this->task_name->FldCaption());
+		}
+		if (!$this->sqlscript->FldIsDetailKey && !is_null($this->sqlscript->FormValue) && $this->sqlscript->FormValue == "") {
+			ew_AddMessage($gsFormError, $Language->Phrase("EnterRequiredField") . " - " . $this->sqlscript->FldCaption());
+		}
+		if (!$this->phpscript->FldIsDetailKey && !is_null($this->phpscript->FormValue) && $this->phpscript->FormValue == "") {
+			ew_AddMessage($gsFormError, $Language->Phrase("EnterRequiredField") . " - " . $this->phpscript->FldCaption());
 		}
 
 		// Return validate result
@@ -597,6 +666,12 @@ class ctask_edit extends ctask {
 
 			// task_name
 			$this->task_name->SetDbValueDef($rsnew, $this->task_name->CurrentValue, "", $this->task_name->ReadOnly);
+
+			// sqlscript
+			$this->sqlscript->SetDbValueDef($rsnew, $this->sqlscript->CurrentValue, "", $this->sqlscript->ReadOnly);
+
+			// phpscript
+			$this->phpscript->SetDbValueDef($rsnew, $this->phpscript->CurrentValue, "", $this->phpscript->ReadOnly);
 
 			// Call Row Updating event
 			$bUpdateRow = $this->Row_Updating($rsold, $rsnew);
@@ -646,7 +721,7 @@ class ctask_edit extends ctask {
 	// Write Audit Trail start/end for grid update
 	function WriteAuditTrailDummy($typ) {
 		$table = 'task';
-	  $usr = CurrentUserName();
+	  $usr = CurrentUserID();
 		ew_WriteAuditTrail("log", ew_StdCurrentDateTime(), ew_ScriptName(), $usr, $typ, $table, "", "", "", "");
 	}
 
@@ -663,7 +738,7 @@ class ctask_edit extends ctask {
 		// Write Audit Trail
 		$dt = ew_StdCurrentDateTime();
 		$id = ew_ScriptName();
-	  $usr = CurrentUserName();
+	  $usr = CurrentUserID();
 		foreach (array_keys($rsnew) as $fldname) {
 			if ($this->fields[$fldname]->FldDataType <> EW_DATATYPE_BLOB) { // Ignore BLOB fields
 				if ($this->fields[$fldname]->FldDataType == EW_DATATYPE_DATE) { // DateTime field
@@ -809,6 +884,12 @@ ftaskedit.Validate = function() {
 			elm = this.GetElements("x" + infix + "_task_name");
 			if (elm && !ew_HasValue(elm))
 				return this.OnError(elm, ewLanguage.Phrase("EnterRequiredField") + " - <?php echo ew_JsEncode2($task->task_name->FldCaption()) ?>");
+			elm = this.GetElements("x" + infix + "_sqlscript");
+			if (elm && !ew_HasValue(elm))
+				return this.OnError(elm, ewLanguage.Phrase("EnterRequiredField") + " - <?php echo ew_JsEncode2($task->sqlscript->FldCaption()) ?>");
+			elm = this.GetElements("x" + infix + "_phpscript");
+			if (elm && !ew_HasValue(elm))
+				return this.OnError(elm, ewLanguage.Phrase("EnterRequiredField") + " - <?php echo ew_JsEncode2($task->phpscript->FldCaption()) ?>");
 
 			// Set up row object
 			ew_ElementsToRow(fobj);
@@ -932,6 +1013,42 @@ $task_edit->ShowMessage();
 <input type="hidden" data-field="x_task_name" name="x_task_name" id="x_task_name" value="<?php echo ew_HtmlEncode($task->task_name->FormValue) ?>">
 <?php } ?>
 <?php echo $task->task_name->CustomMsg ?></td>
+	</tr>
+<?php } ?>
+<?php if ($task->sqlscript->Visible) { // sqlscript ?>
+	<tr id="r_sqlscript">
+		<td><span id="elh_task_sqlscript"><?php echo $task->sqlscript->FldCaption() ?><?php echo $Language->Phrase("FieldRequiredIndicator") ?></span></td>
+		<td<?php echo $task->sqlscript->CellAttributes() ?>>
+<?php if ($task->CurrentAction <> "F") { ?>
+<span id="el_task_sqlscript" class="control-group">
+<textarea data-field="x_sqlscript" name="x_sqlscript" id="x_sqlscript" cols="35" rows="4" placeholder="<?php echo $task->sqlscript->PlaceHolder ?>"<?php echo $task->sqlscript->EditAttributes() ?>><?php echo $task->sqlscript->EditValue ?></textarea>
+</span>
+<?php } else { ?>
+<span id="el_task_sqlscript" class="control-group">
+<span<?php echo $task->sqlscript->ViewAttributes() ?>>
+<?php echo $task->sqlscript->ViewValue ?></span>
+</span>
+<input type="hidden" data-field="x_sqlscript" name="x_sqlscript" id="x_sqlscript" value="<?php echo ew_HtmlEncode($task->sqlscript->FormValue) ?>">
+<?php } ?>
+<?php echo $task->sqlscript->CustomMsg ?></td>
+	</tr>
+<?php } ?>
+<?php if ($task->phpscript->Visible) { // phpscript ?>
+	<tr id="r_phpscript">
+		<td><span id="elh_task_phpscript"><?php echo $task->phpscript->FldCaption() ?><?php echo $Language->Phrase("FieldRequiredIndicator") ?></span></td>
+		<td<?php echo $task->phpscript->CellAttributes() ?>>
+<?php if ($task->CurrentAction <> "F") { ?>
+<span id="el_task_phpscript" class="control-group">
+<textarea data-field="x_phpscript" name="x_phpscript" id="x_phpscript" cols="35" rows="4" placeholder="<?php echo $task->phpscript->PlaceHolder ?>"<?php echo $task->phpscript->EditAttributes() ?>><?php echo $task->phpscript->EditValue ?></textarea>
+</span>
+<?php } else { ?>
+<span id="el_task_phpscript" class="control-group">
+<span<?php echo $task->phpscript->ViewAttributes() ?>>
+<?php echo $task->phpscript->ViewValue ?></span>
+</span>
+<input type="hidden" data-field="x_phpscript" name="x_phpscript" id="x_phpscript" value="<?php echo ew_HtmlEncode($task->phpscript->FormValue) ?>">
+<?php } ?>
+<?php echo $task->phpscript->CustomMsg ?></td>
 	</tr>
 <?php } ?>
 </table>

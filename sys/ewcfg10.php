@@ -26,7 +26,7 @@ define("EW_CONFIG_FILE_FOLDER", EW_PROJECT_NAME . "", TRUE); // Config file name
 define("EW_PROJECT_ID", "{3246B9FA-4C51-4733-8040-34B188FCD87E}", TRUE); // Project ID (GUID)
 $EW_RELATED_PROJECT_ID = "";
 $EW_RELATED_LANGUAGE_FOLDER = "";
-define("EW_RANDOM_KEY", '0a8t9Ee2bZyx4xIF', TRUE); // Random key for encryption
+define("EW_RANDOM_KEY", '4ZGtxe6KsUaeiESi', TRUE); // Random key for encryption
 define("EW_PROJECT_STYLESHEET_FILENAME", "phpcss/project1.css", TRUE); // Project stylesheet file name
 define("EW_CHARSET", "", TRUE); // Project charset
 define("EW_EMAIL_CHARSET", EW_CHARSET, TRUE); // Email charset
@@ -195,6 +195,21 @@ define("EW_ADMIN_USER_NAME", "admin", TRUE); // Administrator user name
 define("EW_ADMIN_PASSWORD", "adminadmin", TRUE); // Administrator password
 define("EW_USE_CUSTOM_LOGIN", TRUE, TRUE); // Use custom login
 
+// Dynamic User Level settings
+// User level definition table/field names
+
+@define("EW_USER_LEVEL_TABLE", "`userlevels`", TRUE);
+@define("EW_USER_LEVEL_ID_FIELD", "`userlevelid`", TRUE);
+@define("EW_USER_LEVEL_NAME_FIELD", "`userlevelname`", TRUE);
+
+// User Level privileges table/field names
+@define("EW_USER_LEVEL_PRIV_TABLE", "`userlevelpermissions`", TRUE);
+@define("EW_USER_LEVEL_PRIV_TABLE_NAME_FIELD", "`tablename`", TRUE);
+@define("EW_USER_LEVEL_PRIV_TABLE_NAME_FIELD_2", "tablename", TRUE);
+@define("EW_USER_LEVEL_PRIV_TABLE_NAME_FIELD_SIZE", 255, TRUE);
+@define("EW_USER_LEVEL_PRIV_USER_LEVEL_ID_FIELD", "`userlevelid`", TRUE);
+@define("EW_USER_LEVEL_PRIV_PRIV_FIELD", "`permission`", TRUE);
+
 // User level constants
 define("EW_ALLOW_ADD", 1, TRUE); // Add
 define("EW_ALLOW_DELETE", 2, TRUE); // Delete
@@ -220,7 +235,7 @@ define("EW_USER_ID_ALLOW", 104, TRUE);
 // User table filters
 define("EW_USER_TABLE", "`login`",  TRUE);
 define("EW_USER_NAME_FILTER", "(`loginname` = '%u')",  TRUE);
-define("EW_USER_ID_FILTER", "",  TRUE);
+define("EW_USER_ID_FILTER", "(`idlogin` = %u)",  TRUE);
 define("EW_USER_EMAIL_FILTER", "(`Email` = '%e')",  TRUE);
 define("EW_USER_ACTIVATE_FILTER", "",  TRUE);
 define("EW_USER_PROFILE_FIELD_NAME", "Profile",  TRUE);

@@ -209,6 +209,21 @@ class ccommand_edit extends ccommand {
 			$Security->SaveLastUrl();
 			$this->Page_Terminate("login.php");
 		}
+		$Security->TablePermission_Loading();
+		$Security->LoadCurrentUserLevel($this->ProjectID . $this->TableName);
+		$Security->TablePermission_Loaded();
+		if (!$Security->IsLoggedIn()) {
+			$Security->SaveLastUrl();
+			$this->Page_Terminate("login.php");
+		}
+		if (!$Security->CanEdit()) {
+			$Security->SaveLastUrl();
+			$this->setFailureMessage($Language->Phrase("NoPermission")); // Set no permission
+			$this->Page_Terminate("commandlist.php");
+		}
+		$Security->UserID_Loading();
+		if ($Security->IsLoggedIn()) $Security->LoadUserID();
+		$Security->UserID_Loaded();
 
 		// Create form object
 		$objForm = new cFormObj();
@@ -849,29 +864,29 @@ class ccommand_edit extends ccommand {
 			$rsnew = array();
 
 			// user_id
-			$this->user_id->SetDbValueDef($rsnew, CurrentUserID(), 0);
+			$this->user_id->SetDbValueDef($rsnew, CurrentUserID(), NULL);
 			$rsnew['user_id'] = &$this->user_id->DbValue;
 
 			// task_id
-			$this->task_id->SetDbValueDef($rsnew, $this->task_id->CurrentValue, 0, $this->task_id->ReadOnly);
+			$this->task_id->SetDbValueDef($rsnew, $this->task_id->CurrentValue, NULL, $this->task_id->ReadOnly);
 
 			// server_id
-			$this->server_id->SetDbValueDef($rsnew, $this->server_id->CurrentValue, 0, $this->server_id->ReadOnly);
+			$this->server_id->SetDbValueDef($rsnew, $this->server_id->CurrentValue, NULL, $this->server_id->ReadOnly);
 
 			// command_input
-			$this->command_input->SetDbValueDef($rsnew, $this->command_input->CurrentValue, "", $this->command_input->ReadOnly);
+			$this->command_input->SetDbValueDef($rsnew, $this->command_input->CurrentValue, NULL, $this->command_input->ReadOnly);
 
 			// command_output
-			$this->command_output->SetDbValueDef($rsnew, $this->command_output->CurrentValue, "", $this->command_output->ReadOnly);
+			$this->command_output->SetDbValueDef($rsnew, $this->command_output->CurrentValue, NULL, $this->command_output->ReadOnly);
 
 			// command_status
-			$this->command_status->SetDbValueDef($rsnew, $this->command_status->CurrentValue, "", $this->command_status->ReadOnly);
+			$this->command_status->SetDbValueDef($rsnew, $this->command_status->CurrentValue, NULL, $this->command_status->ReadOnly);
 
 			// command_log
-			$this->command_log->SetDbValueDef($rsnew, $this->command_log->CurrentValue, "", $this->command_log->ReadOnly);
+			$this->command_log->SetDbValueDef($rsnew, $this->command_log->CurrentValue, NULL, $this->command_log->ReadOnly);
 
 			// command_time
-			$this->command_time->SetDbValueDef($rsnew, ew_CurrentDateTime(), ew_CurrentDate());
+			$this->command_time->SetDbValueDef($rsnew, ew_CurrentDateTime(), NULL);
 			$rsnew['command_time'] = &$this->command_time->DbValue;
 
 			// Call Row Updating event
@@ -922,7 +937,7 @@ class ccommand_edit extends ccommand {
 	// Write Audit Trail start/end for grid update
 	function WriteAuditTrailDummy($typ) {
 		$table = 'command';
-	  $usr = CurrentUserName();
+	  $usr = CurrentUserID();
 		ew_WriteAuditTrail("log", ew_StdCurrentDateTime(), ew_ScriptName(), $usr, $typ, $table, "", "", "", "");
 	}
 
@@ -939,7 +954,7 @@ class ccommand_edit extends ccommand {
 		// Write Audit Trail
 		$dt = ew_StdCurrentDateTime();
 		$id = ew_ScriptName();
-	  $usr = CurrentUserName();
+	  $usr = CurrentUserID();
 		foreach (array_keys($rsnew) as $fldname) {
 			if ($this->fields[$fldname]->FldDataType <> EW_DATATYPE_BLOB) { // Ignore BLOB fields
 				if ($this->fields[$fldname]->FldDataType == EW_DATATYPE_DATE) { // DateTime field

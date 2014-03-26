@@ -192,32 +192,43 @@ class cdefault {
 	function Page_Main() {
 		global $Security, $Language;
 		if (!$Security->IsLoggedIn()) $Security->AutoLogin();
-		if ($Security->IsLoggedIn())
+		$Security->LoadUserLevel(); // Load User Level
+		if ($Security->AllowList(CurrentProjectID() . 'command'))
 		$this->Page_Terminate("commandlist.php"); // Exit and go to default page
-		if ($Security->IsLoggedIn())
+		if ($Security->AllowList(CurrentProjectID() . 'function_group'))
 			$this->Page_Terminate("function_grouplist.php");
-		if ($Security->IsLoggedIn())
+		if ($Security->AllowList(CurrentProjectID() . 'function_group_relation'))
 			$this->Page_Terminate("function_group_relationlist.php");
-		if ($Security->IsLoggedIn())
+		if ($Security->AllowList(CurrentProjectID() . 'parameter'))
 			$this->Page_Terminate("parameterlist.php");
-		if ($Security->IsLoggedIn())
+		if ($Security->AllowList(CurrentProjectID() . 'script'))
 			$this->Page_Terminate("scriptlist.php");
-		if ($Security->IsLoggedIn())
+		if ($Security->AllowList(CurrentProjectID() . 'script_function'))
 			$this->Page_Terminate("script_functionlist.php");
-		if ($Security->IsLoggedIn())
+		if ($Security->AllowList(CurrentProjectID() . 'server'))
 			$this->Page_Terminate("serverlist.php");
-		if ($Security->IsLoggedIn())
+		if ($Security->AllowList(CurrentProjectID() . 'task'))
 			$this->Page_Terminate("tasklist.php");
-		if ($Security->IsLoggedIn())
+		if ($Security->AllowList(CurrentProjectID() . 'task_function_group'))
 			$this->Page_Terminate("task_function_grouplist.php");
-		if ($Security->IsLoggedIn())
+		if ($Security->AllowList(CurrentProjectID() . 'audittrail'))
 			$this->Page_Terminate("audittraillist.php");
-		if ($Security->IsLoggedIn())
+		if ($Security->AllowList(CurrentProjectID() . 'login'))
 			$this->Page_Terminate("_loginlist.php");
-		if ($Security->IsLoggedIn())
+		if ($Security->AllowList(CurrentProjectID() . 'generator report'))
 			$this->Page_Terminate("generator_reportlist.php");
-		if ($Security->IsLoggedIn())
+		if ($Security->AllowList(CurrentProjectID() . 'Report Grouping by Task'))
 			$this->Page_Terminate("Report_Grouping_by_Taskreport.php");
+		if ($Security->AllowList(CurrentProjectID() . 'userlevelpermissions'))
+			$this->Page_Terminate("userlevelpermissionslist.php");
+		if ($Security->AllowList(CurrentProjectID() . 'userlevels'))
+			$this->Page_Terminate("userlevelslist.php");
+		if ($Security->AllowList(CurrentProjectID() . 'start_task'))
+			$this->Page_Terminate("start_tasklist.php");
+		if ($Security->AllowList(CurrentProjectID() . 'restart_task'))
+			$this->Page_Terminate("restart_tasklist.php");
+		if ($Security->AllowList(CurrentProjectID() . 'listandstart_task'))
+			$this->Page_Terminate("listandstart_tasklist.php");
 		if ($Security->IsLoggedIn()) {
 			$this->setFailureMessage($Language->Phrase("NoPermission") . "<br><br><a href=\"logout.php\">" . $Language->Phrase("BackToLogin") . "</a>");
 		} else {

@@ -209,6 +209,21 @@ class ccommand_delete extends ccommand {
 			$Security->SaveLastUrl();
 			$this->Page_Terminate("login.php");
 		}
+		$Security->TablePermission_Loading();
+		$Security->LoadCurrentUserLevel($this->ProjectID . $this->TableName);
+		$Security->TablePermission_Loaded();
+		if (!$Security->IsLoggedIn()) {
+			$Security->SaveLastUrl();
+			$this->Page_Terminate("login.php");
+		}
+		if (!$Security->CanDelete()) {
+			$Security->SaveLastUrl();
+			$this->setFailureMessage($Language->Phrase("NoPermission")); // Set no permission
+			$this->Page_Terminate("commandlist.php");
+		}
+		$Security->UserID_Loading();
+		if ($Security->IsLoggedIn()) $Security->LoadUserID();
+		$Security->UserID_Loaded();
 		$this->CurrentAction = (@$_GET["a"] <> "") ? $_GET["a"] : @$_POST["a_list"]; // Set up curent action
 		$this->command_id->Visible = !$this->IsAdd() && !$this->IsCopy() && !$this->IsGridAdd();
 
@@ -442,6 +457,22 @@ class ccommand_delete extends ccommand {
 			}
 			$this->server_id->ViewCustomAttributes = "";
 
+			// command_input
+			$this->command_input->ViewValue = $this->command_input->CurrentValue;
+			$this->command_input->ViewCustomAttributes = "";
+
+			// command_output
+			$this->command_output->ViewValue = $this->command_output->CurrentValue;
+			$this->command_output->ViewCustomAttributes = "";
+
+			// command_status
+			$this->command_status->ViewValue = $this->command_status->CurrentValue;
+			$this->command_status->ViewCustomAttributes = "";
+
+			// command_log
+			$this->command_log->ViewValue = $this->command_log->CurrentValue;
+			$this->command_log->ViewCustomAttributes = "";
+
 			// command_time
 			$this->command_time->ViewValue = $this->command_time->CurrentValue;
 			$this->command_time->ViewValue = ew_FormatDateTime($this->command_time->ViewValue, 11);
@@ -467,6 +498,26 @@ class ccommand_delete extends ccommand {
 			$this->server_id->HrefValue = "";
 			$this->server_id->TooltipValue = "";
 
+			// command_input
+			$this->command_input->LinkCustomAttributes = "";
+			$this->command_input->HrefValue = "";
+			$this->command_input->TooltipValue = "";
+
+			// command_output
+			$this->command_output->LinkCustomAttributes = "";
+			$this->command_output->HrefValue = "";
+			$this->command_output->TooltipValue = "";
+
+			// command_status
+			$this->command_status->LinkCustomAttributes = "";
+			$this->command_status->HrefValue = "";
+			$this->command_status->TooltipValue = "";
+
+			// command_log
+			$this->command_log->LinkCustomAttributes = "";
+			$this->command_log->HrefValue = "";
+			$this->command_log->TooltipValue = "";
+
 			// command_time
 			$this->command_time->LinkCustomAttributes = "";
 			$this->command_time->HrefValue = "";
@@ -483,6 +534,10 @@ class ccommand_delete extends ccommand {
 	//
 	function DeleteRows() {
 		global $conn, $Language, $Security;
+		if (!$Security->CanDelete()) {
+			$this->setFailureMessage($Language->Phrase("NoDeletePermission")); // No delete permission
+			return FALSE;
+		}
 		$DeleteRows = TRUE;
 		$sSql = $this->SQL();
 		$conn->raiseErrorFn = 'ew_ErrorFn';
@@ -576,7 +631,7 @@ class ccommand_delete extends ccommand {
 	// Write Audit Trail start/end for grid update
 	function WriteAuditTrailDummy($typ) {
 		$table = 'command';
-	  $usr = CurrentUserName();
+	  $usr = CurrentUserID();
 		ew_WriteAuditTrail("log", ew_StdCurrentDateTime(), ew_ScriptName(), $usr, $typ, $table, "", "", "", "");
 	}
 
@@ -594,7 +649,7 @@ class ccommand_delete extends ccommand {
 		// Write Audit Trail
 		$dt = ew_StdCurrentDateTime();
 		$id = ew_ScriptName();
-	  $curUser = CurrentUserName();
+	  $curUser = CurrentUserID();
 		foreach (array_keys($rs) as $fldname) {
 			if (array_key_exists($fldname, $this->fields) && $this->fields[$fldname]->FldDataType <> EW_DATATYPE_BLOB) { // Ignore BLOB fields
 				if ($this->fields[$fldname]->FldDataType == EW_DATATYPE_MEMO) {
@@ -768,6 +823,18 @@ $command_delete->ShowMessage();
 <?php if ($command->server_id->Visible) { // server_id ?>
 		<td><span id="elh_command_server_id" class="command_server_id"><?php echo $command->server_id->FldCaption() ?></span></td>
 <?php } ?>
+<?php if ($command->command_input->Visible) { // command_input ?>
+		<td><span id="elh_command_command_input" class="command_command_input"><?php echo $command->command_input->FldCaption() ?></span></td>
+<?php } ?>
+<?php if ($command->command_output->Visible) { // command_output ?>
+		<td><span id="elh_command_command_output" class="command_command_output"><?php echo $command->command_output->FldCaption() ?></span></td>
+<?php } ?>
+<?php if ($command->command_status->Visible) { // command_status ?>
+		<td><span id="elh_command_command_status" class="command_command_status"><?php echo $command->command_status->FldCaption() ?></span></td>
+<?php } ?>
+<?php if ($command->command_log->Visible) { // command_log ?>
+		<td><span id="elh_command_command_log" class="command_command_log"><?php echo $command->command_log->FldCaption() ?></span></td>
+<?php } ?>
 <?php if ($command->command_time->Visible) { // command_time ?>
 		<td><span id="elh_command_command_time" class="command_command_time"><?php echo $command->command_time->FldCaption() ?></span></td>
 <?php } ?>
@@ -821,6 +888,38 @@ while (!$command_delete->Recordset->EOF) {
 <span id="el<?php echo $command_delete->RowCnt ?>_command_server_id" class="control-group command_server_id">
 <span<?php echo $command->server_id->ViewAttributes() ?>>
 <?php echo $command->server_id->ListViewValue() ?></span>
+</span>
+</td>
+<?php } ?>
+<?php if ($command->command_input->Visible) { // command_input ?>
+		<td<?php echo $command->command_input->CellAttributes() ?>>
+<span id="el<?php echo $command_delete->RowCnt ?>_command_command_input" class="control-group command_command_input">
+<span<?php echo $command->command_input->ViewAttributes() ?>>
+<?php echo $command->command_input->ListViewValue() ?></span>
+</span>
+</td>
+<?php } ?>
+<?php if ($command->command_output->Visible) { // command_output ?>
+		<td<?php echo $command->command_output->CellAttributes() ?>>
+<span id="el<?php echo $command_delete->RowCnt ?>_command_command_output" class="control-group command_command_output">
+<span<?php echo $command->command_output->ViewAttributes() ?>>
+<?php echo $command->command_output->ListViewValue() ?></span>
+</span>
+</td>
+<?php } ?>
+<?php if ($command->command_status->Visible) { // command_status ?>
+		<td<?php echo $command->command_status->CellAttributes() ?>>
+<span id="el<?php echo $command_delete->RowCnt ?>_command_command_status" class="control-group command_command_status">
+<span<?php echo $command->command_status->ViewAttributes() ?>>
+<?php echo $command->command_status->ListViewValue() ?></span>
+</span>
+</td>
+<?php } ?>
+<?php if ($command->command_log->Visible) { // command_log ?>
+		<td<?php echo $command->command_log->CellAttributes() ?>>
+<span id="el<?php echo $command_delete->RowCnt ?>_command_command_log" class="control-group command_command_log">
+<span<?php echo $command->command_log->ViewAttributes() ?>>
+<?php echo $command->command_log->ListViewValue() ?></span>
 </span>
 </td>
 <?php } ?>

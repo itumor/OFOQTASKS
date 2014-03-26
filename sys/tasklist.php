@@ -277,6 +277,21 @@ class ctask_list extends ctask {
 			$Security->SaveLastUrl();
 			$this->Page_Terminate("login.php");
 		}
+		$Security->TablePermission_Loading();
+		$Security->LoadCurrentUserLevel($this->ProjectID . $this->TableName);
+		$Security->TablePermission_Loaded();
+		if (!$Security->IsLoggedIn()) {
+			$Security->SaveLastUrl();
+			$this->Page_Terminate("login.php");
+		}
+		if (!$Security->CanList()) {
+			$Security->SaveLastUrl();
+			$this->setFailureMessage($Language->Phrase("NoPermission")); // Set no permission
+			$this->Page_Terminate("login.php");
+		}
+		$Security->UserID_Loading();
+		if ($Security->IsLoggedIn()) $Security->LoadUserID();
+		$Security->UserID_Loaded();
 
 		// Get export parameters
 		if (@$_GET["export"] <> "") {
@@ -500,6 +515,8 @@ class ctask_list extends ctask {
 
 		// Build filter
 		$sFilter = "";
+		if (!$Security->CanList())
+			$sFilter = "(0=1)"; // Filter all records
 		ew_AddFilter($sFilter, $this->DbDetailFilter);
 		ew_AddFilter($sFilter, $this->SearchWhere);
 
@@ -578,8 +595,11 @@ class ctask_list extends ctask {
 	function AdvancedSearchWhere() {
 		global $Security;
 		$sWhere = "";
+		if (!$Security->CanSearch()) return "";
 		$this->BuildSearchSql($sWhere, $this->task_id, FALSE); // task_id
 		$this->BuildSearchSql($sWhere, $this->task_name, FALSE); // task_name
+		$this->BuildSearchSql($sWhere, $this->sqlscript, FALSE); // sqlscript
+		$this->BuildSearchSql($sWhere, $this->phpscript, FALSE); // phpscript
 
 		// Set up search parm
 		if ($sWhere <> "") {
@@ -588,6 +608,8 @@ class ctask_list extends ctask {
 		if ($this->Command == "search") {
 			$this->task_id->AdvancedSearch->Save(); // task_id
 			$this->task_name->AdvancedSearch->Save(); // task_name
+			$this->sqlscript->AdvancedSearch->Save(); // sqlscript
+			$this->phpscript->AdvancedSearch->Save(); // phpscript
 		}
 		return $sWhere;
 	}
@@ -646,6 +668,8 @@ class ctask_list extends ctask {
 		$sKeyword = ew_AdjustSql($Keyword);
 		$sWhere = "";
 		$this->BuildBasicSearchSQL($sWhere, $this->task_name, $Keyword);
+		$this->BuildBasicSearchSQL($sWhere, $this->sqlscript, $Keyword);
+		$this->BuildBasicSearchSQL($sWhere, $this->phpscript, $Keyword);
 		return $sWhere;
 	}
 
@@ -667,6 +691,7 @@ class ctask_list extends ctask {
 	function BasicSearchWhere() {
 		global $Security;
 		$sSearchStr = "";
+		if (!$Security->CanSearch()) return "";
 		$sSearchKeyword = $this->BasicSearch->Keyword;
 		$sSearchType = $this->BasicSearch->Type;
 		if ($sSearchKeyword <> "") {
@@ -701,6 +726,10 @@ class ctask_list extends ctask {
 			return TRUE;
 		if ($this->task_name->AdvancedSearch->IssetSession())
 			return TRUE;
+		if ($this->sqlscript->AdvancedSearch->IssetSession())
+			return TRUE;
+		if ($this->phpscript->AdvancedSearch->IssetSession())
+			return TRUE;
 		return FALSE;
 	}
 
@@ -732,6 +761,8 @@ class ctask_list extends ctask {
 	function ResetAdvancedSearchParms() {
 		$this->task_id->AdvancedSearch->UnsetSession();
 		$this->task_name->AdvancedSearch->UnsetSession();
+		$this->sqlscript->AdvancedSearch->UnsetSession();
+		$this->phpscript->AdvancedSearch->UnsetSession();
 	}
 
 	// Restore all search parameters
@@ -744,6 +775,8 @@ class ctask_list extends ctask {
 		// Restore advanced search values
 		$this->task_id->AdvancedSearch->Load();
 		$this->task_name->AdvancedSearch->Load();
+		$this->sqlscript->AdvancedSearch->Load();
+		$this->phpscript->AdvancedSearch->Load();
 	}
 
 	// Set up sort parameters
@@ -755,6 +788,8 @@ class ctask_list extends ctask {
 			$this->CurrentOrderType = @$_GET["ordertype"];
 			$this->UpdateSort($this->task_id); // task_id
 			$this->UpdateSort($this->task_name); // task_name
+			$this->UpdateSort($this->sqlscript); // sqlscript
+			$this->UpdateSort($this->phpscript); // phpscript
 			$this->setStartRecordNumber(1); // Reset start position
 		}
 	}
@@ -789,6 +824,8 @@ class ctask_list extends ctask {
 				$this->setSessionOrderBy($sOrderBy);
 				$this->task_id->setSort("");
 				$this->task_name->setSort("");
+				$this->sqlscript->setSort("");
+				$this->phpscript->setSort("");
 			}
 
 			// Reset start position
@@ -810,24 +847,24 @@ class ctask_list extends ctask {
 		// "view"
 		$item = &$this->ListOptions->Add("view");
 		$item->CssStyle = "white-space: nowrap;";
-		$item->Visible = $Security->IsLoggedIn();
+		$item->Visible = $Security->CanView();
 		$item->OnLeft = TRUE;
 
 		// "edit"
 		$item = &$this->ListOptions->Add("edit");
 		$item->CssStyle = "white-space: nowrap;";
-		$item->Visible = $Security->IsLoggedIn();
+		$item->Visible = $Security->CanEdit();
 		$item->OnLeft = TRUE;
 
 		// "copy"
 		$item = &$this->ListOptions->Add("copy");
 		$item->CssStyle = "white-space: nowrap;";
-		$item->Visible = $Security->IsLoggedIn();
+		$item->Visible = $Security->CanAdd();
 		$item->OnLeft = TRUE;
 
 		// "checkbox"
 		$item = &$this->ListOptions->Add("checkbox");
-		$item->Visible = $Security->IsLoggedIn();
+		$item->Visible = $Security->CanDelete();
 		$item->OnLeft = TRUE;
 		$item->Header = "<label class=\"checkbox\"><input type=\"checkbox\" name=\"key\" id=\"key\" onclick=\"ew_SelectAllKey(this);\"></label>";
 		$item->MoveTo(0);
@@ -853,14 +890,14 @@ class ctask_list extends ctask {
 
 		// "view"
 		$oListOpt = &$this->ListOptions->Items["view"];
-		if ($Security->IsLoggedIn())
+		if ($Security->CanView())
 			$oListOpt->Body = "<a class=\"ewRowLink ewView\" data-caption=\"" . ew_HtmlTitle($Language->Phrase("ViewLink")) . "\" href=\"" . ew_HtmlEncode($this->ViewUrl) . "\">" . $Language->Phrase("ViewLink") . "</a>";
 		else
 			$oListOpt->Body = "";
 
 		// "edit"
 		$oListOpt = &$this->ListOptions->Items["edit"];
-		if ($Security->IsLoggedIn()) {
+		if ($Security->CanEdit()) {
 			$oListOpt->Body = "<a class=\"ewRowLink ewEdit\" data-caption=\"" . ew_HtmlTitle($Language->Phrase("EditLink")) . "\" href=\"" . ew_HtmlEncode($this->EditUrl) . "\">" . $Language->Phrase("EditLink") . "</a>";
 		} else {
 			$oListOpt->Body = "";
@@ -868,7 +905,7 @@ class ctask_list extends ctask {
 
 		// "copy"
 		$oListOpt = &$this->ListOptions->Items["copy"];
-		if ($Security->IsLoggedIn()) {
+		if ($Security->CanAdd()) {
 			$oListOpt->Body = "<a class=\"ewRowLink ewCopy\" data-caption=\"" . ew_HtmlTitle($Language->Phrase("CopyLink")) . "\" href=\"" . ew_HtmlEncode($this->CopyUrl) . "\">" . $Language->Phrase("CopyLink") . "</a>";
 		} else {
 			$oListOpt->Body = "";
@@ -892,13 +929,13 @@ class ctask_list extends ctask {
 		// Add
 		$item = &$option->Add("add");
 		$item->Body = "<a class=\"ewAddEdit ewAdd\" href=\"" . ew_HtmlEncode($this->AddUrl) . "\">" . $Language->Phrase("AddLink") . "</a>";
-		$item->Visible = ($this->AddUrl <> "" && $Security->IsLoggedIn());
+		$item->Visible = ($this->AddUrl <> "" && $Security->CanAdd());
 		$option = $options["action"];
 
 		// Add multi delete
 		$item = &$option->Add("multidelete");
 		$item->Body = "<a class=\"ewAction ewMultiDelete\" href=\"\" onclick=\"ew_SubmitSelected(document.ftasklist, '" . $this->MultiDeleteUrl . "', ewLanguage.Phrase('DeleteMultiConfirmMsg'));return false;\">" . $Language->Phrase("DeleteSelectedLink") . "</a>";
-		$item->Visible = ($Security->IsLoggedIn());
+		$item->Visible = ($Security->CanDelete());
 
 		// Set up options default
 		foreach ($options as &$option) {
@@ -1045,6 +1082,16 @@ class ctask_list extends ctask {
 		$this->task_name->AdvancedSearch->SearchValue = ew_StripSlashes(@$_GET["x_task_name"]);
 		if ($this->task_name->AdvancedSearch->SearchValue <> "") $this->Command = "search";
 		$this->task_name->AdvancedSearch->SearchOperator = @$_GET["z_task_name"];
+
+		// sqlscript
+		$this->sqlscript->AdvancedSearch->SearchValue = ew_StripSlashes(@$_GET["x_sqlscript"]);
+		if ($this->sqlscript->AdvancedSearch->SearchValue <> "") $this->Command = "search";
+		$this->sqlscript->AdvancedSearch->SearchOperator = @$_GET["z_sqlscript"];
+
+		// phpscript
+		$this->phpscript->AdvancedSearch->SearchValue = ew_StripSlashes(@$_GET["x_phpscript"]);
+		if ($this->phpscript->AdvancedSearch->SearchValue <> "") $this->Command = "search";
+		$this->phpscript->AdvancedSearch->SearchOperator = @$_GET["z_phpscript"];
 	}
 
 	// Load recordset
@@ -1098,6 +1145,8 @@ class ctask_list extends ctask {
 		$this->Row_Selected($row);
 		$this->task_id->setDbValue($rs->fields('task_id'));
 		$this->task_name->setDbValue($rs->fields('task_name'));
+		$this->sqlscript->setDbValue($rs->fields('sqlscript'));
+		$this->phpscript->setDbValue($rs->fields('phpscript'));
 	}
 
 	// Load DbValue from recordset
@@ -1106,6 +1155,8 @@ class ctask_list extends ctask {
 		$row = is_array($rs) ? $rs : $rs->fields;
 		$this->task_id->DbValue = $row['task_id'];
 		$this->task_name->DbValue = $row['task_name'];
+		$this->sqlscript->DbValue = $row['sqlscript'];
+		$this->phpscript->DbValue = $row['phpscript'];
 	}
 
 	// Load old record
@@ -1149,6 +1200,8 @@ class ctask_list extends ctask {
 		// Common render codes for all row types
 		// task_id
 		// task_name
+		// sqlscript
+		// phpscript
 
 		if ($this->RowType == EW_ROWTYPE_VIEW) { // View row
 
@@ -1159,6 +1212,14 @@ class ctask_list extends ctask {
 			// task_name
 			$this->task_name->ViewValue = $this->task_name->CurrentValue;
 			$this->task_name->ViewCustomAttributes = "";
+
+			// sqlscript
+			$this->sqlscript->ViewValue = $this->sqlscript->CurrentValue;
+			$this->sqlscript->ViewCustomAttributes = "";
+
+			// phpscript
+			$this->phpscript->ViewValue = $this->phpscript->CurrentValue;
+			$this->phpscript->ViewCustomAttributes = "";
 
 			// task_id
 			$this->task_id->LinkCustomAttributes = "";
@@ -1171,6 +1232,20 @@ class ctask_list extends ctask {
 			$this->task_name->TooltipValue = "";
 			if ($this->Export == "")
 				$this->task_name->ViewValue = ew_Highlight($this->HighlightName(), $this->task_name->ViewValue, $this->BasicSearch->getKeyword(), $this->BasicSearch->getType(), $this->task_name->AdvancedSearch->getValue("x"), "");
+
+			// sqlscript
+			$this->sqlscript->LinkCustomAttributes = "";
+			$this->sqlscript->HrefValue = "";
+			$this->sqlscript->TooltipValue = "";
+			if ($this->Export == "")
+				$this->sqlscript->ViewValue = ew_Highlight($this->HighlightName(), $this->sqlscript->ViewValue, $this->BasicSearch->getKeyword(), $this->BasicSearch->getType(), $this->sqlscript->AdvancedSearch->getValue("x"), "");
+
+			// phpscript
+			$this->phpscript->LinkCustomAttributes = "";
+			$this->phpscript->HrefValue = "";
+			$this->phpscript->TooltipValue = "";
+			if ($this->Export == "")
+				$this->phpscript->ViewValue = ew_Highlight($this->HighlightName(), $this->phpscript->ViewValue, $this->BasicSearch->getKeyword(), $this->BasicSearch->getType(), $this->phpscript->AdvancedSearch->getValue("x"), "");
 		}
 
 		// Call Row Rendered event
@@ -1205,6 +1280,8 @@ class ctask_list extends ctask {
 	function LoadAdvancedSearch() {
 		$this->task_id->AdvancedSearch->Load();
 		$this->task_name->AdvancedSearch->Load();
+		$this->sqlscript->AdvancedSearch->Load();
+		$this->phpscript->AdvancedSearch->Load();
 	}
 
 	// Set up export options
@@ -1438,6 +1515,8 @@ class ctask_list extends ctask {
 		}
 		$this->AddSearchQueryString($sQry, $this->task_id); // task_id
 		$this->AddSearchQueryString($sQry, $this->task_name); // task_name
+		$this->AddSearchQueryString($sQry, $this->sqlscript); // sqlscript
+		$this->AddSearchQueryString($sQry, $this->phpscript); // phpscript
 
 		// Build QueryString for pager
 		$sQry .= "&" . EW_TABLE_REC_PER_PAGE . "=" . urlencode($this->getRecordsPerPage()) . "&" . EW_TABLE_START_REC . "=" . urlencode($this->getStartRecordNumber());
@@ -1473,7 +1552,7 @@ class ctask_list extends ctask {
 	// Write Audit Trail start/end for grid update
 	function WriteAuditTrailDummy($typ) {
 		$table = 'task';
-	  $usr = CurrentUserName();
+	  $usr = CurrentUserID();
 		ew_WriteAuditTrail("log", ew_StdCurrentDateTime(), ew_ScriptName(), $usr, $typ, $table, "", "", "", "");
 	}
 
@@ -1653,7 +1732,7 @@ if (ftasklistsrch) ftasklistsrch.InitSearchPanel = true;
 		$task_list->Recordset = $task_list->LoadRecordset($task_list->StartRec-1, $task_list->DisplayRecs);
 $task_list->RenderOtherOptions();
 ?>
-<?php if ($Security->IsLoggedIn()) { ?>
+<?php if ($Security->CanSearch()) { ?>
 <?php if ($task->Export == "" && $task->CurrentAction == "") { ?>
 <form name="ftasklistsrch" id="ftasklistsrch" class="ewForm form-inline" action="<?php echo ew_CurrentPage() ?>">
 <table class="ewSearchTable"><tr><td>
@@ -1736,10 +1815,14 @@ $task_list->ShowMessage();
 </td>
 </tr></tbody></table>
 <?php } else { ?>
+	<?php if ($Security->CanList()) { ?>
 	<?php if ($task_list->SearchWhere == "0=101") { ?>
 	<p><?php echo $Language->Phrase("EnterSearchCriteria") ?></p>
 	<?php } else { ?>
 	<p><?php echo $Language->Phrase("NoRecord") ?></p>
+	<?php } ?>
+	<?php } else { ?>
+	<p><?php echo $Language->Phrase("NoPermission") ?></p>
 	<?php } ?>
 <?php } ?>
 </td>
@@ -1798,6 +1881,24 @@ $task_list->ListOptions->Render("header", "left");
 	<?php } else { ?>
 		<td><div class="ewPointer" onclick="ew_Sort(event,'<?php echo $task->SortUrl($task->task_name) ?>',1);"><div id="elh_task_task_name" class="task_task_name">
 			<div class="ewTableHeaderBtn"><span class="ewTableHeaderCaption"><?php echo $task->task_name->FldCaption() ?><?php echo $Language->Phrase("SrchLegend") ?></span><span class="ewTableHeaderSort"><?php if ($task->task_name->getSort() == "ASC") { ?><span class="caret ewSortUp"></span><?php } elseif ($task->task_name->getSort() == "DESC") { ?><span class="caret"></span><?php } ?></span></div>
+        </div></div></td>
+	<?php } ?>
+<?php } ?>		
+<?php if ($task->sqlscript->Visible) { // sqlscript ?>
+	<?php if ($task->SortUrl($task->sqlscript) == "") { ?>
+		<td><div id="elh_task_sqlscript" class="task_sqlscript"><div class="ewTableHeaderCaption"><?php echo $task->sqlscript->FldCaption() ?></div></div></td>
+	<?php } else { ?>
+		<td><div class="ewPointer" onclick="ew_Sort(event,'<?php echo $task->SortUrl($task->sqlscript) ?>',1);"><div id="elh_task_sqlscript" class="task_sqlscript">
+			<div class="ewTableHeaderBtn"><span class="ewTableHeaderCaption"><?php echo $task->sqlscript->FldCaption() ?><?php echo $Language->Phrase("SrchLegend") ?></span><span class="ewTableHeaderSort"><?php if ($task->sqlscript->getSort() == "ASC") { ?><span class="caret ewSortUp"></span><?php } elseif ($task->sqlscript->getSort() == "DESC") { ?><span class="caret"></span><?php } ?></span></div>
+        </div></div></td>
+	<?php } ?>
+<?php } ?>		
+<?php if ($task->phpscript->Visible) { // phpscript ?>
+	<?php if ($task->SortUrl($task->phpscript) == "") { ?>
+		<td><div id="elh_task_phpscript" class="task_phpscript"><div class="ewTableHeaderCaption"><?php echo $task->phpscript->FldCaption() ?></div></div></td>
+	<?php } else { ?>
+		<td><div class="ewPointer" onclick="ew_Sort(event,'<?php echo $task->SortUrl($task->phpscript) ?>',1);"><div id="elh_task_phpscript" class="task_phpscript">
+			<div class="ewTableHeaderBtn"><span class="ewTableHeaderCaption"><?php echo $task->phpscript->FldCaption() ?><?php echo $Language->Phrase("SrchLegend") ?></span><span class="ewTableHeaderSort"><?php if ($task->phpscript->getSort() == "ASC") { ?><span class="caret ewSortUp"></span><?php } elseif ($task->phpscript->getSort() == "DESC") { ?><span class="caret"></span><?php } ?></span></div>
         </div></div></td>
 	<?php } ?>
 <?php } ?>		
@@ -1877,6 +1978,18 @@ $task_list->ListOptions->Render("body", "left", $task_list->RowCnt);
 <?php echo $task->task_name->ListViewValue() ?></span>
 <a id="<?php echo $task_list->PageObjName . "_row_" . $task_list->RowCnt ?>"></a></td>
 	<?php } ?>
+	<?php if ($task->sqlscript->Visible) { // sqlscript ?>
+		<td<?php echo $task->sqlscript->CellAttributes() ?>>
+<span<?php echo $task->sqlscript->ViewAttributes() ?>>
+<?php echo $task->sqlscript->ListViewValue() ?></span>
+<a id="<?php echo $task_list->PageObjName . "_row_" . $task_list->RowCnt ?>"></a></td>
+	<?php } ?>
+	<?php if ($task->phpscript->Visible) { // phpscript ?>
+		<td<?php echo $task->phpscript->CellAttributes() ?>>
+<span<?php echo $task->phpscript->ViewAttributes() ?>>
+<?php echo $task->phpscript->ListViewValue() ?></span>
+<a id="<?php echo $task_list->PageObjName . "_row_" . $task_list->RowCnt ?>"></a></td>
+	<?php } ?>
 <?php
 
 // Render list options (body, right)
@@ -1937,10 +2050,14 @@ if ($task_list->Recordset)
 </td>
 </tr></tbody></table>
 <?php } else { ?>
+	<?php if ($Security->CanList()) { ?>
 	<?php if ($task_list->SearchWhere == "0=101") { ?>
 	<p><?php echo $Language->Phrase("EnterSearchCriteria") ?></p>
 	<?php } else { ?>
 	<p><?php echo $Language->Phrase("NoRecord") ?></p>
+	<?php } ?>
+	<?php } else { ?>
+	<p><?php echo $Language->Phrase("NoPermission") ?></p>
 	<?php } ?>
 <?php } ?>
 </td>

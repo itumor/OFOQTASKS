@@ -209,6 +209,21 @@ class ctask_delete extends ctask {
 			$Security->SaveLastUrl();
 			$this->Page_Terminate("login.php");
 		}
+		$Security->TablePermission_Loading();
+		$Security->LoadCurrentUserLevel($this->ProjectID . $this->TableName);
+		$Security->TablePermission_Loaded();
+		if (!$Security->IsLoggedIn()) {
+			$Security->SaveLastUrl();
+			$this->Page_Terminate("login.php");
+		}
+		if (!$Security->CanDelete()) {
+			$Security->SaveLastUrl();
+			$this->setFailureMessage($Language->Phrase("NoPermission")); // Set no permission
+			$this->Page_Terminate("tasklist.php");
+		}
+		$Security->UserID_Loading();
+		if ($Security->IsLoggedIn()) $Security->LoadUserID();
+		$Security->UserID_Loaded();
 		$this->CurrentAction = (@$_GET["a"] <> "") ? $_GET["a"] : @$_POST["a_list"]; // Set up curent action
 		$this->task_id->Visible = !$this->IsAdd() && !$this->IsCopy() && !$this->IsGridAdd();
 
@@ -339,6 +354,8 @@ class ctask_delete extends ctask {
 		$this->Row_Selected($row);
 		$this->task_id->setDbValue($rs->fields('task_id'));
 		$this->task_name->setDbValue($rs->fields('task_name'));
+		$this->sqlscript->setDbValue($rs->fields('sqlscript'));
+		$this->phpscript->setDbValue($rs->fields('phpscript'));
 	}
 
 	// Load DbValue from recordset
@@ -347,6 +364,8 @@ class ctask_delete extends ctask {
 		$row = is_array($rs) ? $rs : $rs->fields;
 		$this->task_id->DbValue = $row['task_id'];
 		$this->task_name->DbValue = $row['task_name'];
+		$this->sqlscript->DbValue = $row['sqlscript'];
+		$this->phpscript->DbValue = $row['phpscript'];
 	}
 
 	// Render row values based on field settings
@@ -362,6 +381,8 @@ class ctask_delete extends ctask {
 		// Common render codes for all row types
 		// task_id
 		// task_name
+		// sqlscript
+		// phpscript
 
 		if ($this->RowType == EW_ROWTYPE_VIEW) { // View row
 
@@ -373,6 +394,14 @@ class ctask_delete extends ctask {
 			$this->task_name->ViewValue = $this->task_name->CurrentValue;
 			$this->task_name->ViewCustomAttributes = "";
 
+			// sqlscript
+			$this->sqlscript->ViewValue = $this->sqlscript->CurrentValue;
+			$this->sqlscript->ViewCustomAttributes = "";
+
+			// phpscript
+			$this->phpscript->ViewValue = $this->phpscript->CurrentValue;
+			$this->phpscript->ViewCustomAttributes = "";
+
 			// task_id
 			$this->task_id->LinkCustomAttributes = "";
 			$this->task_id->HrefValue = "";
@@ -382,6 +411,16 @@ class ctask_delete extends ctask {
 			$this->task_name->LinkCustomAttributes = "";
 			$this->task_name->HrefValue = "";
 			$this->task_name->TooltipValue = "";
+
+			// sqlscript
+			$this->sqlscript->LinkCustomAttributes = "";
+			$this->sqlscript->HrefValue = "";
+			$this->sqlscript->TooltipValue = "";
+
+			// phpscript
+			$this->phpscript->LinkCustomAttributes = "";
+			$this->phpscript->HrefValue = "";
+			$this->phpscript->TooltipValue = "";
 		}
 
 		// Call Row Rendered event
@@ -394,6 +433,10 @@ class ctask_delete extends ctask {
 	//
 	function DeleteRows() {
 		global $conn, $Language, $Security;
+		if (!$Security->CanDelete()) {
+			$this->setFailureMessage($Language->Phrase("NoDeletePermission")); // No delete permission
+			return FALSE;
+		}
 		$DeleteRows = TRUE;
 		$sSql = $this->SQL();
 		$conn->raiseErrorFn = 'ew_ErrorFn';
@@ -487,7 +530,7 @@ class ctask_delete extends ctask {
 	// Write Audit Trail start/end for grid update
 	function WriteAuditTrailDummy($typ) {
 		$table = 'task';
-	  $usr = CurrentUserName();
+	  $usr = CurrentUserID();
 		ew_WriteAuditTrail("log", ew_StdCurrentDateTime(), ew_ScriptName(), $usr, $typ, $table, "", "", "", "");
 	}
 
@@ -505,7 +548,7 @@ class ctask_delete extends ctask {
 		// Write Audit Trail
 		$dt = ew_StdCurrentDateTime();
 		$id = ew_ScriptName();
-	  $curUser = CurrentUserName();
+	  $curUser = CurrentUserID();
 		foreach (array_keys($rs) as $fldname) {
 			if (array_key_exists($fldname, $this->fields) && $this->fields[$fldname]->FldDataType <> EW_DATATYPE_BLOB) { // Ignore BLOB fields
 				if ($this->fields[$fldname]->FldDataType == EW_DATATYPE_MEMO) {
@@ -671,6 +714,12 @@ $task_delete->ShowMessage();
 <?php if ($task->task_name->Visible) { // task_name ?>
 		<td><span id="elh_task_task_name" class="task_task_name"><?php echo $task->task_name->FldCaption() ?></span></td>
 <?php } ?>
+<?php if ($task->sqlscript->Visible) { // sqlscript ?>
+		<td><span id="elh_task_sqlscript" class="task_sqlscript"><?php echo $task->sqlscript->FldCaption() ?></span></td>
+<?php } ?>
+<?php if ($task->phpscript->Visible) { // phpscript ?>
+		<td><span id="elh_task_phpscript" class="task_phpscript"><?php echo $task->phpscript->FldCaption() ?></span></td>
+<?php } ?>
 	</tr>
 	</thead>
 	<tbody>
@@ -705,6 +754,22 @@ while (!$task_delete->Recordset->EOF) {
 <span id="el<?php echo $task_delete->RowCnt ?>_task_task_name" class="control-group task_task_name">
 <span<?php echo $task->task_name->ViewAttributes() ?>>
 <?php echo $task->task_name->ListViewValue() ?></span>
+</span>
+</td>
+<?php } ?>
+<?php if ($task->sqlscript->Visible) { // sqlscript ?>
+		<td<?php echo $task->sqlscript->CellAttributes() ?>>
+<span id="el<?php echo $task_delete->RowCnt ?>_task_sqlscript" class="control-group task_sqlscript">
+<span<?php echo $task->sqlscript->ViewAttributes() ?>>
+<?php echo $task->sqlscript->ListViewValue() ?></span>
+</span>
+</td>
+<?php } ?>
+<?php if ($task->phpscript->Visible) { // phpscript ?>
+		<td<?php echo $task->phpscript->CellAttributes() ?>>
+<span id="el<?php echo $task_delete->RowCnt ?>_task_phpscript" class="control-group task_phpscript">
+<span<?php echo $task->phpscript->ViewAttributes() ?>>
+<?php echo $task->phpscript->ListViewValue() ?></span>
 </span>
 </td>
 <?php } ?>

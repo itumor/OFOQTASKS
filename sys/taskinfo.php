@@ -9,6 +9,8 @@ $task = NULL;
 class ctask extends cTable {
 	var $task_id;
 	var $task_name;
+	var $sqlscript;
+	var $phpscript;
 
 	//
 	// Table class constructor
@@ -42,6 +44,14 @@ class ctask extends cTable {
 		// task_name
 		$this->task_name = new cField('task', 'task', 'x_task_name', 'task_name', '`task_name`', '`task_name`', 200, -1, FALSE, '`task_name`', FALSE, FALSE, FALSE, 'FORMATTED TEXT');
 		$this->fields['task_name'] = &$this->task_name;
+
+		// sqlscript
+		$this->sqlscript = new cField('task', 'task', 'x_sqlscript', 'sqlscript', '`sqlscript`', '`sqlscript`', 201, -1, FALSE, '`sqlscript`', FALSE, FALSE, FALSE, 'FORMATTED TEXT');
+		$this->fields['sqlscript'] = &$this->sqlscript;
+
+		// phpscript
+		$this->phpscript = new cField('task', 'task', 'x_phpscript', 'phpscript', '`phpscript`', '`phpscript`', 201, -1, FALSE, '`phpscript`', FALSE, FALSE, FALSE, 'FORMATTED TEXT');
+		$this->fields['phpscript'] = &$this->phpscript;
 	}
 
 	// Single column sort
@@ -462,6 +472,8 @@ class ctask extends cTable {
 	function LoadListRowValues(&$rs) {
 		$this->task_id->setDbValue($rs->fields('task_id'));
 		$this->task_name->setDbValue($rs->fields('task_name'));
+		$this->sqlscript->setDbValue($rs->fields('sqlscript'));
+		$this->phpscript->setDbValue($rs->fields('phpscript'));
 	}
 
 	// Render list row values
@@ -474,6 +486,8 @@ class ctask extends cTable {
    // Common render codes
 		// task_id
 		// task_name
+		// sqlscript
+		// phpscript
 		// task_id
 
 		$this->task_id->ViewValue = $this->task_id->CurrentValue;
@@ -482,6 +496,14 @@ class ctask extends cTable {
 		// task_name
 		$this->task_name->ViewValue = $this->task_name->CurrentValue;
 		$this->task_name->ViewCustomAttributes = "";
+
+		// sqlscript
+		$this->sqlscript->ViewValue = $this->sqlscript->CurrentValue;
+		$this->sqlscript->ViewCustomAttributes = "";
+
+		// phpscript
+		$this->phpscript->ViewValue = $this->phpscript->CurrentValue;
+		$this->phpscript->ViewCustomAttributes = "";
 
 		// task_id
 		$this->task_id->LinkCustomAttributes = "";
@@ -492,6 +514,16 @@ class ctask extends cTable {
 		$this->task_name->LinkCustomAttributes = "";
 		$this->task_name->HrefValue = "";
 		$this->task_name->TooltipValue = "";
+
+		// sqlscript
+		$this->sqlscript->LinkCustomAttributes = "";
+		$this->sqlscript->HrefValue = "";
+		$this->sqlscript->TooltipValue = "";
+
+		// phpscript
+		$this->phpscript->LinkCustomAttributes = "";
+		$this->phpscript->HrefValue = "";
+		$this->phpscript->TooltipValue = "";
 
 		// Call Row Rendered event
 		$this->Row_Rendered();
@@ -517,9 +549,13 @@ class ctask extends cTable {
 			if ($ExportPageType == "view") {
 				if ($this->task_id->Exportable) $Doc->ExportCaption($this->task_id);
 				if ($this->task_name->Exportable) $Doc->ExportCaption($this->task_name);
+				if ($this->sqlscript->Exportable) $Doc->ExportCaption($this->sqlscript);
+				if ($this->phpscript->Exportable) $Doc->ExportCaption($this->phpscript);
 			} else {
 				if ($this->task_id->Exportable) $Doc->ExportCaption($this->task_id);
 				if ($this->task_name->Exportable) $Doc->ExportCaption($this->task_name);
+				if ($this->sqlscript->Exportable) $Doc->ExportCaption($this->sqlscript);
+				if ($this->phpscript->Exportable) $Doc->ExportCaption($this->phpscript);
 			}
 			$Doc->EndExportRow();
 		}
@@ -551,9 +587,13 @@ class ctask extends cTable {
 				if ($ExportPageType == "view") {
 					if ($this->task_id->Exportable) $Doc->ExportField($this->task_id);
 					if ($this->task_name->Exportable) $Doc->ExportField($this->task_name);
+					if ($this->sqlscript->Exportable) $Doc->ExportField($this->sqlscript);
+					if ($this->phpscript->Exportable) $Doc->ExportField($this->phpscript);
 				} else {
 					if ($this->task_id->Exportable) $Doc->ExportField($this->task_id);
 					if ($this->task_name->Exportable) $Doc->ExportField($this->task_name);
+					if ($this->sqlscript->Exportable) $Doc->ExportField($this->sqlscript);
+					if ($this->phpscript->Exportable) $Doc->ExportField($this->phpscript);
 				}
 				$Doc->EndExportRow();
 			}
@@ -611,7 +651,8 @@ class ctask extends cTable {
 	}
 
 	// Row Inserted event
-	function Row_Inserted($rsold, &$rsnew) {
+	function Row_Inserted($rsold, &$rsnew) { 
+	add_new_task($rsnew['task_name']) ;
 
 		//echo "Row Inserted"
 	}
@@ -628,7 +669,8 @@ class ctask extends cTable {
 	// Row Updated event
 	function Row_Updated($rsold, &$rsnew) {
 
-		//echo "Row Updated";
+		//echo "Row Updated";  
+		add_new_task($rsnew['task_name']) ;
 	}
 
 	// Row Update Conflict event

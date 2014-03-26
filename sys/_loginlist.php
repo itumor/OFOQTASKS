@@ -273,6 +273,25 @@ class cp_login_list extends c_login {
 			$Security->SaveLastUrl();
 			$this->Page_Terminate("login.php");
 		}
+		$Security->TablePermission_Loading();
+		$Security->LoadCurrentUserLevel($this->ProjectID . $this->TableName);
+		$Security->TablePermission_Loaded();
+		if (!$Security->IsLoggedIn()) {
+			$Security->SaveLastUrl();
+			$this->Page_Terminate("login.php");
+		}
+		if (!$Security->CanList()) {
+			$Security->SaveLastUrl();
+			$this->setFailureMessage($Language->Phrase("NoPermission")); // Set no permission
+			$this->Page_Terminate("login.php");
+		}
+		$Security->UserID_Loading();
+		if ($Security->IsLoggedIn()) $Security->LoadUserID();
+		$Security->UserID_Loaded();
+		if ($Security->IsLoggedIn() && strval($Security->CurrentUserID()) == "") {
+			$this->setFailureMessage($Language->Phrase("NoPermission")); // Set no permission
+			$this->Page_Terminate();
+		}
 
 		// Get export parameters
 		if (@$_GET["export"] <> "") {
@@ -496,6 +515,8 @@ class cp_login_list extends c_login {
 
 		// Build filter
 		$sFilter = "";
+		if (!$Security->CanList())
+			$sFilter = "(0=1)"; // Filter all records
 		ew_AddFilter($sFilter, $this->DbDetailFilter);
 		ew_AddFilter($sFilter, $this->SearchWhere);
 
@@ -574,12 +595,14 @@ class cp_login_list extends c_login {
 	function AdvancedSearchWhere() {
 		global $Security;
 		$sWhere = "";
+		if (!$Security->CanSearch()) return "";
 		$this->BuildSearchSql($sWhere, $this->idlogin, FALSE); // idlogin
 		$this->BuildSearchSql($sWhere, $this->loginname, FALSE); // loginname
 		$this->BuildSearchSql($sWhere, $this->loginpassword, FALSE); // loginpassword
 		$this->BuildSearchSql($sWhere, $this->_Email, FALSE); // Email
 		$this->BuildSearchSql($sWhere, $this->Activated, FALSE); // Activated
 		$this->BuildSearchSql($sWhere, $this->Profile, FALSE); // Profile
+		$this->BuildSearchSql($sWhere, $this->levels, FALSE); // levels
 
 		// Set up search parm
 		if ($sWhere <> "") {
@@ -592,6 +615,7 @@ class cp_login_list extends c_login {
 			$this->_Email->AdvancedSearch->Save(); // Email
 			$this->Activated->AdvancedSearch->Save(); // Activated
 			$this->Profile->AdvancedSearch->Save(); // Profile
+			$this->levels->AdvancedSearch->Save(); // levels
 		}
 		return $sWhere;
 	}
@@ -675,6 +699,7 @@ class cp_login_list extends c_login {
 	function BasicSearchWhere() {
 		global $Security;
 		$sSearchStr = "";
+		if (!$Security->CanSearch()) return "";
 		$sSearchKeyword = $this->BasicSearch->Keyword;
 		$sSearchType = $this->BasicSearch->Type;
 		if ($sSearchKeyword <> "") {
@@ -717,6 +742,8 @@ class cp_login_list extends c_login {
 			return TRUE;
 		if ($this->Profile->AdvancedSearch->IssetSession())
 			return TRUE;
+		if ($this->levels->AdvancedSearch->IssetSession())
+			return TRUE;
 		return FALSE;
 	}
 
@@ -752,6 +779,7 @@ class cp_login_list extends c_login {
 		$this->_Email->AdvancedSearch->UnsetSession();
 		$this->Activated->AdvancedSearch->UnsetSession();
 		$this->Profile->AdvancedSearch->UnsetSession();
+		$this->levels->AdvancedSearch->UnsetSession();
 	}
 
 	// Restore all search parameters
@@ -768,6 +796,7 @@ class cp_login_list extends c_login {
 		$this->_Email->AdvancedSearch->Load();
 		$this->Activated->AdvancedSearch->Load();
 		$this->Profile->AdvancedSearch->Load();
+		$this->levels->AdvancedSearch->Load();
 	}
 
 	// Set up sort parameters
@@ -783,6 +812,7 @@ class cp_login_list extends c_login {
 			$this->UpdateSort($this->_Email); // Email
 			$this->UpdateSort($this->Activated); // Activated
 			$this->UpdateSort($this->Profile); // Profile
+			$this->UpdateSort($this->levels); // levels
 			$this->setStartRecordNumber(1); // Reset start position
 		}
 	}
@@ -821,6 +851,7 @@ class cp_login_list extends c_login {
 				$this->_Email->setSort("");
 				$this->Activated->setSort("");
 				$this->Profile->setSort("");
+				$this->levels->setSort("");
 			}
 
 			// Reset start position
@@ -842,24 +873,24 @@ class cp_login_list extends c_login {
 		// "view"
 		$item = &$this->ListOptions->Add("view");
 		$item->CssStyle = "white-space: nowrap;";
-		$item->Visible = $Security->IsLoggedIn();
+		$item->Visible = $Security->CanView();
 		$item->OnLeft = TRUE;
 
 		// "edit"
 		$item = &$this->ListOptions->Add("edit");
 		$item->CssStyle = "white-space: nowrap;";
-		$item->Visible = $Security->IsLoggedIn();
+		$item->Visible = $Security->CanEdit();
 		$item->OnLeft = TRUE;
 
 		// "copy"
 		$item = &$this->ListOptions->Add("copy");
 		$item->CssStyle = "white-space: nowrap;";
-		$item->Visible = $Security->IsLoggedIn();
+		$item->Visible = $Security->CanAdd();
 		$item->OnLeft = TRUE;
 
 		// "checkbox"
 		$item = &$this->ListOptions->Add("checkbox");
-		$item->Visible = $Security->IsLoggedIn();
+		$item->Visible = $Security->CanDelete();
 		$item->OnLeft = TRUE;
 		$item->Header = "<label class=\"checkbox\"><input type=\"checkbox\" name=\"key\" id=\"key\" onclick=\"ew_SelectAllKey(this);\"></label>";
 		$item->MoveTo(0);
@@ -885,14 +916,14 @@ class cp_login_list extends c_login {
 
 		// "view"
 		$oListOpt = &$this->ListOptions->Items["view"];
-		if ($Security->IsLoggedIn())
+		if ($Security->CanView() && $this->ShowOptionLink('view'))
 			$oListOpt->Body = "<a class=\"ewRowLink ewView\" data-caption=\"" . ew_HtmlTitle($Language->Phrase("ViewLink")) . "\" href=\"" . ew_HtmlEncode($this->ViewUrl) . "\">" . $Language->Phrase("ViewLink") . "</a>";
 		else
 			$oListOpt->Body = "";
 
 		// "edit"
 		$oListOpt = &$this->ListOptions->Items["edit"];
-		if ($Security->IsLoggedIn()) {
+		if ($Security->CanEdit() && $this->ShowOptionLink('edit')) {
 			$oListOpt->Body = "<a class=\"ewRowLink ewEdit\" data-caption=\"" . ew_HtmlTitle($Language->Phrase("EditLink")) . "\" href=\"" . ew_HtmlEncode($this->EditUrl) . "\">" . $Language->Phrase("EditLink") . "</a>";
 		} else {
 			$oListOpt->Body = "";
@@ -900,7 +931,7 @@ class cp_login_list extends c_login {
 
 		// "copy"
 		$oListOpt = &$this->ListOptions->Items["copy"];
-		if ($Security->IsLoggedIn()) {
+		if ($Security->CanAdd() && $this->ShowOptionLink('add')) {
 			$oListOpt->Body = "<a class=\"ewRowLink ewCopy\" data-caption=\"" . ew_HtmlTitle($Language->Phrase("CopyLink")) . "\" href=\"" . ew_HtmlEncode($this->CopyUrl) . "\">" . $Language->Phrase("CopyLink") . "</a>";
 		} else {
 			$oListOpt->Body = "";
@@ -924,13 +955,13 @@ class cp_login_list extends c_login {
 		// Add
 		$item = &$option->Add("add");
 		$item->Body = "<a class=\"ewAddEdit ewAdd\" href=\"" . ew_HtmlEncode($this->AddUrl) . "\">" . $Language->Phrase("AddLink") . "</a>";
-		$item->Visible = ($this->AddUrl <> "" && $Security->IsLoggedIn());
+		$item->Visible = ($this->AddUrl <> "" && $Security->CanAdd());
 		$option = $options["action"];
 
 		// Add multi delete
 		$item = &$option->Add("multidelete");
 		$item->Body = "<a class=\"ewAction ewMultiDelete\" href=\"\" onclick=\"ew_SubmitSelected(document.f_loginlist, '" . $this->MultiDeleteUrl . "', ewLanguage.Phrase('DeleteMultiConfirmMsg'));return false;\">" . $Language->Phrase("DeleteSelectedLink") . "</a>";
-		$item->Visible = ($Security->IsLoggedIn());
+		$item->Visible = ($Security->CanDelete());
 
 		// Set up options default
 		foreach ($options as &$option) {
@@ -1097,6 +1128,11 @@ class cp_login_list extends c_login {
 		$this->Profile->AdvancedSearch->SearchValue = ew_StripSlashes(@$_GET["x_Profile"]);
 		if ($this->Profile->AdvancedSearch->SearchValue <> "") $this->Command = "search";
 		$this->Profile->AdvancedSearch->SearchOperator = @$_GET["z_Profile"];
+
+		// levels
+		$this->levels->AdvancedSearch->SearchValue = ew_StripSlashes(@$_GET["x_levels"]);
+		if ($this->levels->AdvancedSearch->SearchValue <> "") $this->Command = "search";
+		$this->levels->AdvancedSearch->SearchOperator = @$_GET["z_levels"];
 	}
 
 	// Load recordset
@@ -1154,6 +1190,7 @@ class cp_login_list extends c_login {
 		$this->_Email->setDbValue($rs->fields('Email'));
 		$this->Activated->setDbValue($rs->fields('Activated'));
 		$this->Profile->setDbValue($rs->fields('Profile'));
+		$this->levels->setDbValue($rs->fields('levels'));
 	}
 
 	// Load DbValue from recordset
@@ -1166,6 +1203,7 @@ class cp_login_list extends c_login {
 		$this->_Email->DbValue = $row['Email'];
 		$this->Activated->DbValue = $row['Activated'];
 		$this->Profile->DbValue = $row['Profile'];
+		$this->levels->DbValue = $row['levels'];
 	}
 
 	// Load old record
@@ -1213,6 +1251,7 @@ class cp_login_list extends c_login {
 		// Email
 		// Activated
 		// Profile
+		// levels
 
 		if ($this->RowType == EW_ROWTYPE_VIEW) { // View row
 
@@ -1239,6 +1278,34 @@ class cp_login_list extends c_login {
 			// Profile
 			$this->Profile->ViewValue = $this->Profile->CurrentValue;
 			$this->Profile->ViewCustomAttributes = "";
+
+			// levels
+			if ($Security->CanAdmin()) { // System admin
+			if (strval($this->levels->CurrentValue) <> "") {
+				$sFilterWrk = "`userlevelid`" . ew_SearchString("=", $this->levels->CurrentValue, EW_DATATYPE_NUMBER);
+			$sSqlWrk = "SELECT `userlevelid`, `userlevelname` AS `DispFld`, '' AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld` FROM `userlevels`";
+			$sWhereWrk = "";
+			if ($sFilterWrk <> "") {
+				ew_AddFilter($sWhereWrk, $sFilterWrk);
+			}
+
+			// Call Lookup selecting
+			$this->Lookup_Selecting($this->levels, $sWhereWrk);
+			if ($sWhereWrk <> "") $sSqlWrk .= " WHERE " . $sWhereWrk;
+				$rswrk = $conn->Execute($sSqlWrk);
+				if ($rswrk && !$rswrk->EOF) { // Lookup values found
+					$this->levels->ViewValue = $rswrk->fields('DispFld');
+					$rswrk->Close();
+				} else {
+					$this->levels->ViewValue = $this->levels->CurrentValue;
+				}
+			} else {
+				$this->levels->ViewValue = NULL;
+			}
+			} else {
+				$this->levels->ViewValue = "********";
+			}
+			$this->levels->ViewCustomAttributes = "";
 
 			// idlogin
 			$this->idlogin->LinkCustomAttributes = "";
@@ -1277,6 +1344,11 @@ class cp_login_list extends c_login {
 			$this->Profile->TooltipValue = "";
 			if ($this->Export == "")
 				$this->Profile->ViewValue = ew_Highlight($this->HighlightName(), $this->Profile->ViewValue, $this->BasicSearch->getKeyword(), $this->BasicSearch->getType(), $this->Profile->AdvancedSearch->getValue("x"), "");
+
+			// levels
+			$this->levels->LinkCustomAttributes = "";
+			$this->levels->HrefValue = "";
+			$this->levels->TooltipValue = "";
 		}
 
 		// Call Row Rendered event
@@ -1315,6 +1387,7 @@ class cp_login_list extends c_login {
 		$this->_Email->AdvancedSearch->Load();
 		$this->Activated->AdvancedSearch->Load();
 		$this->Profile->AdvancedSearch->Load();
+		$this->levels->AdvancedSearch->Load();
 	}
 
 	// Set up export options
@@ -1552,6 +1625,7 @@ class cp_login_list extends c_login {
 		$this->AddSearchQueryString($sQry, $this->_Email); // Email
 		$this->AddSearchQueryString($sQry, $this->Activated); // Activated
 		$this->AddSearchQueryString($sQry, $this->Profile); // Profile
+		$this->AddSearchQueryString($sQry, $this->levels); // levels
 
 		// Build QueryString for pager
 		$sQry .= "&" . EW_TABLE_REC_PER_PAGE . "=" . urlencode($this->getRecordsPerPage()) . "&" . EW_TABLE_START_REC . "=" . urlencode($this->getStartRecordNumber());
@@ -1574,6 +1648,14 @@ class cp_login_list extends c_login {
 		}
 	}
 
+	// Show link optionally based on User ID
+	function ShowOptionLink($id = "") {
+		global $Security;
+		if ($Security->IsLoggedIn() && !$Security->IsAdmin() && !$this->UserIDAllow($id))
+			return $Security->IsValidUserID($this->idlogin->CurrentValue);
+		return TRUE;
+	}
+
 	// Set up Breadcrumb
 	function SetupBreadcrumb() {
 		global $Breadcrumb, $Language;
@@ -1587,7 +1669,7 @@ class cp_login_list extends c_login {
 	// Write Audit Trail start/end for grid update
 	function WriteAuditTrailDummy($typ) {
 		$table = 'login';
-	  $usr = CurrentUserName();
+	  $usr = CurrentUserID();
 		ew_WriteAuditTrail("log", ew_StdCurrentDateTime(), ew_ScriptName(), $usr, $typ, $table, "", "", "", "");
 	}
 
@@ -1732,8 +1814,9 @@ f_loginlist.ValidateRequired = false;
 <?php } ?>
 
 // Dynamic selection lists
-// Form object for search
+f_loginlist.Lists["x_levels"] = {"LinkField":"x_userlevelid","Ajax":null,"AutoFill":false,"DisplayFields":["x_userlevelname","","",""],"ParentFields":[],"FilterFields":[],"Options":[]};
 
+// Form object for search
 var f_loginlistsrch = new ew_Form("f_loginlistsrch");
 
 // Init search panel as collapsed
@@ -1767,7 +1850,7 @@ if (f_loginlistsrch) f_loginlistsrch.InitSearchPanel = true;
 		$p_login_list->Recordset = $p_login_list->LoadRecordset($p_login_list->StartRec-1, $p_login_list->DisplayRecs);
 $p_login_list->RenderOtherOptions();
 ?>
-<?php if ($Security->IsLoggedIn()) { ?>
+<?php if ($Security->CanSearch()) { ?>
 <?php if ($_login->Export == "" && $_login->CurrentAction == "") { ?>
 <form name="f_loginlistsrch" id="f_loginlistsrch" class="ewForm form-inline" action="<?php echo ew_CurrentPage() ?>">
 <table class="ewSearchTable"><tr><td>
@@ -1850,10 +1933,14 @@ $p_login_list->ShowMessage();
 </td>
 </tr></tbody></table>
 <?php } else { ?>
+	<?php if ($Security->CanList()) { ?>
 	<?php if ($p_login_list->SearchWhere == "0=101") { ?>
 	<p><?php echo $Language->Phrase("EnterSearchCriteria") ?></p>
 	<?php } else { ?>
 	<p><?php echo $Language->Phrase("NoRecord") ?></p>
+	<?php } ?>
+	<?php } else { ?>
+	<p><?php echo $Language->Phrase("NoPermission") ?></p>
 	<?php } ?>
 <?php } ?>
 </td>
@@ -1948,6 +2035,15 @@ $p_login_list->ListOptions->Render("header", "left");
 	<?php } else { ?>
 		<td><div class="ewPointer" onclick="ew_Sort(event,'<?php echo $_login->SortUrl($_login->Profile) ?>',1);"><div id="elh__login_Profile" class="_login_Profile">
 			<div class="ewTableHeaderBtn"><span class="ewTableHeaderCaption"><?php echo $_login->Profile->FldCaption() ?><?php echo $Language->Phrase("SrchLegend") ?></span><span class="ewTableHeaderSort"><?php if ($_login->Profile->getSort() == "ASC") { ?><span class="caret ewSortUp"></span><?php } elseif ($_login->Profile->getSort() == "DESC") { ?><span class="caret"></span><?php } ?></span></div>
+        </div></div></td>
+	<?php } ?>
+<?php } ?>		
+<?php if ($_login->levels->Visible) { // levels ?>
+	<?php if ($_login->SortUrl($_login->levels) == "") { ?>
+		<td><div id="elh__login_levels" class="_login_levels"><div class="ewTableHeaderCaption"><?php echo $_login->levels->FldCaption() ?></div></div></td>
+	<?php } else { ?>
+		<td><div class="ewPointer" onclick="ew_Sort(event,'<?php echo $_login->SortUrl($_login->levels) ?>',1);"><div id="elh__login_levels" class="_login_levels">
+			<div class="ewTableHeaderBtn"><span class="ewTableHeaderCaption"><?php echo $_login->levels->FldCaption() ?></span><span class="ewTableHeaderSort"><?php if ($_login->levels->getSort() == "ASC") { ?><span class="caret ewSortUp"></span><?php } elseif ($_login->levels->getSort() == "DESC") { ?><span class="caret"></span><?php } ?></span></div>
         </div></div></td>
 	<?php } ?>
 <?php } ?>		
@@ -2051,6 +2147,12 @@ $p_login_list->ListOptions->Render("body", "left", $p_login_list->RowCnt);
 <?php echo $_login->Profile->ListViewValue() ?></span>
 <a id="<?php echo $p_login_list->PageObjName . "_row_" . $p_login_list->RowCnt ?>"></a></td>
 	<?php } ?>
+	<?php if ($_login->levels->Visible) { // levels ?>
+		<td<?php echo $_login->levels->CellAttributes() ?>>
+<span<?php echo $_login->levels->ViewAttributes() ?>>
+<?php echo $_login->levels->ListViewValue() ?></span>
+<a id="<?php echo $p_login_list->PageObjName . "_row_" . $p_login_list->RowCnt ?>"></a></td>
+	<?php } ?>
 <?php
 
 // Render list options (body, right)
@@ -2111,10 +2213,14 @@ if ($p_login_list->Recordset)
 </td>
 </tr></tbody></table>
 <?php } else { ?>
+	<?php if ($Security->CanList()) { ?>
 	<?php if ($p_login_list->SearchWhere == "0=101") { ?>
 	<p><?php echo $Language->Phrase("EnterSearchCriteria") ?></p>
 	<?php } else { ?>
 	<p><?php echo $Language->Phrase("NoRecord") ?></p>
+	<?php } ?>
+	<?php } else { ?>
+	<p><?php echo $Language->Phrase("NoPermission") ?></p>
 	<?php } ?>
 <?php } ?>
 </td>
