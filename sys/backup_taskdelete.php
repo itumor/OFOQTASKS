@@ -5,7 +5,7 @@ ob_start(); // Turn on output buffering
 <?php include_once "ewcfg10.php" ?>
 <?php include_once "ewmysql10.php" ?>
 <?php include_once "phpfn10.php" ?>
-<?php include_once "start_taskinfo.php" ?>
+<?php include_once "backup_taskinfo.php" ?>
 <?php include_once "_logininfo.php" ?>
 <?php include_once "userfn10.php" ?>
 <?php
@@ -14,9 +14,9 @@ ob_start(); // Turn on output buffering
 // Page class
 //
 
-$start_task_delete = NULL; // Initialize page object first
+$backup_task_delete = NULL; // Initialize page object first
 
-class cstart_task_delete extends cstart_task {
+class cbackup_task_delete extends cbackup_task {
 
 	// Page ID
 	var $PageID = 'delete';
@@ -25,10 +25,10 @@ class cstart_task_delete extends cstart_task {
 	var $ProjectID = "{3246B9FA-4C51-4733-8040-34B188FCD87E}";
 
 	// Table name
-	var $TableName = 'start_task';
+	var $TableName = 'backup_task';
 
 	// Page object name
-	var $PageObjName = 'start_task_delete';
+	var $PageObjName = 'backup_task_delete';
 
 	// Page name
 	function PageName() {
@@ -171,10 +171,10 @@ class cstart_task_delete extends cstart_task {
 		// Parent constuctor
 		parent::__construct();
 
-		// Table object (start_task)
-		if (!isset($GLOBALS["start_task"])) {
-			$GLOBALS["start_task"] = &$this;
-			$GLOBALS["Table"] = &$GLOBALS["start_task"];
+		// Table object (backup_task)
+		if (!isset($GLOBALS["backup_task"])) {
+			$GLOBALS["backup_task"] = &$this;
+			$GLOBALS["Table"] = &$GLOBALS["backup_task"];
 		}
 
 		// Table object (_login)
@@ -186,7 +186,7 @@ class cstart_task_delete extends cstart_task {
 
 		// Table name (for backward compatibility)
 		if (!defined("EW_TABLE_NAME"))
-			define("EW_TABLE_NAME", 'start_task', TRUE);
+			define("EW_TABLE_NAME", 'backup_task', TRUE);
 
 		// Start timer
 		if (!isset($GLOBALS["gTimer"])) $GLOBALS["gTimer"] = new cTimer();
@@ -218,7 +218,7 @@ class cstart_task_delete extends cstart_task {
 		if (!$Security->CanDelete()) {
 			$Security->SaveLastUrl();
 			$this->setFailureMessage($Language->Phrase("NoPermission")); // Set no permission
-			$this->Page_Terminate("start_tasklist.php");
+			$this->Page_Terminate("backup_tasklist.php");
 		}
 		$Security->UserID_Loading();
 		if ($Security->IsLoggedIn()) $Security->LoadUserID();
@@ -277,10 +277,10 @@ class cstart_task_delete extends cstart_task {
 		$this->RecKeys = $this->GetRecordKeys(); // Load record keys
 		$sFilter = $this->GetKeyFilter();
 		if ($sFilter == "")
-			$this->Page_Terminate("start_tasklist.php"); // Prevent SQL injection, return to list
+			$this->Page_Terminate("backup_tasklist.php"); // Prevent SQL injection, return to list
 
 		// Set up filter (SQL WHHERE clause) and get return SQL
-		// SQL constructor in start_task class, start_taskinfo.php
+		// SQL constructor in backup_task class, backup_taskinfo.php
 
 		$this->CurrentFilter = $sFilter;
 
@@ -402,27 +402,7 @@ class cstart_task_delete extends cstart_task {
 			$this->id->ViewCustomAttributes = "";
 
 			// server_id_mysqladmin
-			if (strval($this->server_id_mysqladmin->CurrentValue) <> "") {
-				$sFilterWrk = "`server_id`" . ew_SearchString("=", $this->server_id_mysqladmin->CurrentValue, EW_DATATYPE_NUMBER);
-			$sSqlWrk = "SELECT `server_id`, `server_name` AS `DispFld`, '' AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld` FROM `server`";
-			$sWhereWrk = "";
-			if ($sFilterWrk <> "") {
-				ew_AddFilter($sWhereWrk, $sFilterWrk);
-			}
-
-			// Call Lookup selecting
-			$this->Lookup_Selecting($this->server_id_mysqladmin, $sWhereWrk);
-			if ($sWhereWrk <> "") $sSqlWrk .= " WHERE " . $sWhereWrk;
-				$rswrk = $conn->Execute($sSqlWrk);
-				if ($rswrk && !$rswrk->EOF) { // Lookup values found
-					$this->server_id_mysqladmin->ViewValue = $rswrk->fields('DispFld');
-					$rswrk->Close();
-				} else {
-					$this->server_id_mysqladmin->ViewValue = $this->server_id_mysqladmin->CurrentValue;
-				}
-			} else {
-				$this->server_id_mysqladmin->ViewValue = NULL;
-			}
+			$this->server_id_mysqladmin->ViewValue = $this->server_id_mysqladmin->CurrentValue;
 			$this->server_id_mysqladmin->ViewCustomAttributes = "";
 
 			// HOSTNAME
@@ -458,6 +438,36 @@ class cstart_task_delete extends cstart_task {
 			$this->server_id_mysqladmin->LinkCustomAttributes = "";
 			$this->server_id_mysqladmin->HrefValue = "";
 			$this->server_id_mysqladmin->TooltipValue = "";
+
+			// HOSTNAME
+			$this->HOSTNAME->LinkCustomAttributes = "";
+			$this->HOSTNAME->HrefValue = "";
+			$this->HOSTNAME->TooltipValue = "";
+
+			// USERNAME
+			$this->USERNAME->LinkCustomAttributes = "";
+			$this->USERNAME->HrefValue = "";
+			$this->USERNAME->TooltipValue = "";
+
+			// PASSWORD
+			$this->PASSWORD->LinkCustomAttributes = "";
+			$this->PASSWORD->HrefValue = "";
+			$this->PASSWORD->TooltipValue = "";
+
+			// DATABASE
+			$this->DATABASE->LinkCustomAttributes = "";
+			$this->DATABASE->HrefValue = "";
+			$this->DATABASE->TooltipValue = "";
+
+			// FILEPATH
+			$this->FILEPATH->LinkCustomAttributes = "";
+			$this->FILEPATH->HrefValue = "";
+			$this->FILEPATH->TooltipValue = "";
+
+			// FILENAME
+			$this->FILENAME->LinkCustomAttributes = "";
+			$this->FILENAME->HrefValue = "";
+			$this->FILENAME->TooltipValue = "";
 		}
 
 		// Call Row Rendered event
@@ -552,7 +562,7 @@ class cstart_task_delete extends cstart_task {
 		global $Breadcrumb, $Language;
 		$Breadcrumb = new cBreadcrumb();
 		$PageCaption = $this->TableCaption();
-		$Breadcrumb->Add("list", "<span id=\"ewPageCaption\">" . $PageCaption . "</span>", "start_tasklist.php", $this->TableVar);
+		$Breadcrumb->Add("list", "<span id=\"ewPageCaption\">" . $PageCaption . "</span>", "backup_tasklist.php", $this->TableVar);
 		$PageCaption = $Language->Phrase("delete");
 		$Breadcrumb->Add("delete", "<span id=\"ewPageCaption\">" . $PageCaption . "</span>", ew_CurrentUrl(), $this->TableVar);
 	}
@@ -622,33 +632,33 @@ class cstart_task_delete extends cstart_task {
 <?php
 
 // Create page object
-if (!isset($start_task_delete)) $start_task_delete = new cstart_task_delete();
+if (!isset($backup_task_delete)) $backup_task_delete = new cbackup_task_delete();
 
 // Page init
-$start_task_delete->Page_Init();
+$backup_task_delete->Page_Init();
 
 // Page main
-$start_task_delete->Page_Main();
+$backup_task_delete->Page_Main();
 
 // Global Page Rendering event (in userfn*.php)
 Page_Rendering();
 
 // Page Rendering event
-$start_task_delete->Page_Render();
+$backup_task_delete->Page_Render();
 ?>
 <?php include_once "header.php" ?>
 <script type="text/javascript">
 
 // Page object
-var start_task_delete = new ew_Page("start_task_delete");
-start_task_delete.PageID = "delete"; // Page ID
-var EW_PAGE_ID = start_task_delete.PageID; // For backward compatibility
+var backup_task_delete = new ew_Page("backup_task_delete");
+backup_task_delete.PageID = "delete"; // Page ID
+var EW_PAGE_ID = backup_task_delete.PageID; // For backward compatibility
 
 // Form object
-var fstart_taskdelete = new ew_Form("fstart_taskdelete");
+var fbackup_taskdelete = new ew_Form("fbackup_taskdelete");
 
 // Form_CustomValidate event
-fstart_taskdelete.Form_CustomValidate = 
+fbackup_taskdelete.Form_CustomValidate = 
  function(fobj) { // DO NOT CHANGE THIS LINE!
 
  	// Your custom validation code here, return false if invalid. 
@@ -657,15 +667,14 @@ fstart_taskdelete.Form_CustomValidate =
 
 // Use JavaScript validation or not
 <?php if (EW_CLIENT_VALIDATE) { ?>
-fstart_taskdelete.ValidateRequired = true;
+fbackup_taskdelete.ValidateRequired = true;
 <?php } else { ?>
-fstart_taskdelete.ValidateRequired = false; 
+fbackup_taskdelete.ValidateRequired = false; 
 <?php } ?>
 
 // Dynamic selection lists
-fstart_taskdelete.Lists["x_server_id_mysqladmin"] = {"LinkField":"x_server_id","Ajax":true,"AutoFill":false,"DisplayFields":["x_server_name","","",""],"ParentFields":[],"FilterFields":[],"Options":[]};
-
 // Form object for search
+
 </script>
 <script type="text/javascript">
 
@@ -674,80 +683,146 @@ fstart_taskdelete.Lists["x_server_id_mysqladmin"] = {"LinkField":"x_server_id","
 <?php
 
 // Load records for display
-if ($start_task_delete->Recordset = $start_task_delete->LoadRecordset())
-	$start_task_deleteTotalRecs = $start_task_delete->Recordset->RecordCount(); // Get record count
-if ($start_task_deleteTotalRecs <= 0) { // No record found, exit
-	if ($start_task_delete->Recordset)
-		$start_task_delete->Recordset->Close();
-	$start_task_delete->Page_Terminate("start_tasklist.php"); // Return to list
+if ($backup_task_delete->Recordset = $backup_task_delete->LoadRecordset())
+	$backup_task_deleteTotalRecs = $backup_task_delete->Recordset->RecordCount(); // Get record count
+if ($backup_task_deleteTotalRecs <= 0) { // No record found, exit
+	if ($backup_task_delete->Recordset)
+		$backup_task_delete->Recordset->Close();
+	$backup_task_delete->Page_Terminate("backup_tasklist.php"); // Return to list
 }
 ?>
 <?php $Breadcrumb->Render(); ?>
-<?php $start_task_delete->ShowPageHeader(); ?>
+<?php $backup_task_delete->ShowPageHeader(); ?>
 <?php
-$start_task_delete->ShowMessage();
+$backup_task_delete->ShowMessage();
 ?>
-<form name="fstart_taskdelete" id="fstart_taskdelete" class="ewForm form-horizontal" action="<?php echo ew_CurrentPage() ?>" method="post">
-<input type="hidden" name="t" value="start_task">
+<form name="fbackup_taskdelete" id="fbackup_taskdelete" class="ewForm form-horizontal" action="<?php echo ew_CurrentPage() ?>" method="post">
+<input type="hidden" name="t" value="backup_task">
 <input type="hidden" name="a_delete" id="a_delete" value="D">
-<?php foreach ($start_task_delete->RecKeys as $key) { ?>
+<?php foreach ($backup_task_delete->RecKeys as $key) { ?>
 <?php $keyvalue = is_array($key) ? implode($EW_COMPOSITE_KEY_SEPARATOR, $key) : $key; ?>
 <input type="hidden" name="key_m[]" value="<?php echo ew_HtmlEncode($keyvalue) ?>">
 <?php } ?>
 <table cellspacing="0" class="ewGrid"><tr><td class="ewGridContent">
 <div class="ewGridMiddlePanel">
-<table id="tbl_start_taskdelete" class="ewTable ewTableSeparate">
-<?php echo $start_task->TableCustomInnerHtml ?>
+<table id="tbl_backup_taskdelete" class="ewTable ewTableSeparate">
+<?php echo $backup_task->TableCustomInnerHtml ?>
 	<thead>
 	<tr class="ewTableHeader">
-<?php if ($start_task->id->Visible) { // id ?>
-		<td><span id="elh_start_task_id" class="start_task_id"><?php echo $start_task->id->FldCaption() ?></span></td>
+<?php if ($backup_task->id->Visible) { // id ?>
+		<td><span id="elh_backup_task_id" class="backup_task_id"><?php echo $backup_task->id->FldCaption() ?></span></td>
 <?php } ?>
-<?php if ($start_task->server_id_mysqladmin->Visible) { // server_id_mysqladmin ?>
-		<td><span id="elh_start_task_server_id_mysqladmin" class="start_task_server_id_mysqladmin"><?php echo $start_task->server_id_mysqladmin->FldCaption() ?></span></td>
+<?php if ($backup_task->server_id_mysqladmin->Visible) { // server_id_mysqladmin ?>
+		<td><span id="elh_backup_task_server_id_mysqladmin" class="backup_task_server_id_mysqladmin"><?php echo $backup_task->server_id_mysqladmin->FldCaption() ?></span></td>
+<?php } ?>
+<?php if ($backup_task->HOSTNAME->Visible) { // HOSTNAME ?>
+		<td><span id="elh_backup_task_HOSTNAME" class="backup_task_HOSTNAME"><?php echo $backup_task->HOSTNAME->FldCaption() ?></span></td>
+<?php } ?>
+<?php if ($backup_task->USERNAME->Visible) { // USERNAME ?>
+		<td><span id="elh_backup_task_USERNAME" class="backup_task_USERNAME"><?php echo $backup_task->USERNAME->FldCaption() ?></span></td>
+<?php } ?>
+<?php if ($backup_task->PASSWORD->Visible) { // PASSWORD ?>
+		<td><span id="elh_backup_task_PASSWORD" class="backup_task_PASSWORD"><?php echo $backup_task->PASSWORD->FldCaption() ?></span></td>
+<?php } ?>
+<?php if ($backup_task->DATABASE->Visible) { // DATABASE ?>
+		<td><span id="elh_backup_task_DATABASE" class="backup_task_DATABASE"><?php echo $backup_task->DATABASE->FldCaption() ?></span></td>
+<?php } ?>
+<?php if ($backup_task->FILEPATH->Visible) { // FILEPATH ?>
+		<td><span id="elh_backup_task_FILEPATH" class="backup_task_FILEPATH"><?php echo $backup_task->FILEPATH->FldCaption() ?></span></td>
+<?php } ?>
+<?php if ($backup_task->FILENAME->Visible) { // FILENAME ?>
+		<td><span id="elh_backup_task_FILENAME" class="backup_task_FILENAME"><?php echo $backup_task->FILENAME->FldCaption() ?></span></td>
 <?php } ?>
 	</tr>
 	</thead>
 	<tbody>
 <?php
-$start_task_delete->RecCnt = 0;
+$backup_task_delete->RecCnt = 0;
 $i = 0;
-while (!$start_task_delete->Recordset->EOF) {
-	$start_task_delete->RecCnt++;
-	$start_task_delete->RowCnt++;
+while (!$backup_task_delete->Recordset->EOF) {
+	$backup_task_delete->RecCnt++;
+	$backup_task_delete->RowCnt++;
 
 	// Set row properties
-	$start_task->ResetAttrs();
-	$start_task->RowType = EW_ROWTYPE_VIEW; // View
+	$backup_task->ResetAttrs();
+	$backup_task->RowType = EW_ROWTYPE_VIEW; // View
 
 	// Get the field contents
-	$start_task_delete->LoadRowValues($start_task_delete->Recordset);
+	$backup_task_delete->LoadRowValues($backup_task_delete->Recordset);
 
 	// Render row
-	$start_task_delete->RenderRow();
+	$backup_task_delete->RenderRow();
 ?>
-	<tr<?php echo $start_task->RowAttributes() ?>>
-<?php if ($start_task->id->Visible) { // id ?>
-		<td<?php echo $start_task->id->CellAttributes() ?>>
-<span id="el<?php echo $start_task_delete->RowCnt ?>_start_task_id" class="control-group start_task_id">
-<span<?php echo $start_task->id->ViewAttributes() ?>>
-<?php echo $start_task->id->ListViewValue() ?></span>
+	<tr<?php echo $backup_task->RowAttributes() ?>>
+<?php if ($backup_task->id->Visible) { // id ?>
+		<td<?php echo $backup_task->id->CellAttributes() ?>>
+<span id="el<?php echo $backup_task_delete->RowCnt ?>_backup_task_id" class="control-group backup_task_id">
+<span<?php echo $backup_task->id->ViewAttributes() ?>>
+<?php echo $backup_task->id->ListViewValue() ?></span>
 </span>
 </td>
 <?php } ?>
-<?php if ($start_task->server_id_mysqladmin->Visible) { // server_id_mysqladmin ?>
-		<td<?php echo $start_task->server_id_mysqladmin->CellAttributes() ?>>
-<span id="el<?php echo $start_task_delete->RowCnt ?>_start_task_server_id_mysqladmin" class="control-group start_task_server_id_mysqladmin">
-<span<?php echo $start_task->server_id_mysqladmin->ViewAttributes() ?>>
-<?php echo $start_task->server_id_mysqladmin->ListViewValue() ?></span>
+<?php if ($backup_task->server_id_mysqladmin->Visible) { // server_id_mysqladmin ?>
+		<td<?php echo $backup_task->server_id_mysqladmin->CellAttributes() ?>>
+<span id="el<?php echo $backup_task_delete->RowCnt ?>_backup_task_server_id_mysqladmin" class="control-group backup_task_server_id_mysqladmin">
+<span<?php echo $backup_task->server_id_mysqladmin->ViewAttributes() ?>>
+<?php echo $backup_task->server_id_mysqladmin->ListViewValue() ?></span>
+</span>
+</td>
+<?php } ?>
+<?php if ($backup_task->HOSTNAME->Visible) { // HOSTNAME ?>
+		<td<?php echo $backup_task->HOSTNAME->CellAttributes() ?>>
+<span id="el<?php echo $backup_task_delete->RowCnt ?>_backup_task_HOSTNAME" class="control-group backup_task_HOSTNAME">
+<span<?php echo $backup_task->HOSTNAME->ViewAttributes() ?>>
+<?php echo $backup_task->HOSTNAME->ListViewValue() ?></span>
+</span>
+</td>
+<?php } ?>
+<?php if ($backup_task->USERNAME->Visible) { // USERNAME ?>
+		<td<?php echo $backup_task->USERNAME->CellAttributes() ?>>
+<span id="el<?php echo $backup_task_delete->RowCnt ?>_backup_task_USERNAME" class="control-group backup_task_USERNAME">
+<span<?php echo $backup_task->USERNAME->ViewAttributes() ?>>
+<?php echo $backup_task->USERNAME->ListViewValue() ?></span>
+</span>
+</td>
+<?php } ?>
+<?php if ($backup_task->PASSWORD->Visible) { // PASSWORD ?>
+		<td<?php echo $backup_task->PASSWORD->CellAttributes() ?>>
+<span id="el<?php echo $backup_task_delete->RowCnt ?>_backup_task_PASSWORD" class="control-group backup_task_PASSWORD">
+<span<?php echo $backup_task->PASSWORD->ViewAttributes() ?>>
+<?php echo $backup_task->PASSWORD->ListViewValue() ?></span>
+</span>
+</td>
+<?php } ?>
+<?php if ($backup_task->DATABASE->Visible) { // DATABASE ?>
+		<td<?php echo $backup_task->DATABASE->CellAttributes() ?>>
+<span id="el<?php echo $backup_task_delete->RowCnt ?>_backup_task_DATABASE" class="control-group backup_task_DATABASE">
+<span<?php echo $backup_task->DATABASE->ViewAttributes() ?>>
+<?php echo $backup_task->DATABASE->ListViewValue() ?></span>
+</span>
+</td>
+<?php } ?>
+<?php if ($backup_task->FILEPATH->Visible) { // FILEPATH ?>
+		<td<?php echo $backup_task->FILEPATH->CellAttributes() ?>>
+<span id="el<?php echo $backup_task_delete->RowCnt ?>_backup_task_FILEPATH" class="control-group backup_task_FILEPATH">
+<span<?php echo $backup_task->FILEPATH->ViewAttributes() ?>>
+<?php echo $backup_task->FILEPATH->ListViewValue() ?></span>
+</span>
+</td>
+<?php } ?>
+<?php if ($backup_task->FILENAME->Visible) { // FILENAME ?>
+		<td<?php echo $backup_task->FILENAME->CellAttributes() ?>>
+<span id="el<?php echo $backup_task_delete->RowCnt ?>_backup_task_FILENAME" class="control-group backup_task_FILENAME">
+<span<?php echo $backup_task->FILENAME->ViewAttributes() ?>>
+<?php echo $backup_task->FILENAME->ListViewValue() ?></span>
 </span>
 </td>
 <?php } ?>
 	</tr>
 <?php
-	$start_task_delete->Recordset->MoveNext();
+	$backup_task_delete->Recordset->MoveNext();
 }
-$start_task_delete->Recordset->Close();
+$backup_task_delete->Recordset->Close();
 ?>
 </tbody>
 </table>
@@ -758,10 +833,10 @@ $start_task_delete->Recordset->Close();
 </div>
 </form>
 <script type="text/javascript">
-fstart_taskdelete.Init();
+fbackup_taskdelete.Init();
 </script>
 <?php
-$start_task_delete->ShowPageFooter();
+$backup_task_delete->ShowPageFooter();
 if (EW_DEBUG_ENABLED)
 	echo ew_DebugMsg();
 ?>
@@ -773,5 +848,5 @@ if (EW_DEBUG_ENABLED)
 </script>
 <?php include_once "footer.php" ?>
 <?php
-$start_task_delete->Page_Terminate();
+$backup_task_delete->Page_Terminate();
 ?>

@@ -77,8 +77,11 @@ function task_parameters($task_name){
 function create_table_statement($task_name){
   $task_table_name = preg_replace("^\W^", "_", $task_name); 
   //echo $task_table_name;die;
-   $sql = "CREATE TABLE IF NOT EXISTS `{$task_table_name}_task` (
-`id` int(11) unsigned NOT NULL auto_increment, \n";
+  $sql = "DROP TABLE IF EXISTS `{$task_table_name}_task`; \n";
+   $sql .= "CREATE TABLE IF NOT EXISTS `{$task_table_name}_task` (
+`id` int(11) unsigned NOT NULL auto_increment,\n
+`username` varchar(255) NOT NULL default '',\n
+`datetime` DATETIME NOT NULL, \n";
    $parameters = task_parameters($task_name);
    foreach ($parameters as $parameter) {
     $sql .="`$parameter` varchar(255) NOT NULL default '',\n";

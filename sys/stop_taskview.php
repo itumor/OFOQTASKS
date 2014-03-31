@@ -5,7 +5,7 @@ ob_start(); // Turn on output buffering
 <?php include_once "ewcfg10.php" ?>
 <?php include_once "ewmysql10.php" ?>
 <?php include_once "phpfn10.php" ?>
-<?php include_once "start_taskinfo.php" ?>
+<?php include_once "stop_taskinfo.php" ?>
 <?php include_once "_logininfo.php" ?>
 <?php include_once "userfn10.php" ?>
 <?php
@@ -14,9 +14,9 @@ ob_start(); // Turn on output buffering
 // Page class
 //
 
-$start_task_view = NULL; // Initialize page object first
+$stop_task_view = NULL; // Initialize page object first
 
-class cstart_task_view extends cstart_task {
+class cstop_task_view extends cstop_task {
 
 	// Page ID
 	var $PageID = 'view';
@@ -25,10 +25,10 @@ class cstart_task_view extends cstart_task {
 	var $ProjectID = "{3246B9FA-4C51-4733-8040-34B188FCD87E}";
 
 	// Table name
-	var $TableName = 'start_task';
+	var $TableName = 'stop_task';
 
 	// Page object name
-	var $PageObjName = 'start_task_view';
+	var $PageObjName = 'stop_task_view';
 
 	// Page name
 	function PageName() {
@@ -197,10 +197,10 @@ class cstart_task_view extends cstart_task {
 		// Parent constuctor
 		parent::__construct();
 
-		// Table object (start_task)
-		if (!isset($GLOBALS["start_task"])) {
-			$GLOBALS["start_task"] = &$this;
-			$GLOBALS["Table"] = &$GLOBALS["start_task"];
+		// Table object (stop_task)
+		if (!isset($GLOBALS["stop_task"])) {
+			$GLOBALS["stop_task"] = &$this;
+			$GLOBALS["Table"] = &$GLOBALS["stop_task"];
 		}
 		$KeyUrl = "";
 		if (@$_GET["id"] <> "") {
@@ -224,7 +224,7 @@ class cstart_task_view extends cstart_task {
 
 		// Table name (for backward compatibility)
 		if (!defined("EW_TABLE_NAME"))
-			define("EW_TABLE_NAME", 'start_task', TRUE);
+			define("EW_TABLE_NAME", 'stop_task', TRUE);
 
 		// Start timer
 		if (!isset($GLOBALS["gTimer"])) $GLOBALS["gTimer"] = new cTimer();
@@ -269,7 +269,7 @@ class cstart_task_view extends cstart_task {
 		if (!$Security->CanView()) {
 			$Security->SaveLastUrl();
 			$this->setFailureMessage($Language->Phrase("NoPermission")); // Set no permission
-			$this->Page_Terminate("start_tasklist.php");
+			$this->Page_Terminate("stop_tasklist.php");
 		}
 		$Security->UserID_Loading();
 		if ($Security->IsLoggedIn()) $Security->LoadUserID();
@@ -380,7 +380,7 @@ class cstart_task_view extends cstart_task {
 					if ($this->TotalRecs <= 0) { // No record found
 						if ($this->getSuccessMessage() == "" && $this->getFailureMessage() == "")
 							$this->setFailureMessage($Language->Phrase("NoRecord")); // Set no record message
-						$this->Page_Terminate("start_tasklist.php"); // Return to list page
+						$this->Page_Terminate("stop_tasklist.php"); // Return to list page
 					} elseif ($bLoadCurrentRecord) { // Load current record position
 						$this->SetUpStartRec(); // Set up start record position
 
@@ -404,7 +404,7 @@ class cstart_task_view extends cstart_task {
 					if (!$bMatchRecord) {
 						if ($this->getSuccessMessage() == "" && $this->getFailureMessage() == "")
 							$this->setFailureMessage($Language->Phrase("NoRecord")); // Set no record message
-						$sReturnUrl = "start_tasklist.php"; // No matching record, return to list
+						$sReturnUrl = "stop_tasklist.php"; // No matching record, return to list
 					} else {
 						$this->LoadRowValues($this->Recordset); // Load row values
 					}
@@ -417,7 +417,7 @@ class cstart_task_view extends cstart_task {
 				exit();
 			}
 		} else {
-			$sReturnUrl = "start_tasklist.php"; // Not page request, return to list
+			$sReturnUrl = "stop_tasklist.php"; // Not page request, return to list
 		}
 		if ($sReturnUrl <> "")
 			$this->Page_Terminate($sReturnUrl);
@@ -608,27 +608,7 @@ class cstart_task_view extends cstart_task {
 			$this->id->ViewCustomAttributes = "";
 
 			// server_id_mysqladmin
-			if (strval($this->server_id_mysqladmin->CurrentValue) <> "") {
-				$sFilterWrk = "`server_id`" . ew_SearchString("=", $this->server_id_mysqladmin->CurrentValue, EW_DATATYPE_NUMBER);
-			$sSqlWrk = "SELECT `server_id`, `server_name` AS `DispFld`, '' AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld` FROM `server`";
-			$sWhereWrk = "";
-			if ($sFilterWrk <> "") {
-				ew_AddFilter($sWhereWrk, $sFilterWrk);
-			}
-
-			// Call Lookup selecting
-			$this->Lookup_Selecting($this->server_id_mysqladmin, $sWhereWrk);
-			if ($sWhereWrk <> "") $sSqlWrk .= " WHERE " . $sWhereWrk;
-				$rswrk = $conn->Execute($sSqlWrk);
-				if ($rswrk && !$rswrk->EOF) { // Lookup values found
-					$this->server_id_mysqladmin->ViewValue = $rswrk->fields('DispFld');
-					$rswrk->Close();
-				} else {
-					$this->server_id_mysqladmin->ViewValue = $this->server_id_mysqladmin->CurrentValue;
-				}
-			} else {
-				$this->server_id_mysqladmin->ViewValue = NULL;
-			}
+			$this->server_id_mysqladmin->ViewValue = $this->server_id_mysqladmin->CurrentValue;
 			$this->server_id_mysqladmin->ViewCustomAttributes = "";
 
 			// HOSTNAME
@@ -742,7 +722,7 @@ class cstart_task_view extends cstart_task {
 
 		// Export to Email
 		$item = &$this->ExportOptions->Add("email");
-		$item->Body = "<a id=\"emf_start_task\" href=\"javascript:void(0);\" class=\"ewExportLink ewEmail\" data-caption=\"" . $Language->Phrase("ExportToEmailText") . "\" onclick=\"ew_EmailDialogShow({lnk:'emf_start_task',hdr:ewLanguage.Phrase('ExportToEmail'),f:document.fstart_taskview,key:" . ew_ArrayToJsonAttr($this->RecKey) . ",sel:false});\">" . $Language->Phrase("ExportToEmail") . "</a>";
+		$item->Body = "<a id=\"emf_stop_task\" href=\"javascript:void(0);\" class=\"ewExportLink ewEmail\" data-caption=\"" . $Language->Phrase("ExportToEmailText") . "\" onclick=\"ew_EmailDialogShow({lnk:'emf_stop_task',hdr:ewLanguage.Phrase('ExportToEmail'),f:document.fstop_taskview,key:" . ew_ArrayToJsonAttr($this->RecKey) . ",sel:false});\">" . $Language->Phrase("ExportToEmail") . "</a>";
 		$item->Visible = TRUE;
 
 		// Drop down button for export
@@ -930,7 +910,7 @@ class cstart_task_view extends cstart_task {
 		global $Breadcrumb, $Language;
 		$Breadcrumb = new cBreadcrumb();
 		$PageCaption = $this->TableCaption();
-		$Breadcrumb->Add("list", "<span id=\"ewPageCaption\">" . $PageCaption . "</span>", "start_tasklist.php", $this->TableVar);
+		$Breadcrumb->Add("list", "<span id=\"ewPageCaption\">" . $PageCaption . "</span>", "stop_tasklist.php", $this->TableVar);
 		$PageCaption = $Language->Phrase("view");
 		$Breadcrumb->Add("view", "<span id=\"ewPageCaption\">" . $PageCaption . "</span>", ew_CurrentUrl(), $this->TableVar);
 	}
@@ -1000,34 +980,34 @@ class cstart_task_view extends cstart_task {
 <?php
 
 // Create page object
-if (!isset($start_task_view)) $start_task_view = new cstart_task_view();
+if (!isset($stop_task_view)) $stop_task_view = new cstop_task_view();
 
 // Page init
-$start_task_view->Page_Init();
+$stop_task_view->Page_Init();
 
 // Page main
-$start_task_view->Page_Main();
+$stop_task_view->Page_Main();
 
 // Global Page Rendering event (in userfn*.php)
 Page_Rendering();
 
 // Page Rendering event
-$start_task_view->Page_Render();
+$stop_task_view->Page_Render();
 ?>
 <?php include_once "header.php" ?>
-<?php if ($start_task->Export == "") { ?>
+<?php if ($stop_task->Export == "") { ?>
 <script type="text/javascript">
 
 // Page object
-var start_task_view = new ew_Page("start_task_view");
-start_task_view.PageID = "view"; // Page ID
-var EW_PAGE_ID = start_task_view.PageID; // For backward compatibility
+var stop_task_view = new ew_Page("stop_task_view");
+stop_task_view.PageID = "view"; // Page ID
+var EW_PAGE_ID = stop_task_view.PageID; // For backward compatibility
 
 // Form object
-var fstart_taskview = new ew_Form("fstart_taskview");
+var fstop_taskview = new ew_Form("fstop_taskview");
 
 // Form_CustomValidate event
-fstart_taskview.Form_CustomValidate = 
+fstop_taskview.Form_CustomValidate = 
  function(fobj) { // DO NOT CHANGE THIS LINE!
 
  	// Your custom validation code here, return false if invalid. 
@@ -1036,63 +1016,62 @@ fstart_taskview.Form_CustomValidate =
 
 // Use JavaScript validation or not
 <?php if (EW_CLIENT_VALIDATE) { ?>
-fstart_taskview.ValidateRequired = true;
+fstop_taskview.ValidateRequired = true;
 <?php } else { ?>
-fstart_taskview.ValidateRequired = false; 
+fstop_taskview.ValidateRequired = false; 
 <?php } ?>
 
 // Dynamic selection lists
-fstart_taskview.Lists["x_server_id_mysqladmin"] = {"LinkField":"x_server_id","Ajax":true,"AutoFill":false,"DisplayFields":["x_server_name","","",""],"ParentFields":[],"FilterFields":[],"Options":[]};
-
 // Form object for search
+
 </script>
 <script type="text/javascript">
 
 // Write your client script here, no need to add script tags.
 </script>
 <?php } ?>
-<?php if ($start_task->Export == "") { ?>
+<?php if ($stop_task->Export == "") { ?>
 <?php $Breadcrumb->Render(); ?>
 <?php } ?>
-<?php if ($start_task->Export == "") { ?>
+<?php if ($stop_task->Export == "") { ?>
 <div class="ewViewExportOptions">
-<?php $start_task_view->ExportOptions->Render("body") ?>
-<?php if (!$start_task_view->ExportOptions->UseDropDownButton) { ?>
+<?php $stop_task_view->ExportOptions->Render("body") ?>
+<?php if (!$stop_task_view->ExportOptions->UseDropDownButton) { ?>
 </div>
 <div class="ewViewOtherOptions">
 <?php } ?>
 <?php
-	foreach ($start_task_view->OtherOptions as &$option)
+	foreach ($stop_task_view->OtherOptions as &$option)
 		$option->Render("body");
 ?>
 </div>
 <?php } ?>
-<?php $start_task_view->ShowPageHeader(); ?>
+<?php $stop_task_view->ShowPageHeader(); ?>
 <?php
-$start_task_view->ShowMessage();
+$stop_task_view->ShowMessage();
 ?>
-<?php if ($start_task->Export == "") { ?>
+<?php if ($stop_task->Export == "") { ?>
 <form name="ewPagerForm" class="ewForm form-horizontal" action="<?php echo ew_CurrentPage() ?>">
 <table class="ewPager">
 <tr><td>
-<?php if (!isset($start_task_view->Pager)) $start_task_view->Pager = new cNumericPager($start_task_view->StartRec, $start_task_view->DisplayRecs, $start_task_view->TotalRecs, $start_task_view->RecRange) ?>
-<?php if ($start_task_view->Pager->RecordCount > 0) { ?>
+<?php if (!isset($stop_task_view->Pager)) $stop_task_view->Pager = new cNumericPager($stop_task_view->StartRec, $stop_task_view->DisplayRecs, $stop_task_view->TotalRecs, $stop_task_view->RecRange) ?>
+<?php if ($stop_task_view->Pager->RecordCount > 0) { ?>
 <table cellspacing="0" class="ewStdTable"><tbody><tr><td>
 <div class="pagination"><ul>
-	<?php if ($start_task_view->Pager->FirstButton->Enabled) { ?>
-	<li><a href="<?php echo $start_task_view->PageUrl() ?>start=<?php echo $start_task_view->Pager->FirstButton->Start ?>"><?php echo $Language->Phrase("PagerFirst") ?></a></li>
+	<?php if ($stop_task_view->Pager->FirstButton->Enabled) { ?>
+	<li><a href="<?php echo $stop_task_view->PageUrl() ?>start=<?php echo $stop_task_view->Pager->FirstButton->Start ?>"><?php echo $Language->Phrase("PagerFirst") ?></a></li>
 	<?php } ?>
-	<?php if ($start_task_view->Pager->PrevButton->Enabled) { ?>
-	<li><a href="<?php echo $start_task_view->PageUrl() ?>start=<?php echo $start_task_view->Pager->PrevButton->Start ?>"><?php echo $Language->Phrase("PagerPrevious") ?></a></li>
+	<?php if ($stop_task_view->Pager->PrevButton->Enabled) { ?>
+	<li><a href="<?php echo $stop_task_view->PageUrl() ?>start=<?php echo $stop_task_view->Pager->PrevButton->Start ?>"><?php echo $Language->Phrase("PagerPrevious") ?></a></li>
 	<?php } ?>
-	<?php foreach ($start_task_view->Pager->Items as $PagerItem) { ?>
-		<li<?php if (!$PagerItem->Enabled) { echo " class=\" active\""; } ?>><a href="<?php if ($PagerItem->Enabled) { echo $start_task_view->PageUrl() . "start=" . $PagerItem->Start; } else { echo "#"; } ?>"><?php echo $PagerItem->Text ?></a></li>
+	<?php foreach ($stop_task_view->Pager->Items as $PagerItem) { ?>
+		<li<?php if (!$PagerItem->Enabled) { echo " class=\" active\""; } ?>><a href="<?php if ($PagerItem->Enabled) { echo $stop_task_view->PageUrl() . "start=" . $PagerItem->Start; } else { echo "#"; } ?>"><?php echo $PagerItem->Text ?></a></li>
 	<?php } ?>
-	<?php if ($start_task_view->Pager->NextButton->Enabled) { ?>
-	<li><a href="<?php echo $start_task_view->PageUrl() ?>start=<?php echo $start_task_view->Pager->NextButton->Start ?>"><?php echo $Language->Phrase("PagerNext") ?></a></li>
+	<?php if ($stop_task_view->Pager->NextButton->Enabled) { ?>
+	<li><a href="<?php echo $stop_task_view->PageUrl() ?>start=<?php echo $stop_task_view->Pager->NextButton->Start ?>"><?php echo $Language->Phrase("PagerNext") ?></a></li>
 	<?php } ?>
-	<?php if ($start_task_view->Pager->LastButton->Enabled) { ?>
-	<li><a href="<?php echo $start_task_view->PageUrl() ?>start=<?php echo $start_task_view->Pager->LastButton->Start ?>"><?php echo $Language->Phrase("PagerLast") ?></a></li>
+	<?php if ($stop_task_view->Pager->LastButton->Enabled) { ?>
+	<li><a href="<?php echo $stop_task_view->PageUrl() ?>start=<?php echo $stop_task_view->Pager->LastButton->Start ?>"><?php echo $Language->Phrase("PagerLast") ?></a></li>
 	<?php } ?>
 </ul></div>
 </td>
@@ -1104,121 +1083,121 @@ $start_task_view->ShowMessage();
 </tr></table>
 </form>
 <?php } ?>
-<form name="fstart_taskview" id="fstart_taskview" class="ewForm form-horizontal" action="<?php echo ew_CurrentPage() ?>" method="post">
-<input type="hidden" name="t" value="start_task">
+<form name="fstop_taskview" id="fstop_taskview" class="ewForm form-horizontal" action="<?php echo ew_CurrentPage() ?>" method="post">
+<input type="hidden" name="t" value="stop_task">
 <table cellspacing="0" class="ewGrid"><tr><td>
-<table id="tbl_start_taskview" class="table table-bordered table-striped">
-<?php if ($start_task->id->Visible) { // id ?>
+<table id="tbl_stop_taskview" class="table table-bordered table-striped">
+<?php if ($stop_task->id->Visible) { // id ?>
 	<tr id="r_id">
-		<td><span id="elh_start_task_id"><?php echo $start_task->id->FldCaption() ?></span></td>
-		<td<?php echo $start_task->id->CellAttributes() ?>>
-<span id="el_start_task_id" class="control-group">
-<span<?php echo $start_task->id->ViewAttributes() ?>>
-<?php echo $start_task->id->ViewValue ?></span>
+		<td><span id="elh_stop_task_id"><?php echo $stop_task->id->FldCaption() ?></span></td>
+		<td<?php echo $stop_task->id->CellAttributes() ?>>
+<span id="el_stop_task_id" class="control-group">
+<span<?php echo $stop_task->id->ViewAttributes() ?>>
+<?php echo $stop_task->id->ViewValue ?></span>
 </span>
 </td>
 	</tr>
 <?php } ?>
-<?php if ($start_task->server_id_mysqladmin->Visible) { // server_id_mysqladmin ?>
+<?php if ($stop_task->server_id_mysqladmin->Visible) { // server_id_mysqladmin ?>
 	<tr id="r_server_id_mysqladmin">
-		<td><span id="elh_start_task_server_id_mysqladmin"><?php echo $start_task->server_id_mysqladmin->FldCaption() ?></span></td>
-		<td<?php echo $start_task->server_id_mysqladmin->CellAttributes() ?>>
-<span id="el_start_task_server_id_mysqladmin" class="control-group">
-<span<?php echo $start_task->server_id_mysqladmin->ViewAttributes() ?>>
-<?php echo $start_task->server_id_mysqladmin->ViewValue ?></span>
+		<td><span id="elh_stop_task_server_id_mysqladmin"><?php echo $stop_task->server_id_mysqladmin->FldCaption() ?></span></td>
+		<td<?php echo $stop_task->server_id_mysqladmin->CellAttributes() ?>>
+<span id="el_stop_task_server_id_mysqladmin" class="control-group">
+<span<?php echo $stop_task->server_id_mysqladmin->ViewAttributes() ?>>
+<?php echo $stop_task->server_id_mysqladmin->ViewValue ?></span>
 </span>
 </td>
 	</tr>
 <?php } ?>
-<?php if ($start_task->HOSTNAME->Visible) { // HOSTNAME ?>
+<?php if ($stop_task->HOSTNAME->Visible) { // HOSTNAME ?>
 	<tr id="r_HOSTNAME">
-		<td><span id="elh_start_task_HOSTNAME"><?php echo $start_task->HOSTNAME->FldCaption() ?></span></td>
-		<td<?php echo $start_task->HOSTNAME->CellAttributes() ?>>
-<span id="el_start_task_HOSTNAME" class="control-group">
-<span<?php echo $start_task->HOSTNAME->ViewAttributes() ?>>
-<?php echo $start_task->HOSTNAME->ViewValue ?></span>
+		<td><span id="elh_stop_task_HOSTNAME"><?php echo $stop_task->HOSTNAME->FldCaption() ?></span></td>
+		<td<?php echo $stop_task->HOSTNAME->CellAttributes() ?>>
+<span id="el_stop_task_HOSTNAME" class="control-group">
+<span<?php echo $stop_task->HOSTNAME->ViewAttributes() ?>>
+<?php echo $stop_task->HOSTNAME->ViewValue ?></span>
 </span>
 </td>
 	</tr>
 <?php } ?>
-<?php if ($start_task->USERNAME->Visible) { // USERNAME ?>
+<?php if ($stop_task->USERNAME->Visible) { // USERNAME ?>
 	<tr id="r_USERNAME">
-		<td><span id="elh_start_task_USERNAME"><?php echo $start_task->USERNAME->FldCaption() ?></span></td>
-		<td<?php echo $start_task->USERNAME->CellAttributes() ?>>
-<span id="el_start_task_USERNAME" class="control-group">
-<span<?php echo $start_task->USERNAME->ViewAttributes() ?>>
-<?php echo $start_task->USERNAME->ViewValue ?></span>
+		<td><span id="elh_stop_task_USERNAME"><?php echo $stop_task->USERNAME->FldCaption() ?></span></td>
+		<td<?php echo $stop_task->USERNAME->CellAttributes() ?>>
+<span id="el_stop_task_USERNAME" class="control-group">
+<span<?php echo $stop_task->USERNAME->ViewAttributes() ?>>
+<?php echo $stop_task->USERNAME->ViewValue ?></span>
 </span>
 </td>
 	</tr>
 <?php } ?>
-<?php if ($start_task->PASSWORD->Visible) { // PASSWORD ?>
+<?php if ($stop_task->PASSWORD->Visible) { // PASSWORD ?>
 	<tr id="r_PASSWORD">
-		<td><span id="elh_start_task_PASSWORD"><?php echo $start_task->PASSWORD->FldCaption() ?></span></td>
-		<td<?php echo $start_task->PASSWORD->CellAttributes() ?>>
-<span id="el_start_task_PASSWORD" class="control-group">
-<span<?php echo $start_task->PASSWORD->ViewAttributes() ?>>
-<?php echo $start_task->PASSWORD->ViewValue ?></span>
+		<td><span id="elh_stop_task_PASSWORD"><?php echo $stop_task->PASSWORD->FldCaption() ?></span></td>
+		<td<?php echo $stop_task->PASSWORD->CellAttributes() ?>>
+<span id="el_stop_task_PASSWORD" class="control-group">
+<span<?php echo $stop_task->PASSWORD->ViewAttributes() ?>>
+<?php echo $stop_task->PASSWORD->ViewValue ?></span>
 </span>
 </td>
 	</tr>
 <?php } ?>
-<?php if ($start_task->DATABASE->Visible) { // DATABASE ?>
+<?php if ($stop_task->DATABASE->Visible) { // DATABASE ?>
 	<tr id="r_DATABASE">
-		<td><span id="elh_start_task_DATABASE"><?php echo $start_task->DATABASE->FldCaption() ?></span></td>
-		<td<?php echo $start_task->DATABASE->CellAttributes() ?>>
-<span id="el_start_task_DATABASE" class="control-group">
-<span<?php echo $start_task->DATABASE->ViewAttributes() ?>>
-<?php echo $start_task->DATABASE->ViewValue ?></span>
+		<td><span id="elh_stop_task_DATABASE"><?php echo $stop_task->DATABASE->FldCaption() ?></span></td>
+		<td<?php echo $stop_task->DATABASE->CellAttributes() ?>>
+<span id="el_stop_task_DATABASE" class="control-group">
+<span<?php echo $stop_task->DATABASE->ViewAttributes() ?>>
+<?php echo $stop_task->DATABASE->ViewValue ?></span>
 </span>
 </td>
 	</tr>
 <?php } ?>
-<?php if ($start_task->FILEPATH->Visible) { // FILEPATH ?>
+<?php if ($stop_task->FILEPATH->Visible) { // FILEPATH ?>
 	<tr id="r_FILEPATH">
-		<td><span id="elh_start_task_FILEPATH"><?php echo $start_task->FILEPATH->FldCaption() ?></span></td>
-		<td<?php echo $start_task->FILEPATH->CellAttributes() ?>>
-<span id="el_start_task_FILEPATH" class="control-group">
-<span<?php echo $start_task->FILEPATH->ViewAttributes() ?>>
-<?php echo $start_task->FILEPATH->ViewValue ?></span>
+		<td><span id="elh_stop_task_FILEPATH"><?php echo $stop_task->FILEPATH->FldCaption() ?></span></td>
+		<td<?php echo $stop_task->FILEPATH->CellAttributes() ?>>
+<span id="el_stop_task_FILEPATH" class="control-group">
+<span<?php echo $stop_task->FILEPATH->ViewAttributes() ?>>
+<?php echo $stop_task->FILEPATH->ViewValue ?></span>
 </span>
 </td>
 	</tr>
 <?php } ?>
-<?php if ($start_task->FILENAME->Visible) { // FILENAME ?>
+<?php if ($stop_task->FILENAME->Visible) { // FILENAME ?>
 	<tr id="r_FILENAME">
-		<td><span id="elh_start_task_FILENAME"><?php echo $start_task->FILENAME->FldCaption() ?></span></td>
-		<td<?php echo $start_task->FILENAME->CellAttributes() ?>>
-<span id="el_start_task_FILENAME" class="control-group">
-<span<?php echo $start_task->FILENAME->ViewAttributes() ?>>
-<?php echo $start_task->FILENAME->ViewValue ?></span>
+		<td><span id="elh_stop_task_FILENAME"><?php echo $stop_task->FILENAME->FldCaption() ?></span></td>
+		<td<?php echo $stop_task->FILENAME->CellAttributes() ?>>
+<span id="el_stop_task_FILENAME" class="control-group">
+<span<?php echo $stop_task->FILENAME->ViewAttributes() ?>>
+<?php echo $stop_task->FILENAME->ViewValue ?></span>
 </span>
 </td>
 	</tr>
 <?php } ?>
 </table>
 </td></tr></table>
-<?php if ($start_task->Export == "") { ?>
+<?php if ($stop_task->Export == "") { ?>
 <table class="ewPager">
 <tr><td>
-<?php if (!isset($start_task_view->Pager)) $start_task_view->Pager = new cNumericPager($start_task_view->StartRec, $start_task_view->DisplayRecs, $start_task_view->TotalRecs, $start_task_view->RecRange) ?>
-<?php if ($start_task_view->Pager->RecordCount > 0) { ?>
+<?php if (!isset($stop_task_view->Pager)) $stop_task_view->Pager = new cNumericPager($stop_task_view->StartRec, $stop_task_view->DisplayRecs, $stop_task_view->TotalRecs, $stop_task_view->RecRange) ?>
+<?php if ($stop_task_view->Pager->RecordCount > 0) { ?>
 <table cellspacing="0" class="ewStdTable"><tbody><tr><td>
 <div class="pagination"><ul>
-	<?php if ($start_task_view->Pager->FirstButton->Enabled) { ?>
-	<li><a href="<?php echo $start_task_view->PageUrl() ?>start=<?php echo $start_task_view->Pager->FirstButton->Start ?>"><?php echo $Language->Phrase("PagerFirst") ?></a></li>
+	<?php if ($stop_task_view->Pager->FirstButton->Enabled) { ?>
+	<li><a href="<?php echo $stop_task_view->PageUrl() ?>start=<?php echo $stop_task_view->Pager->FirstButton->Start ?>"><?php echo $Language->Phrase("PagerFirst") ?></a></li>
 	<?php } ?>
-	<?php if ($start_task_view->Pager->PrevButton->Enabled) { ?>
-	<li><a href="<?php echo $start_task_view->PageUrl() ?>start=<?php echo $start_task_view->Pager->PrevButton->Start ?>"><?php echo $Language->Phrase("PagerPrevious") ?></a></li>
+	<?php if ($stop_task_view->Pager->PrevButton->Enabled) { ?>
+	<li><a href="<?php echo $stop_task_view->PageUrl() ?>start=<?php echo $stop_task_view->Pager->PrevButton->Start ?>"><?php echo $Language->Phrase("PagerPrevious") ?></a></li>
 	<?php } ?>
-	<?php foreach ($start_task_view->Pager->Items as $PagerItem) { ?>
-		<li<?php if (!$PagerItem->Enabled) { echo " class=\" active\""; } ?>><a href="<?php if ($PagerItem->Enabled) { echo $start_task_view->PageUrl() . "start=" . $PagerItem->Start; } else { echo "#"; } ?>"><?php echo $PagerItem->Text ?></a></li>
+	<?php foreach ($stop_task_view->Pager->Items as $PagerItem) { ?>
+		<li<?php if (!$PagerItem->Enabled) { echo " class=\" active\""; } ?>><a href="<?php if ($PagerItem->Enabled) { echo $stop_task_view->PageUrl() . "start=" . $PagerItem->Start; } else { echo "#"; } ?>"><?php echo $PagerItem->Text ?></a></li>
 	<?php } ?>
-	<?php if ($start_task_view->Pager->NextButton->Enabled) { ?>
-	<li><a href="<?php echo $start_task_view->PageUrl() ?>start=<?php echo $start_task_view->Pager->NextButton->Start ?>"><?php echo $Language->Phrase("PagerNext") ?></a></li>
+	<?php if ($stop_task_view->Pager->NextButton->Enabled) { ?>
+	<li><a href="<?php echo $stop_task_view->PageUrl() ?>start=<?php echo $stop_task_view->Pager->NextButton->Start ?>"><?php echo $Language->Phrase("PagerNext") ?></a></li>
 	<?php } ?>
-	<?php if ($start_task_view->Pager->LastButton->Enabled) { ?>
-	<li><a href="<?php echo $start_task_view->PageUrl() ?>start=<?php echo $start_task_view->Pager->LastButton->Start ?>"><?php echo $Language->Phrase("PagerLast") ?></a></li>
+	<?php if ($stop_task_view->Pager->LastButton->Enabled) { ?>
+	<li><a href="<?php echo $stop_task_view->PageUrl() ?>start=<?php echo $stop_task_view->Pager->LastButton->Start ?>"><?php echo $Language->Phrase("PagerLast") ?></a></li>
 	<?php } ?>
 </ul></div>
 </td>
@@ -1231,14 +1210,14 @@ $start_task_view->ShowMessage();
 <?php } ?>
 </form>
 <script type="text/javascript">
-fstart_taskview.Init();
+fstop_taskview.Init();
 </script>
 <?php
-$start_task_view->ShowPageFooter();
+$stop_task_view->ShowPageFooter();
 if (EW_DEBUG_ENABLED)
 	echo ew_DebugMsg();
 ?>
-<?php if ($start_task->Export == "") { ?>
+<?php if ($stop_task->Export == "") { ?>
 <script type="text/javascript">
 
 // Write your table-specific startup script here
@@ -1248,5 +1227,5 @@ if (EW_DEBUG_ENABLED)
 <?php } ?>
 <?php include_once "footer.php" ?>
 <?php
-$start_task_view->Page_Terminate();
+$stop_task_view->Page_Terminate();
 ?>

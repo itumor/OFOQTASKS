@@ -5,7 +5,7 @@ ob_start(); // Turn on output buffering
 <?php include_once "ewcfg10.php" ?>
 <?php include_once "ewmysql10.php" ?>
 <?php include_once "phpfn10.php" ?>
-<?php include_once "start_taskinfo.php" ?>
+<?php include_once "update_taskinfo.php" ?>
 <?php include_once "_logininfo.php" ?>
 <?php include_once "userfn10.php" ?>
 <?php
@@ -14,9 +14,9 @@ ob_start(); // Turn on output buffering
 // Page class
 //
 
-$start_task_add = NULL; // Initialize page object first
+$update_task_add = NULL; // Initialize page object first
 
-class cstart_task_add extends cstart_task {
+class cupdate_task_add extends cupdate_task {
 
 	// Page ID
 	var $PageID = 'add';
@@ -25,10 +25,10 @@ class cstart_task_add extends cstart_task {
 	var $ProjectID = "{3246B9FA-4C51-4733-8040-34B188FCD87E}";
 
 	// Table name
-	var $TableName = 'start_task';
+	var $TableName = 'update_task';
 
 	// Page object name
-	var $PageObjName = 'start_task_add';
+	var $PageObjName = 'update_task_add';
 
 	// Page name
 	function PageName() {
@@ -171,10 +171,10 @@ class cstart_task_add extends cstart_task {
 		// Parent constuctor
 		parent::__construct();
 
-		// Table object (start_task)
-		if (!isset($GLOBALS["start_task"])) {
-			$GLOBALS["start_task"] = &$this;
-			$GLOBALS["Table"] = &$GLOBALS["start_task"];
+		// Table object (update_task)
+		if (!isset($GLOBALS["update_task"])) {
+			$GLOBALS["update_task"] = &$this;
+			$GLOBALS["Table"] = &$GLOBALS["update_task"];
 		}
 
 		// Table object (_login)
@@ -186,7 +186,7 @@ class cstart_task_add extends cstart_task {
 
 		// Table name (for backward compatibility)
 		if (!defined("EW_TABLE_NAME"))
-			define("EW_TABLE_NAME", 'start_task', TRUE);
+			define("EW_TABLE_NAME", 'update_task', TRUE);
 
 		// Start timer
 		if (!isset($GLOBALS["gTimer"])) $GLOBALS["gTimer"] = new cTimer();
@@ -218,7 +218,7 @@ class cstart_task_add extends cstart_task {
 		if (!$Security->CanAdd()) {
 			$Security->SaveLastUrl();
 			$this->setFailureMessage($Language->Phrase("NoPermission")); // Set no permission
-			$this->Page_Terminate("start_tasklist.php");
+			$this->Page_Terminate("update_tasklist.php");
 		}
 		$Security->UserID_Loading();
 		if ($Security->IsLoggedIn()) $Security->LoadUserID();
@@ -315,7 +315,7 @@ class cstart_task_add extends cstart_task {
 			case "C": // Copy an existing record
 				if (!$this->LoadRow()) { // Load record based on key
 					if ($this->getFailureMessage() == "") $this->setFailureMessage($Language->Phrase("NoRecord")); // No record found
-					$this->Page_Terminate("start_tasklist.php"); // No matching record, return to list
+					$this->Page_Terminate("update_tasklist.php"); // No matching record, return to list
 				}
 				break;
 			case "A": // Add new record
@@ -324,7 +324,7 @@ class cstart_task_add extends cstart_task {
 					if ($this->getSuccessMessage() == "")
 						$this->setSuccessMessage($Language->Phrase("AddSuccess")); // Set up success message
 					$sReturnUrl = $this->getReturnUrl();
-					if (ew_GetPageName($sReturnUrl) == "start_taskview.php")
+					if (ew_GetPageName($sReturnUrl) == "update_taskview.php")
 						$sReturnUrl = $this->GetViewUrl(); // View paging, return to view page with keyurl directly
 					$this->Page_Terminate($sReturnUrl); // Clean up and return
 				} else {
@@ -509,27 +509,7 @@ class cstart_task_add extends cstart_task {
 			$this->id->ViewCustomAttributes = "";
 
 			// server_id_mysqladmin
-			if (strval($this->server_id_mysqladmin->CurrentValue) <> "") {
-				$sFilterWrk = "`server_id`" . ew_SearchString("=", $this->server_id_mysqladmin->CurrentValue, EW_DATATYPE_NUMBER);
-			$sSqlWrk = "SELECT `server_id`, `server_name` AS `DispFld`, '' AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld` FROM `server`";
-			$sWhereWrk = "";
-			if ($sFilterWrk <> "") {
-				ew_AddFilter($sWhereWrk, $sFilterWrk);
-			}
-
-			// Call Lookup selecting
-			$this->Lookup_Selecting($this->server_id_mysqladmin, $sWhereWrk);
-			if ($sWhereWrk <> "") $sSqlWrk .= " WHERE " . $sWhereWrk;
-				$rswrk = $conn->Execute($sSqlWrk);
-				if ($rswrk && !$rswrk->EOF) { // Lookup values found
-					$this->server_id_mysqladmin->ViewValue = $rswrk->fields('DispFld');
-					$rswrk->Close();
-				} else {
-					$this->server_id_mysqladmin->ViewValue = $this->server_id_mysqladmin->CurrentValue;
-				}
-			} else {
-				$this->server_id_mysqladmin->ViewValue = NULL;
-			}
+			$this->server_id_mysqladmin->ViewValue = $this->server_id_mysqladmin->CurrentValue;
 			$this->server_id_mysqladmin->ViewCustomAttributes = "";
 
 			// HOSTNAME
@@ -594,25 +574,8 @@ class cstart_task_add extends cstart_task {
 
 			// server_id_mysqladmin
 			$this->server_id_mysqladmin->EditCustomAttributes = "";
-			if (trim(strval($this->server_id_mysqladmin->CurrentValue)) == "") {
-				$sFilterWrk = "0=1";
-			} else {
-				$sFilterWrk = "`server_id`" . ew_SearchString("=", $this->server_id_mysqladmin->CurrentValue, EW_DATATYPE_NUMBER);
-			}
-			$sSqlWrk = "SELECT `server_id`, `server_name` AS `DispFld`, '' AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld`, '' AS `SelectFilterFld`, '' AS `SelectFilterFld2`, '' AS `SelectFilterFld3`, '' AS `SelectFilterFld4` FROM `server`";
-			$sWhereWrk = "";
-			if ($sFilterWrk <> "") {
-				ew_AddFilter($sWhereWrk, $sFilterWrk);
-			}
-
-			// Call Lookup selecting
-			$this->Lookup_Selecting($this->server_id_mysqladmin, $sWhereWrk);
-			if ($sWhereWrk <> "") $sSqlWrk .= " WHERE " . $sWhereWrk;
-			$rswrk = $conn->Execute($sSqlWrk);
-			$arwrk = ($rswrk) ? $rswrk->GetRows() : array();
-			if ($rswrk) $rswrk->Close();
-			array_unshift($arwrk, array("", $Language->Phrase("PleaseSelect"), "", "", "", "", "", "", ""));
-			$this->server_id_mysqladmin->EditValue = $arwrk;
+			$this->server_id_mysqladmin->EditValue = ew_HtmlEncode($this->server_id_mysqladmin->CurrentValue);
+			$this->server_id_mysqladmin->PlaceHolder = ew_HtmlEncode(ew_RemoveHtml($this->server_id_mysqladmin->FldCaption()));
 
 			// HOSTNAME
 			$this->HOSTNAME->EditCustomAttributes = "";
@@ -794,7 +757,7 @@ class cstart_task_add extends cstart_task {
 		global $Breadcrumb, $Language;
 		$Breadcrumb = new cBreadcrumb();
 		$PageCaption = $this->TableCaption();
-		$Breadcrumb->Add("list", "<span id=\"ewPageCaption\">" . $PageCaption . "</span>", "start_tasklist.php", $this->TableVar);
+		$Breadcrumb->Add("list", "<span id=\"ewPageCaption\">" . $PageCaption . "</span>", "update_tasklist.php", $this->TableVar);
 		$PageCaption = ($this->CurrentAction == "C") ? $Language->Phrase("Copy") : $Language->Phrase("Add");
 		$Breadcrumb->Add("add", "<span id=\"ewPageCaption\">" . $PageCaption . "</span>", ew_CurrentUrl(), $this->TableVar);
 	}
@@ -871,33 +834,33 @@ class cstart_task_add extends cstart_task {
 <?php
 
 // Create page object
-if (!isset($start_task_add)) $start_task_add = new cstart_task_add();
+if (!isset($update_task_add)) $update_task_add = new cupdate_task_add();
 
 // Page init
-$start_task_add->Page_Init();
+$update_task_add->Page_Init();
 
 // Page main
-$start_task_add->Page_Main();
+$update_task_add->Page_Main();
 
 // Global Page Rendering event (in userfn*.php)
 Page_Rendering();
 
 // Page Rendering event
-$start_task_add->Page_Render();
+$update_task_add->Page_Render();
 ?>
 <?php include_once "header.php" ?>
 <script type="text/javascript">
 
 // Page object
-var start_task_add = new ew_Page("start_task_add");
-start_task_add.PageID = "add"; // Page ID
-var EW_PAGE_ID = start_task_add.PageID; // For backward compatibility
+var update_task_add = new ew_Page("update_task_add");
+update_task_add.PageID = "add"; // Page ID
+var EW_PAGE_ID = update_task_add.PageID; // For backward compatibility
 
 // Form object
-var fstart_taskadd = new ew_Form("fstart_taskadd");
+var fupdate_taskadd = new ew_Form("fupdate_taskadd");
 
 // Validate form
-fstart_taskadd.Validate = function() {
+fupdate_taskadd.Validate = function() {
 	if (!this.ValidateRequired)
 		return true; // Ignore validation
 	var $ = jQuery, fobj = this.GetForm(), $fobj = $(fobj);
@@ -914,25 +877,25 @@ fstart_taskadd.Validate = function() {
 		$fobj.data("rowindex", infix);
 			elm = this.GetElements("x" + infix + "_server_id_mysqladmin");
 			if (elm && !ew_HasValue(elm))
-				return this.OnError(elm, ewLanguage.Phrase("EnterRequiredField") + " - <?php echo ew_JsEncode2($start_task->server_id_mysqladmin->FldCaption()) ?>");
+				return this.OnError(elm, ewLanguage.Phrase("EnterRequiredField") + " - <?php echo ew_JsEncode2($update_task->server_id_mysqladmin->FldCaption()) ?>");
 			elm = this.GetElements("x" + infix + "_HOSTNAME");
 			if (elm && !ew_HasValue(elm))
-				return this.OnError(elm, ewLanguage.Phrase("EnterRequiredField") + " - <?php echo ew_JsEncode2($start_task->HOSTNAME->FldCaption()) ?>");
+				return this.OnError(elm, ewLanguage.Phrase("EnterRequiredField") + " - <?php echo ew_JsEncode2($update_task->HOSTNAME->FldCaption()) ?>");
 			elm = this.GetElements("x" + infix + "_USERNAME");
 			if (elm && !ew_HasValue(elm))
-				return this.OnError(elm, ewLanguage.Phrase("EnterRequiredField") + " - <?php echo ew_JsEncode2($start_task->USERNAME->FldCaption()) ?>");
+				return this.OnError(elm, ewLanguage.Phrase("EnterRequiredField") + " - <?php echo ew_JsEncode2($update_task->USERNAME->FldCaption()) ?>");
 			elm = this.GetElements("x" + infix + "_PASSWORD");
 			if (elm && !ew_HasValue(elm))
-				return this.OnError(elm, ewLanguage.Phrase("EnterRequiredField") + " - <?php echo ew_JsEncode2($start_task->PASSWORD->FldCaption()) ?>");
+				return this.OnError(elm, ewLanguage.Phrase("EnterRequiredField") + " - <?php echo ew_JsEncode2($update_task->PASSWORD->FldCaption()) ?>");
 			elm = this.GetElements("x" + infix + "_DATABASE");
 			if (elm && !ew_HasValue(elm))
-				return this.OnError(elm, ewLanguage.Phrase("EnterRequiredField") + " - <?php echo ew_JsEncode2($start_task->DATABASE->FldCaption()) ?>");
+				return this.OnError(elm, ewLanguage.Phrase("EnterRequiredField") + " - <?php echo ew_JsEncode2($update_task->DATABASE->FldCaption()) ?>");
 			elm = this.GetElements("x" + infix + "_FILEPATH");
 			if (elm && !ew_HasValue(elm))
-				return this.OnError(elm, ewLanguage.Phrase("EnterRequiredField") + " - <?php echo ew_JsEncode2($start_task->FILEPATH->FldCaption()) ?>");
+				return this.OnError(elm, ewLanguage.Phrase("EnterRequiredField") + " - <?php echo ew_JsEncode2($update_task->FILEPATH->FldCaption()) ?>");
 			elm = this.GetElements("x" + infix + "_FILENAME");
 			if (elm && !ew_HasValue(elm))
-				return this.OnError(elm, ewLanguage.Phrase("EnterRequiredField") + " - <?php echo ew_JsEncode2($start_task->FILENAME->FldCaption()) ?>");
+				return this.OnError(elm, ewLanguage.Phrase("EnterRequiredField") + " - <?php echo ew_JsEncode2($update_task->FILENAME->FldCaption()) ?>");
 
 			// Set up row object
 			ew_ElementsToRow(fobj);
@@ -954,7 +917,7 @@ fstart_taskadd.Validate = function() {
 }
 
 // Form_CustomValidate event
-fstart_taskadd.Form_CustomValidate = 
+fupdate_taskadd.Form_CustomValidate = 
  function(fobj) { // DO NOT CHANGE THIS LINE!
 
  	// Your custom validation code here, return false if invalid. 
@@ -963,124 +926,97 @@ fstart_taskadd.Form_CustomValidate =
 
 // Use JavaScript validation or not
 <?php if (EW_CLIENT_VALIDATE) { ?>
-fstart_taskadd.ValidateRequired = true;
+fupdate_taskadd.ValidateRequired = true;
 <?php } else { ?>
-fstart_taskadd.ValidateRequired = false; 
+fupdate_taskadd.ValidateRequired = false; 
 <?php } ?>
 
 // Dynamic selection lists
-fstart_taskadd.Lists["x_server_id_mysqladmin"] = {"LinkField":"x_server_id","Ajax":true,"AutoFill":false,"DisplayFields":["x_server_name","","",""],"ParentFields":[],"FilterFields":[],"Options":[]};
-
 // Form object for search
+
 </script>
 <script type="text/javascript">
 
 // Write your client script here, no need to add script tags.
 </script>
 <?php $Breadcrumb->Render(); ?>
-<?php $start_task_add->ShowPageHeader(); ?>
+<?php $update_task_add->ShowPageHeader(); ?>
 <?php
-$start_task_add->ShowMessage();
+$update_task_add->ShowMessage();
 ?>
-<form name="fstart_taskadd" id="fstart_taskadd" class="ewForm form-horizontal" action="<?php echo ew_CurrentPage() ?>" method="post">
-<input type="hidden" name="t" value="start_task">
+<form name="fupdate_taskadd" id="fupdate_taskadd" class="ewForm form-horizontal" action="<?php echo ew_CurrentPage() ?>" method="post">
+<input type="hidden" name="t" value="update_task">
 <input type="hidden" name="a_add" id="a_add" value="A">
 <table cellspacing="0" class="ewGrid"><tr><td>
-<table id="tbl_start_taskadd" class="table table-bordered table-striped">
-<?php if ($start_task->server_id_mysqladmin->Visible) { // server_id_mysqladmin ?>
+<table id="tbl_update_taskadd" class="table table-bordered table-striped">
+<?php if ($update_task->server_id_mysqladmin->Visible) { // server_id_mysqladmin ?>
 	<tr id="r_server_id_mysqladmin">
-		<td><span id="elh_start_task_server_id_mysqladmin"><?php echo $start_task->server_id_mysqladmin->FldCaption() ?><?php echo $Language->Phrase("FieldRequiredIndicator") ?></span></td>
-		<td<?php echo $start_task->server_id_mysqladmin->CellAttributes() ?>>
-<span id="el_start_task_server_id_mysqladmin" class="control-group">
-<select data-field="x_server_id_mysqladmin" id="x_server_id_mysqladmin" name="x_server_id_mysqladmin"<?php echo $start_task->server_id_mysqladmin->EditAttributes() ?>>
-<?php
-if (is_array($start_task->server_id_mysqladmin->EditValue)) {
-	$arwrk = $start_task->server_id_mysqladmin->EditValue;
-	$rowswrk = count($arwrk);
-	$emptywrk = TRUE;
-	for ($rowcntwrk = 0; $rowcntwrk < $rowswrk; $rowcntwrk++) {
-		$selwrk = (strval($start_task->server_id_mysqladmin->CurrentValue) == strval($arwrk[$rowcntwrk][0])) ? " selected=\"selected\"" : "";
-		if ($selwrk <> "") $emptywrk = FALSE;
-?>
-<option value="<?php echo ew_HtmlEncode($arwrk[$rowcntwrk][0]) ?>"<?php echo $selwrk ?>>
-<?php echo $arwrk[$rowcntwrk][1] ?>
-</option>
-<?php
-	}
-}
-?>
-</select>
-<?php
-$sSqlWrk = "SELECT `server_id`, `server_name` AS `DispFld`, '' AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld` FROM `server`";
-$sWhereWrk = "";
-
-// Call Lookup selecting
-$start_task->Lookup_Selecting($start_task->server_id_mysqladmin, $sWhereWrk);
-if ($sWhereWrk <> "") $sSqlWrk .= " WHERE " . $sWhereWrk;
-?>
-<input type="hidden" name="s_x_server_id_mysqladmin" id="s_x_server_id_mysqladmin" value="s=<?php echo ew_Encrypt($sSqlWrk) ?>&f0=<?php echo ew_Encrypt("`server_id` = {filter_value}"); ?>&t0=3">
+		<td><span id="elh_update_task_server_id_mysqladmin"><?php echo $update_task->server_id_mysqladmin->FldCaption() ?><?php echo $Language->Phrase("FieldRequiredIndicator") ?></span></td>
+		<td<?php echo $update_task->server_id_mysqladmin->CellAttributes() ?>>
+<span id="el_update_task_server_id_mysqladmin" class="control-group">
+<input type="text" data-field="x_server_id_mysqladmin" name="x_server_id_mysqladmin" id="x_server_id_mysqladmin" size="30" maxlength="255" placeholder="<?php echo $update_task->server_id_mysqladmin->PlaceHolder ?>" value="<?php echo $update_task->server_id_mysqladmin->EditValue ?>"<?php echo $update_task->server_id_mysqladmin->EditAttributes() ?>>
 </span>
-<?php echo $start_task->server_id_mysqladmin->CustomMsg ?></td>
+<?php echo $update_task->server_id_mysqladmin->CustomMsg ?></td>
 	</tr>
 <?php } ?>
-<?php if ($start_task->HOSTNAME->Visible) { // HOSTNAME ?>
+<?php if ($update_task->HOSTNAME->Visible) { // HOSTNAME ?>
 	<tr id="r_HOSTNAME">
-		<td><span id="elh_start_task_HOSTNAME"><?php echo $start_task->HOSTNAME->FldCaption() ?><?php echo $Language->Phrase("FieldRequiredIndicator") ?></span></td>
-		<td<?php echo $start_task->HOSTNAME->CellAttributes() ?>>
-<span id="el_start_task_HOSTNAME" class="control-group">
-<input type="text" data-field="x_HOSTNAME" name="x_HOSTNAME" id="x_HOSTNAME" size="30" maxlength="255" placeholder="<?php echo $start_task->HOSTNAME->PlaceHolder ?>" value="<?php echo $start_task->HOSTNAME->EditValue ?>"<?php echo $start_task->HOSTNAME->EditAttributes() ?>>
+		<td><span id="elh_update_task_HOSTNAME"><?php echo $update_task->HOSTNAME->FldCaption() ?><?php echo $Language->Phrase("FieldRequiredIndicator") ?></span></td>
+		<td<?php echo $update_task->HOSTNAME->CellAttributes() ?>>
+<span id="el_update_task_HOSTNAME" class="control-group">
+<input type="text" data-field="x_HOSTNAME" name="x_HOSTNAME" id="x_HOSTNAME" size="30" maxlength="255" placeholder="<?php echo $update_task->HOSTNAME->PlaceHolder ?>" value="<?php echo $update_task->HOSTNAME->EditValue ?>"<?php echo $update_task->HOSTNAME->EditAttributes() ?>>
 </span>
-<?php echo $start_task->HOSTNAME->CustomMsg ?></td>
+<?php echo $update_task->HOSTNAME->CustomMsg ?></td>
 	</tr>
 <?php } ?>
-<?php if ($start_task->USERNAME->Visible) { // USERNAME ?>
+<?php if ($update_task->USERNAME->Visible) { // USERNAME ?>
 	<tr id="r_USERNAME">
-		<td><span id="elh_start_task_USERNAME"><?php echo $start_task->USERNAME->FldCaption() ?><?php echo $Language->Phrase("FieldRequiredIndicator") ?></span></td>
-		<td<?php echo $start_task->USERNAME->CellAttributes() ?>>
-<span id="el_start_task_USERNAME" class="control-group">
-<input type="text" data-field="x_USERNAME" name="x_USERNAME" id="x_USERNAME" size="30" maxlength="255" placeholder="<?php echo $start_task->USERNAME->PlaceHolder ?>" value="<?php echo $start_task->USERNAME->EditValue ?>"<?php echo $start_task->USERNAME->EditAttributes() ?>>
+		<td><span id="elh_update_task_USERNAME"><?php echo $update_task->USERNAME->FldCaption() ?><?php echo $Language->Phrase("FieldRequiredIndicator") ?></span></td>
+		<td<?php echo $update_task->USERNAME->CellAttributes() ?>>
+<span id="el_update_task_USERNAME" class="control-group">
+<input type="text" data-field="x_USERNAME" name="x_USERNAME" id="x_USERNAME" size="30" maxlength="255" placeholder="<?php echo $update_task->USERNAME->PlaceHolder ?>" value="<?php echo $update_task->USERNAME->EditValue ?>"<?php echo $update_task->USERNAME->EditAttributes() ?>>
 </span>
-<?php echo $start_task->USERNAME->CustomMsg ?></td>
+<?php echo $update_task->USERNAME->CustomMsg ?></td>
 	</tr>
 <?php } ?>
-<?php if ($start_task->PASSWORD->Visible) { // PASSWORD ?>
+<?php if ($update_task->PASSWORD->Visible) { // PASSWORD ?>
 	<tr id="r_PASSWORD">
-		<td><span id="elh_start_task_PASSWORD"><?php echo $start_task->PASSWORD->FldCaption() ?><?php echo $Language->Phrase("FieldRequiredIndicator") ?></span></td>
-		<td<?php echo $start_task->PASSWORD->CellAttributes() ?>>
-<span id="el_start_task_PASSWORD" class="control-group">
-<input type="text" data-field="x_PASSWORD" name="x_PASSWORD" id="x_PASSWORD" size="30" maxlength="255" placeholder="<?php echo $start_task->PASSWORD->PlaceHolder ?>" value="<?php echo $start_task->PASSWORD->EditValue ?>"<?php echo $start_task->PASSWORD->EditAttributes() ?>>
+		<td><span id="elh_update_task_PASSWORD"><?php echo $update_task->PASSWORD->FldCaption() ?><?php echo $Language->Phrase("FieldRequiredIndicator") ?></span></td>
+		<td<?php echo $update_task->PASSWORD->CellAttributes() ?>>
+<span id="el_update_task_PASSWORD" class="control-group">
+<input type="text" data-field="x_PASSWORD" name="x_PASSWORD" id="x_PASSWORD" size="30" maxlength="255" placeholder="<?php echo $update_task->PASSWORD->PlaceHolder ?>" value="<?php echo $update_task->PASSWORD->EditValue ?>"<?php echo $update_task->PASSWORD->EditAttributes() ?>>
 </span>
-<?php echo $start_task->PASSWORD->CustomMsg ?></td>
+<?php echo $update_task->PASSWORD->CustomMsg ?></td>
 	</tr>
 <?php } ?>
-<?php if ($start_task->DATABASE->Visible) { // DATABASE ?>
+<?php if ($update_task->DATABASE->Visible) { // DATABASE ?>
 	<tr id="r_DATABASE">
-		<td><span id="elh_start_task_DATABASE"><?php echo $start_task->DATABASE->FldCaption() ?><?php echo $Language->Phrase("FieldRequiredIndicator") ?></span></td>
-		<td<?php echo $start_task->DATABASE->CellAttributes() ?>>
-<span id="el_start_task_DATABASE" class="control-group">
-<input type="text" data-field="x_DATABASE" name="x_DATABASE" id="x_DATABASE" size="30" maxlength="255" placeholder="<?php echo $start_task->DATABASE->PlaceHolder ?>" value="<?php echo $start_task->DATABASE->EditValue ?>"<?php echo $start_task->DATABASE->EditAttributes() ?>>
+		<td><span id="elh_update_task_DATABASE"><?php echo $update_task->DATABASE->FldCaption() ?><?php echo $Language->Phrase("FieldRequiredIndicator") ?></span></td>
+		<td<?php echo $update_task->DATABASE->CellAttributes() ?>>
+<span id="el_update_task_DATABASE" class="control-group">
+<input type="text" data-field="x_DATABASE" name="x_DATABASE" id="x_DATABASE" size="30" maxlength="255" placeholder="<?php echo $update_task->DATABASE->PlaceHolder ?>" value="<?php echo $update_task->DATABASE->EditValue ?>"<?php echo $update_task->DATABASE->EditAttributes() ?>>
 </span>
-<?php echo $start_task->DATABASE->CustomMsg ?></td>
+<?php echo $update_task->DATABASE->CustomMsg ?></td>
 	</tr>
 <?php } ?>
-<?php if ($start_task->FILEPATH->Visible) { // FILEPATH ?>
+<?php if ($update_task->FILEPATH->Visible) { // FILEPATH ?>
 	<tr id="r_FILEPATH">
-		<td><span id="elh_start_task_FILEPATH"><?php echo $start_task->FILEPATH->FldCaption() ?><?php echo $Language->Phrase("FieldRequiredIndicator") ?></span></td>
-		<td<?php echo $start_task->FILEPATH->CellAttributes() ?>>
-<span id="el_start_task_FILEPATH" class="control-group">
-<input type="text" data-field="x_FILEPATH" name="x_FILEPATH" id="x_FILEPATH" size="30" maxlength="255" placeholder="<?php echo $start_task->FILEPATH->PlaceHolder ?>" value="<?php echo $start_task->FILEPATH->EditValue ?>"<?php echo $start_task->FILEPATH->EditAttributes() ?>>
+		<td><span id="elh_update_task_FILEPATH"><?php echo $update_task->FILEPATH->FldCaption() ?><?php echo $Language->Phrase("FieldRequiredIndicator") ?></span></td>
+		<td<?php echo $update_task->FILEPATH->CellAttributes() ?>>
+<span id="el_update_task_FILEPATH" class="control-group">
+<input type="text" data-field="x_FILEPATH" name="x_FILEPATH" id="x_FILEPATH" size="30" maxlength="255" placeholder="<?php echo $update_task->FILEPATH->PlaceHolder ?>" value="<?php echo $update_task->FILEPATH->EditValue ?>"<?php echo $update_task->FILEPATH->EditAttributes() ?>>
 </span>
-<?php echo $start_task->FILEPATH->CustomMsg ?></td>
+<?php echo $update_task->FILEPATH->CustomMsg ?></td>
 	</tr>
 <?php } ?>
-<?php if ($start_task->FILENAME->Visible) { // FILENAME ?>
+<?php if ($update_task->FILENAME->Visible) { // FILENAME ?>
 	<tr id="r_FILENAME">
-		<td><span id="elh_start_task_FILENAME"><?php echo $start_task->FILENAME->FldCaption() ?><?php echo $Language->Phrase("FieldRequiredIndicator") ?></span></td>
-		<td<?php echo $start_task->FILENAME->CellAttributes() ?>>
-<span id="el_start_task_FILENAME" class="control-group">
-<input type="text" data-field="x_FILENAME" name="x_FILENAME" id="x_FILENAME" size="30" maxlength="255" placeholder="<?php echo $start_task->FILENAME->PlaceHolder ?>" value="<?php echo $start_task->FILENAME->EditValue ?>"<?php echo $start_task->FILENAME->EditAttributes() ?>>
+		<td><span id="elh_update_task_FILENAME"><?php echo $update_task->FILENAME->FldCaption() ?><?php echo $Language->Phrase("FieldRequiredIndicator") ?></span></td>
+		<td<?php echo $update_task->FILENAME->CellAttributes() ?>>
+<span id="el_update_task_FILENAME" class="control-group">
+<input type="text" data-field="x_FILENAME" name="x_FILENAME" id="x_FILENAME" size="30" maxlength="255" placeholder="<?php echo $update_task->FILENAME->PlaceHolder ?>" value="<?php echo $update_task->FILENAME->EditValue ?>"<?php echo $update_task->FILENAME->EditAttributes() ?>>
 </span>
-<?php echo $start_task->FILENAME->CustomMsg ?></td>
+<?php echo $update_task->FILENAME->CustomMsg ?></td>
 	</tr>
 <?php } ?>
 </table>
@@ -1088,13 +1024,13 @@ if ($sWhereWrk <> "") $sSqlWrk .= " WHERE " . $sWhereWrk;
 <button class="btn btn-primary ewButton" name="btnAction" id="btnAction" type="submit"><?php echo $Language->Phrase("AddBtn") ?></button>
 </form>
 <script type="text/javascript">
-fstart_taskadd.Init();
+fupdate_taskadd.Init();
 <?php if (EW_MOBILE_REFLOW && ew_IsMobile()) { ?>
 ew_Reflow();
 <?php } ?>
 </script>
 <?php
-$start_task_add->ShowPageFooter();
+$update_task_add->ShowPageFooter();
 if (EW_DEBUG_ENABLED)
 	echo ew_DebugMsg();
 ?>
@@ -1106,5 +1042,5 @@ if (EW_DEBUG_ENABLED)
 </script>
 <?php include_once "footer.php" ?>
 <?php
-$start_task_add->Page_Terminate();
+$update_task_add->Page_Terminate();
 ?>

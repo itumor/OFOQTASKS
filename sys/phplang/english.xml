@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" standalone="yes"?>
-<ew-language date="2014/3/26" version="10.0.1" id="en" name="English" desc="English" author="e.World Technology Ltd.">
+<ew-language date="2014/3/30" version="10.0.1" id="en" name="English" desc="English" author="e.World Technology Ltd.">
 	<locale>
 		<phrase id="locale" value=""/><!-- *** system locale for this language -->
 		<phrase id="use_system_locale" value="1"/><!-- *** change to "0" to disable system locale and use the following settings *** -->
@@ -377,6 +377,18 @@
 </menu>
 <menu id="67"><phrase id="menutext" value="listandstart task"/>
 </menu>
+<menu id="68"><phrase id="menutext" value="backup task"/>
+</menu>
+<menu id="69"><phrase id="menutext" value="create task"/>
+</menu>
+<menu id="70"><phrase id="menutext" value="drop task"/>
+</menu>
+<menu id="71"><phrase id="menutext" value="restore task"/>
+</menu>
+<menu id="72"><phrase id="menutext" value="stop task"/>
+</menu>
+<menu id="73"><phrase id="menutext" value="update task"/>
+</menu>
 <menu id="37"><phrase id="menutext" value="Generator Report Menu "/>
 </menu>
 <menu id="18"><phrase id="menutext" value="Generator report"/>
@@ -666,6 +678,18 @@
 </field>
 <field id="server_id_mysqladmin"><phrase id="fldcaption" value="server id mysqladmin"/>
 </field>
+<field id="hostname"><phrase id="fldcaption" value="HOSTNAME"/>
+</field>
+<field id="username"><phrase id="fldcaption" value="USERNAME"/>
+</field>
+<field id="password"><phrase id="fldcaption" value="PASSWORD"/>
+</field>
+<field id="database"><phrase id="fldcaption" value="DATABASE"/>
+</field>
+<field id="filepath"><phrase id="fldcaption" value="FILEPATH"/>
+</field>
+<field id="filename"><phrase id="fldcaption" value="FILENAME"/>
+</field>
 </table>
 <table id="restart_task"><phrase id="tblcaption" value="restart task"/>
 <field id="id"><phrase id="fldcaption" value="id"/>
@@ -683,6 +707,114 @@
 <field id="username"><phrase id="fldcaption" value="USERNAME"/>
 </field>
 <field id="password"><phrase id="fldcaption" value="PASSWORD"/>
+</field>
+</table>
+<table id="backup_task"><phrase id="tblcaption" value="backup task"/>
+<field id="id"><phrase id="fldcaption" value="id"/>
+</field>
+<field id="server_id_mysqladmin"><phrase id="fldcaption" value="server id mysqladmin"/>
+</field>
+<field id="hostname"><phrase id="fldcaption" value="HOSTNAME"/>
+</field>
+<field id="username"><phrase id="fldcaption" value="USERNAME"/>
+</field>
+<field id="password"><phrase id="fldcaption" value="PASSWORD"/>
+</field>
+<field id="database"><phrase id="fldcaption" value="DATABASE"/>
+</field>
+<field id="filepath"><phrase id="fldcaption" value="FILEPATH"/>
+</field>
+<field id="filename"><phrase id="fldcaption" value="FILENAME"/>
+</field>
+</table>
+<table id="create_task"><phrase id="tblcaption" value="create task"/>
+<field id="id"><phrase id="fldcaption" value="id"/>
+</field>
+<field id="server_id_mysqladmin"><phrase id="fldcaption" value="server id mysqladmin"/>
+</field>
+<field id="hostname"><phrase id="fldcaption" value="HOSTNAME"/>
+</field>
+<field id="username"><phrase id="fldcaption" value="USERNAME"/>
+</field>
+<field id="password"><phrase id="fldcaption" value="PASSWORD"/>
+</field>
+<field id="database"><phrase id="fldcaption" value="DATABASE"/>
+</field>
+<field id="filepath"><phrase id="fldcaption" value="FILEPATH"/>
+</field>
+<field id="filename"><phrase id="fldcaption" value="FILENAME"/>
+</field>
+</table>
+<table id="drop_task"><phrase id="tblcaption" value="drop task"/>
+<field id="id"><phrase id="fldcaption" value="id"/>
+</field>
+<field id="server_id_mysqladmin"><phrase id="fldcaption" value="server id mysqladmin"/>
+</field>
+<field id="hostname"><phrase id="fldcaption" value="HOSTNAME"/>
+</field>
+<field id="username"><phrase id="fldcaption" value="USERNAME"/>
+</field>
+<field id="password"><phrase id="fldcaption" value="PASSWORD"/>
+</field>
+<field id="database"><phrase id="fldcaption" value="DATABASE"/>
+</field>
+<field id="filepath"><phrase id="fldcaption" value="FILEPATH"/>
+</field>
+<field id="filename"><phrase id="fldcaption" value="FILENAME"/>
+</field>
+</table>
+<table id="restore_task"><phrase id="tblcaption" value="restore task"/>
+<field id="id"><phrase id="fldcaption" value="id"/>
+</field>
+<field id="server_id_mysqladmin"><phrase id="fldcaption" value="server id mysqladmin"/>
+</field>
+<field id="hostname"><phrase id="fldcaption" value="HOSTNAME"/>
+</field>
+<field id="username"><phrase id="fldcaption" value="USERNAME"/>
+</field>
+<field id="password"><phrase id="fldcaption" value="PASSWORD"/>
+</field>
+<field id="database"><phrase id="fldcaption" value="DATABASE"/>
+</field>
+<field id="filepath"><phrase id="fldcaption" value="FILEPATH"/>
+</field>
+<field id="filename"><phrase id="fldcaption" value="FILENAME"/>
+</field>
+</table>
+<table id="stop_task"><phrase id="tblcaption" value="stop task"/>
+<field id="id"><phrase id="fldcaption" value="id"/>
+</field>
+<field id="server_id_mysqladmin"><phrase id="fldcaption" value="server id mysqladmin"/>
+</field>
+<field id="hostname"><phrase id="fldcaption" value="HOSTNAME"/>
+</field>
+<field id="username"><phrase id="fldcaption" value="USERNAME"/>
+</field>
+<field id="password"><phrase id="fldcaption" value="PASSWORD"/>
+</field>
+<field id="database"><phrase id="fldcaption" value="DATABASE"/>
+</field>
+<field id="filepath"><phrase id="fldcaption" value="FILEPATH"/>
+</field>
+<field id="filename"><phrase id="fldcaption" value="FILENAME"/>
+</field>
+</table>
+<table id="update_task"><phrase id="tblcaption" value="update task"/>
+<field id="id"><phrase id="fldcaption" value="id"/>
+</field>
+<field id="server_id_mysqladmin"><phrase id="fldcaption" value="server id mysqladmin"/>
+</field>
+<field id="hostname"><phrase id="fldcaption" value="HOSTNAME"/>
+</field>
+<field id="username"><phrase id="fldcaption" value="USERNAME"/>
+</field>
+<field id="password"><phrase id="fldcaption" value="PASSWORD"/>
+</field>
+<field id="database"><phrase id="fldcaption" value="DATABASE"/>
+</field>
+<field id="filepath"><phrase id="fldcaption" value="FILEPATH"/>
+</field>
+<field id="filename"><phrase id="fldcaption" value="FILENAME"/>
 </field>
 </table>
 </project>

@@ -5,7 +5,7 @@ ob_start(); // Turn on output buffering
 <?php include_once "ewcfg10.php" ?>
 <?php include_once "ewmysql10.php" ?>
 <?php include_once "phpfn10.php" ?>
-<?php include_once "start_taskinfo.php" ?>
+<?php include_once "stop_taskinfo.php" ?>
 <?php include_once "_logininfo.php" ?>
 <?php include_once "userfn10.php" ?>
 <?php
@@ -14,9 +14,9 @@ ob_start(); // Turn on output buffering
 // Page class
 //
 
-$start_task_list = NULL; // Initialize page object first
+$stop_task_list = NULL; // Initialize page object first
 
-class cstart_task_list extends cstart_task {
+class cstop_task_list extends cstop_task {
 
 	// Page ID
 	var $PageID = 'list';
@@ -25,13 +25,13 @@ class cstart_task_list extends cstart_task {
 	var $ProjectID = "{3246B9FA-4C51-4733-8040-34B188FCD87E}";
 
 	// Table name
-	var $TableName = 'start_task';
+	var $TableName = 'stop_task';
 
 	// Page object name
-	var $PageObjName = 'start_task_list';
+	var $PageObjName = 'stop_task_list';
 
 	// Grid form hidden field names
-	var $FormName = 'fstart_tasklist';
+	var $FormName = 'fstop_tasklist';
 	var $FormActionName = 'k_action';
 	var $FormKeyName = 'k_key';
 	var $FormOldKeyName = 'k_oldkey';
@@ -205,10 +205,10 @@ class cstart_task_list extends cstart_task {
 		// Parent constuctor
 		parent::__construct();
 
-		// Table object (start_task)
-		if (!isset($GLOBALS["start_task"])) {
-			$GLOBALS["start_task"] = &$this;
-			$GLOBALS["Table"] = &$GLOBALS["start_task"];
+		// Table object (stop_task)
+		if (!isset($GLOBALS["stop_task"])) {
+			$GLOBALS["stop_task"] = &$this;
+			$GLOBALS["Table"] = &$GLOBALS["stop_task"];
 		}
 
 		// Initialize URLs
@@ -219,12 +219,12 @@ class cstart_task_list extends cstart_task {
 		$this->ExportXmlUrl = $this->PageUrl() . "export=xml";
 		$this->ExportCsvUrl = $this->PageUrl() . "export=csv";
 		$this->ExportPdfUrl = $this->PageUrl() . "export=pdf";
-		$this->AddUrl = "start_taskadd.php";
+		$this->AddUrl = "stop_taskadd.php";
 		$this->InlineAddUrl = $this->PageUrl() . "a=add";
 		$this->GridAddUrl = $this->PageUrl() . "a=gridadd";
 		$this->GridEditUrl = $this->PageUrl() . "a=gridedit";
-		$this->MultiDeleteUrl = "start_taskdelete.php";
-		$this->MultiUpdateUrl = "start_taskupdate.php";
+		$this->MultiDeleteUrl = "stop_taskdelete.php";
+		$this->MultiUpdateUrl = "stop_taskupdate.php";
 
 		// Table object (_login)
 		if (!isset($GLOBALS['_login'])) $GLOBALS['_login'] = new c_login();
@@ -235,7 +235,7 @@ class cstart_task_list extends cstart_task {
 
 		// Table name (for backward compatibility)
 		if (!defined("EW_TABLE_NAME"))
-			define("EW_TABLE_NAME", 'start_task', TRUE);
+			define("EW_TABLE_NAME", 'stop_task', TRUE);
 
 		// Start timer
 		if (!isset($GLOBALS["gTimer"])) $GLOBALS["gTimer"] = new cTimer();
@@ -681,6 +681,12 @@ class cstart_task_list extends cstart_task {
 			$this->CurrentOrderType = @$_GET["ordertype"];
 			$this->UpdateSort($this->id); // id
 			$this->UpdateSort($this->server_id_mysqladmin); // server_id_mysqladmin
+			$this->UpdateSort($this->HOSTNAME); // HOSTNAME
+			$this->UpdateSort($this->USERNAME); // USERNAME
+			$this->UpdateSort($this->PASSWORD); // PASSWORD
+			$this->UpdateSort($this->DATABASE); // DATABASE
+			$this->UpdateSort($this->FILEPATH); // FILEPATH
+			$this->UpdateSort($this->FILENAME); // FILENAME
 			$this->setStartRecordNumber(1); // Reset start position
 		}
 	}
@@ -715,6 +721,12 @@ class cstart_task_list extends cstart_task {
 				$this->setSessionOrderBy($sOrderBy);
 				$this->id->setSort("");
 				$this->server_id_mysqladmin->setSort("");
+				$this->HOSTNAME->setSort("");
+				$this->USERNAME->setSort("");
+				$this->PASSWORD->setSort("");
+				$this->DATABASE->setSort("");
+				$this->FILEPATH->setSort("");
+				$this->FILENAME->setSort("");
 			}
 
 			// Reset start position
@@ -823,7 +835,7 @@ class cstart_task_list extends cstart_task {
 
 		// Add multi delete
 		$item = &$option->Add("multidelete");
-		$item->Body = "<a class=\"ewAction ewMultiDelete\" href=\"\" onclick=\"ew_SubmitSelected(document.fstart_tasklist, '" . $this->MultiDeleteUrl . "', ewLanguage.Phrase('DeleteMultiConfirmMsg'));return false;\">" . $Language->Phrase("DeleteSelectedLink") . "</a>";
+		$item->Body = "<a class=\"ewAction ewMultiDelete\" href=\"\" onclick=\"ew_SubmitSelected(document.fstop_tasklist, '" . $this->MultiDeleteUrl . "', ewLanguage.Phrase('DeleteMultiConfirmMsg'));return false;\">" . $Language->Phrase("DeleteSelectedLink") . "</a>";
 		$item->Visible = ($Security->CanDelete());
 
 		// Set up options default
@@ -849,7 +861,7 @@ class cstart_task_list extends cstart_task {
 
 				// Add custom action
 				$item = &$option->Add("custom_" . $action);
-				$item->Body = "<a class=\"ewAction ewCustomAction\" href=\"\" onclick=\"ew_SubmitSelected(document.fstart_tasklist, '" . ew_CurrentUrl() . "', null, '" . $action . "');return false;\">" . $name . "</a>";
+				$item->Body = "<a class=\"ewAction ewCustomAction\" href=\"\" onclick=\"ew_SubmitSelected(document.fstop_tasklist, '" . ew_CurrentUrl() . "', null, '" . $action . "');return false;\">" . $name . "</a>";
 			}
 
 			// Hide grid edit, multi-delete and multi-update
@@ -1084,27 +1096,7 @@ class cstart_task_list extends cstart_task {
 			$this->id->ViewCustomAttributes = "";
 
 			// server_id_mysqladmin
-			if (strval($this->server_id_mysqladmin->CurrentValue) <> "") {
-				$sFilterWrk = "`server_id`" . ew_SearchString("=", $this->server_id_mysqladmin->CurrentValue, EW_DATATYPE_NUMBER);
-			$sSqlWrk = "SELECT `server_id`, `server_name` AS `DispFld`, '' AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld` FROM `server`";
-			$sWhereWrk = "";
-			if ($sFilterWrk <> "") {
-				ew_AddFilter($sWhereWrk, $sFilterWrk);
-			}
-
-			// Call Lookup selecting
-			$this->Lookup_Selecting($this->server_id_mysqladmin, $sWhereWrk);
-			if ($sWhereWrk <> "") $sSqlWrk .= " WHERE " . $sWhereWrk;
-				$rswrk = $conn->Execute($sSqlWrk);
-				if ($rswrk && !$rswrk->EOF) { // Lookup values found
-					$this->server_id_mysqladmin->ViewValue = $rswrk->fields('DispFld');
-					$rswrk->Close();
-				} else {
-					$this->server_id_mysqladmin->ViewValue = $this->server_id_mysqladmin->CurrentValue;
-				}
-			} else {
-				$this->server_id_mysqladmin->ViewValue = NULL;
-			}
+			$this->server_id_mysqladmin->ViewValue = $this->server_id_mysqladmin->CurrentValue;
 			$this->server_id_mysqladmin->ViewCustomAttributes = "";
 
 			// HOSTNAME
@@ -1140,6 +1132,36 @@ class cstart_task_list extends cstart_task {
 			$this->server_id_mysqladmin->LinkCustomAttributes = "";
 			$this->server_id_mysqladmin->HrefValue = "";
 			$this->server_id_mysqladmin->TooltipValue = "";
+
+			// HOSTNAME
+			$this->HOSTNAME->LinkCustomAttributes = "";
+			$this->HOSTNAME->HrefValue = "";
+			$this->HOSTNAME->TooltipValue = "";
+
+			// USERNAME
+			$this->USERNAME->LinkCustomAttributes = "";
+			$this->USERNAME->HrefValue = "";
+			$this->USERNAME->TooltipValue = "";
+
+			// PASSWORD
+			$this->PASSWORD->LinkCustomAttributes = "";
+			$this->PASSWORD->HrefValue = "";
+			$this->PASSWORD->TooltipValue = "";
+
+			// DATABASE
+			$this->DATABASE->LinkCustomAttributes = "";
+			$this->DATABASE->HrefValue = "";
+			$this->DATABASE->TooltipValue = "";
+
+			// FILEPATH
+			$this->FILEPATH->LinkCustomAttributes = "";
+			$this->FILEPATH->HrefValue = "";
+			$this->FILEPATH->TooltipValue = "";
+
+			// FILENAME
+			$this->FILENAME->LinkCustomAttributes = "";
+			$this->FILENAME->HrefValue = "";
+			$this->FILENAME->TooltipValue = "";
 		}
 
 		// Call Row Rendered event
@@ -1188,7 +1210,7 @@ class cstart_task_list extends cstart_task {
 
 		// Export to Email
 		$item = &$this->ExportOptions->Add("email");
-		$item->Body = "<a id=\"emf_start_task\" href=\"javascript:void(0);\" class=\"ewExportLink ewEmail\" data-caption=\"" . $Language->Phrase("ExportToEmailText") . "\" onclick=\"ew_EmailDialogShow({lnk:'emf_start_task',hdr:ewLanguage.Phrase('ExportToEmail'),f:document.fstart_tasklist,sel:false});\">" . $Language->Phrase("ExportToEmail") . "</a>";
+		$item->Body = "<a id=\"emf_stop_task\" href=\"javascript:void(0);\" class=\"ewExportLink ewEmail\" data-caption=\"" . $Language->Phrase("ExportToEmailText") . "\" onclick=\"ew_EmailDialogShow({lnk:'emf_stop_task',hdr:ewLanguage.Phrase('ExportToEmail'),f:document.fstop_tasklist,sel:false});\">" . $Language->Phrase("ExportToEmail") . "</a>";
 		$item->Visible = TRUE;
 
 		// Drop down button for export
@@ -1506,35 +1528,35 @@ class cstart_task_list extends cstart_task {
 <?php
 
 // Create page object
-if (!isset($start_task_list)) $start_task_list = new cstart_task_list();
+if (!isset($stop_task_list)) $stop_task_list = new cstop_task_list();
 
 // Page init
-$start_task_list->Page_Init();
+$stop_task_list->Page_Init();
 
 // Page main
-$start_task_list->Page_Main();
+$stop_task_list->Page_Main();
 
 // Global Page Rendering event (in userfn*.php)
 Page_Rendering();
 
 // Page Rendering event
-$start_task_list->Page_Render();
+$stop_task_list->Page_Render();
 ?>
 <?php include_once "header.php" ?>
-<?php if ($start_task->Export == "") { ?>
+<?php if ($stop_task->Export == "") { ?>
 <script type="text/javascript">
 
 // Page object
-var start_task_list = new ew_Page("start_task_list");
-start_task_list.PageID = "list"; // Page ID
-var EW_PAGE_ID = start_task_list.PageID; // For backward compatibility
+var stop_task_list = new ew_Page("stop_task_list");
+stop_task_list.PageID = "list"; // Page ID
+var EW_PAGE_ID = stop_task_list.PageID; // For backward compatibility
 
 // Form object
-var fstart_tasklist = new ew_Form("fstart_tasklist");
-fstart_tasklist.FormKeyCountName = '<?php echo $start_task_list->FormKeyCountName ?>';
+var fstop_tasklist = new ew_Form("fstop_tasklist");
+fstop_tasklist.FormKeyCountName = '<?php echo $stop_task_list->FormKeyCountName ?>';
 
 // Form_CustomValidate event
-fstart_tasklist.Form_CustomValidate = 
+fstop_tasklist.Form_CustomValidate = 
  function(fobj) { // DO NOT CHANGE THIS LINE!
 
  	// Your custom validation code here, return false if invalid. 
@@ -1543,77 +1565,76 @@ fstart_tasklist.Form_CustomValidate =
 
 // Use JavaScript validation or not
 <?php if (EW_CLIENT_VALIDATE) { ?>
-fstart_tasklist.ValidateRequired = true;
+fstop_tasklist.ValidateRequired = true;
 <?php } else { ?>
-fstart_tasklist.ValidateRequired = false; 
+fstop_tasklist.ValidateRequired = false; 
 <?php } ?>
 
 // Dynamic selection lists
-fstart_tasklist.Lists["x_server_id_mysqladmin"] = {"LinkField":"x_server_id","Ajax":true,"AutoFill":false,"DisplayFields":["x_server_name","","",""],"ParentFields":[],"FilterFields":[],"Options":[]};
-
 // Form object for search
-var fstart_tasklistsrch = new ew_Form("fstart_tasklistsrch");
+
+var fstop_tasklistsrch = new ew_Form("fstop_tasklistsrch");
 
 // Init search panel as collapsed
-if (fstart_tasklistsrch) fstart_tasklistsrch.InitSearchPanel = true;
+if (fstop_tasklistsrch) fstop_tasklistsrch.InitSearchPanel = true;
 </script>
 <script type="text/javascript">
 
 // Write your client script here, no need to add script tags.
 </script>
 <?php } ?>
-<?php if ($start_task->Export == "") { ?>
+<?php if ($stop_task->Export == "") { ?>
 <?php $Breadcrumb->Render(); ?>
 <?php } ?>
-<?php if ($start_task_list->ExportOptions->Visible()) { ?>
-<div class="ewListExportOptions"><?php $start_task_list->ExportOptions->Render("body") ?></div>
+<?php if ($stop_task_list->ExportOptions->Visible()) { ?>
+<div class="ewListExportOptions"><?php $stop_task_list->ExportOptions->Render("body") ?></div>
 <?php } ?>
 <?php
 	$bSelectLimit = EW_SELECT_LIMIT;
 	if ($bSelectLimit) {
-		$start_task_list->TotalRecs = $start_task->SelectRecordCount();
+		$stop_task_list->TotalRecs = $stop_task->SelectRecordCount();
 	} else {
-		if ($start_task_list->Recordset = $start_task_list->LoadRecordset())
-			$start_task_list->TotalRecs = $start_task_list->Recordset->RecordCount();
+		if ($stop_task_list->Recordset = $stop_task_list->LoadRecordset())
+			$stop_task_list->TotalRecs = $stop_task_list->Recordset->RecordCount();
 	}
-	$start_task_list->StartRec = 1;
-	if ($start_task_list->DisplayRecs <= 0 || ($start_task->Export <> "" && $start_task->ExportAll)) // Display all records
-		$start_task_list->DisplayRecs = $start_task_list->TotalRecs;
-	if (!($start_task->Export <> "" && $start_task->ExportAll))
-		$start_task_list->SetUpStartRec(); // Set up start record position
+	$stop_task_list->StartRec = 1;
+	if ($stop_task_list->DisplayRecs <= 0 || ($stop_task->Export <> "" && $stop_task->ExportAll)) // Display all records
+		$stop_task_list->DisplayRecs = $stop_task_list->TotalRecs;
+	if (!($stop_task->Export <> "" && $stop_task->ExportAll))
+		$stop_task_list->SetUpStartRec(); // Set up start record position
 	if ($bSelectLimit)
-		$start_task_list->Recordset = $start_task_list->LoadRecordset($start_task_list->StartRec-1, $start_task_list->DisplayRecs);
-$start_task_list->RenderOtherOptions();
+		$stop_task_list->Recordset = $stop_task_list->LoadRecordset($stop_task_list->StartRec-1, $stop_task_list->DisplayRecs);
+$stop_task_list->RenderOtherOptions();
 ?>
 <?php if ($Security->CanSearch()) { ?>
-<?php if ($start_task->Export == "" && $start_task->CurrentAction == "") { ?>
-<form name="fstart_tasklistsrch" id="fstart_tasklistsrch" class="ewForm form-inline" action="<?php echo ew_CurrentPage() ?>">
+<?php if ($stop_task->Export == "" && $stop_task->CurrentAction == "") { ?>
+<form name="fstop_tasklistsrch" id="fstop_tasklistsrch" class="ewForm form-inline" action="<?php echo ew_CurrentPage() ?>">
 <table class="ewSearchTable"><tr><td>
-<div class="accordion" id="fstart_tasklistsrch_SearchGroup">
+<div class="accordion" id="fstop_tasklistsrch_SearchGroup">
 	<div class="accordion-group">
 		<div class="accordion-heading">
-<a class="accordion-toggle" data-toggle="collapse" data-parent="#fstart_tasklistsrch_SearchGroup" href="#fstart_tasklistsrch_SearchBody"><?php echo $Language->Phrase("Search") ?></a>
+<a class="accordion-toggle" data-toggle="collapse" data-parent="#fstop_tasklistsrch_SearchGroup" href="#fstop_tasklistsrch_SearchBody"><?php echo $Language->Phrase("Search") ?></a>
 		</div>
-		<div id="fstart_tasklistsrch_SearchBody" class="accordion-body collapse in">
+		<div id="fstop_tasklistsrch_SearchBody" class="accordion-body collapse in">
 			<div class="accordion-inner">
-<div id="fstart_tasklistsrch_SearchPanel">
+<div id="fstop_tasklistsrch_SearchPanel">
 <input type="hidden" name="cmd" value="search">
-<input type="hidden" name="t" value="start_task">
+<input type="hidden" name="t" value="stop_task">
 <div class="ewBasicSearch">
 <div id="xsr_1" class="ewRow">
 	<div class="btn-group ewButtonGroup">
 	<div class="input-append">
-	<input type="text" name="<?php echo EW_TABLE_BASIC_SEARCH ?>" id="<?php echo EW_TABLE_BASIC_SEARCH ?>" class="input-large" value="<?php echo ew_HtmlEncode($start_task_list->BasicSearch->getKeyword()) ?>" placeholder="<?php echo $Language->Phrase("Search") ?>">
+	<input type="text" name="<?php echo EW_TABLE_BASIC_SEARCH ?>" id="<?php echo EW_TABLE_BASIC_SEARCH ?>" class="input-large" value="<?php echo ew_HtmlEncode($stop_task_list->BasicSearch->getKeyword()) ?>" placeholder="<?php echo $Language->Phrase("Search") ?>">
 	<button class="btn btn-primary ewButton" name="btnsubmit" id="btnsubmit" type="submit"><?php echo $Language->Phrase("QuickSearchBtn") ?></button>
 	</div>
 	</div>
 	<div class="btn-group ewButtonGroup">
-	<a class="btn ewShowAll" href="<?php echo $start_task_list->PageUrl() ?>cmd=reset"><?php echo $Language->Phrase("ShowAll") ?></a>
+	<a class="btn ewShowAll" href="<?php echo $stop_task_list->PageUrl() ?>cmd=reset"><?php echo $Language->Phrase("ShowAll") ?></a>
 </div>
 <div id="xsr_2" class="ewRow">
-	<label class="inline radio ewRadio" style="white-space: nowrap;"><input type="radio" name="<?php echo EW_TABLE_BASIC_SEARCH_TYPE ?>" value="="<?php if ($start_task_list->BasicSearch->getType() == "=") { ?> checked="checked"<?php } ?>><?php echo $Language->Phrase("ExactPhrase") ?></label>
-	<label class="inline radio ewRadio" style="white-space: nowrap;"><input type="radio" name="<?php echo EW_TABLE_BASIC_SEARCH_TYPE ?>" value="AND"<?php if ($start_task_list->BasicSearch->getType() == "AND") { ?> checked="checked"<?php } ?>><?php echo $Language->Phrase("AllWord") ?></label>
-	<label class="inline radio ewRadio" style="white-space: nowrap;"><input type="radio" name="<?php echo EW_TABLE_BASIC_SEARCH_TYPE ?>" value="OR"<?php if ($start_task_list->BasicSearch->getType() == "OR") { ?> checked="checked"<?php } ?>><?php echo $Language->Phrase("AnyWord") ?></label>
+	<label class="inline radio ewRadio" style="white-space: nowrap;"><input type="radio" name="<?php echo EW_TABLE_BASIC_SEARCH_TYPE ?>" value="="<?php if ($stop_task_list->BasicSearch->getType() == "=") { ?> checked="checked"<?php } ?>><?php echo $Language->Phrase("ExactPhrase") ?></label>
+	<label class="inline radio ewRadio" style="white-space: nowrap;"><input type="radio" name="<?php echo EW_TABLE_BASIC_SEARCH_TYPE ?>" value="AND"<?php if ($stop_task_list->BasicSearch->getType() == "AND") { ?> checked="checked"<?php } ?>><?php echo $Language->Phrase("AllWord") ?></label>
+	<label class="inline radio ewRadio" style="white-space: nowrap;"><input type="radio" name="<?php echo EW_TABLE_BASIC_SEARCH_TYPE ?>" value="OR"<?php if ($stop_task_list->BasicSearch->getType() == "OR") { ?> checked="checked"<?php } ?>><?php echo $Language->Phrase("AnyWord") ?></label>
 </div>
 </div>
 </div>
@@ -1625,46 +1646,46 @@ $start_task_list->RenderOtherOptions();
 </form>
 <?php } ?>
 <?php } ?>
-<?php $start_task_list->ShowPageHeader(); ?>
+<?php $stop_task_list->ShowPageHeader(); ?>
 <?php
-$start_task_list->ShowMessage();
+$stop_task_list->ShowMessage();
 ?>
 <table cellspacing="0" class="ewGrid"><tr><td class="ewGridContent">
-<?php if ($start_task->Export == "") { ?>
+<?php if ($stop_task->Export == "") { ?>
 <div class="ewGridUpperPanel">
-<?php if ($start_task->CurrentAction <> "gridadd" && $start_task->CurrentAction <> "gridedit") { ?>
+<?php if ($stop_task->CurrentAction <> "gridadd" && $stop_task->CurrentAction <> "gridedit") { ?>
 <form name="ewPagerForm" class="ewForm form-horizontal" action="<?php echo ew_CurrentPage() ?>">
 <table class="ewPager">
 <tr><td>
-<?php if (!isset($start_task_list->Pager)) $start_task_list->Pager = new cNumericPager($start_task_list->StartRec, $start_task_list->DisplayRecs, $start_task_list->TotalRecs, $start_task_list->RecRange) ?>
-<?php if ($start_task_list->Pager->RecordCount > 0) { ?>
+<?php if (!isset($stop_task_list->Pager)) $stop_task_list->Pager = new cNumericPager($stop_task_list->StartRec, $stop_task_list->DisplayRecs, $stop_task_list->TotalRecs, $stop_task_list->RecRange) ?>
+<?php if ($stop_task_list->Pager->RecordCount > 0) { ?>
 <table cellspacing="0" class="ewStdTable"><tbody><tr><td>
 <div class="pagination"><ul>
-	<?php if ($start_task_list->Pager->FirstButton->Enabled) { ?>
-	<li><a href="<?php echo $start_task_list->PageUrl() ?>start=<?php echo $start_task_list->Pager->FirstButton->Start ?>"><?php echo $Language->Phrase("PagerFirst") ?></a></li>
+	<?php if ($stop_task_list->Pager->FirstButton->Enabled) { ?>
+	<li><a href="<?php echo $stop_task_list->PageUrl() ?>start=<?php echo $stop_task_list->Pager->FirstButton->Start ?>"><?php echo $Language->Phrase("PagerFirst") ?></a></li>
 	<?php } ?>
-	<?php if ($start_task_list->Pager->PrevButton->Enabled) { ?>
-	<li><a href="<?php echo $start_task_list->PageUrl() ?>start=<?php echo $start_task_list->Pager->PrevButton->Start ?>"><?php echo $Language->Phrase("PagerPrevious") ?></a></li>
+	<?php if ($stop_task_list->Pager->PrevButton->Enabled) { ?>
+	<li><a href="<?php echo $stop_task_list->PageUrl() ?>start=<?php echo $stop_task_list->Pager->PrevButton->Start ?>"><?php echo $Language->Phrase("PagerPrevious") ?></a></li>
 	<?php } ?>
-	<?php foreach ($start_task_list->Pager->Items as $PagerItem) { ?>
-		<li<?php if (!$PagerItem->Enabled) { echo " class=\" active\""; } ?>><a href="<?php if ($PagerItem->Enabled) { echo $start_task_list->PageUrl() . "start=" . $PagerItem->Start; } else { echo "#"; } ?>"><?php echo $PagerItem->Text ?></a></li>
+	<?php foreach ($stop_task_list->Pager->Items as $PagerItem) { ?>
+		<li<?php if (!$PagerItem->Enabled) { echo " class=\" active\""; } ?>><a href="<?php if ($PagerItem->Enabled) { echo $stop_task_list->PageUrl() . "start=" . $PagerItem->Start; } else { echo "#"; } ?>"><?php echo $PagerItem->Text ?></a></li>
 	<?php } ?>
-	<?php if ($start_task_list->Pager->NextButton->Enabled) { ?>
-	<li><a href="<?php echo $start_task_list->PageUrl() ?>start=<?php echo $start_task_list->Pager->NextButton->Start ?>"><?php echo $Language->Phrase("PagerNext") ?></a></li>
+	<?php if ($stop_task_list->Pager->NextButton->Enabled) { ?>
+	<li><a href="<?php echo $stop_task_list->PageUrl() ?>start=<?php echo $stop_task_list->Pager->NextButton->Start ?>"><?php echo $Language->Phrase("PagerNext") ?></a></li>
 	<?php } ?>
-	<?php if ($start_task_list->Pager->LastButton->Enabled) { ?>
-	<li><a href="<?php echo $start_task_list->PageUrl() ?>start=<?php echo $start_task_list->Pager->LastButton->Start ?>"><?php echo $Language->Phrase("PagerLast") ?></a></li>
+	<?php if ($stop_task_list->Pager->LastButton->Enabled) { ?>
+	<li><a href="<?php echo $stop_task_list->PageUrl() ?>start=<?php echo $stop_task_list->Pager->LastButton->Start ?>"><?php echo $Language->Phrase("PagerLast") ?></a></li>
 	<?php } ?>
 </ul></div>
 </td>
 <td>
-	<?php if ($start_task_list->Pager->ButtonCount > 0) { ?>&nbsp;&nbsp;&nbsp;&nbsp;<?php } ?>
-	<?php echo $Language->Phrase("Record") ?>&nbsp;<?php echo $start_task_list->Pager->FromIndex ?>&nbsp;<?php echo $Language->Phrase("To") ?>&nbsp;<?php echo $start_task_list->Pager->ToIndex ?>&nbsp;<?php echo $Language->Phrase("Of") ?>&nbsp;<?php echo $start_task_list->Pager->RecordCount ?>
+	<?php if ($stop_task_list->Pager->ButtonCount > 0) { ?>&nbsp;&nbsp;&nbsp;&nbsp;<?php } ?>
+	<?php echo $Language->Phrase("Record") ?>&nbsp;<?php echo $stop_task_list->Pager->FromIndex ?>&nbsp;<?php echo $Language->Phrase("To") ?>&nbsp;<?php echo $stop_task_list->Pager->ToIndex ?>&nbsp;<?php echo $Language->Phrase("Of") ?>&nbsp;<?php echo $stop_task_list->Pager->RecordCount ?>
 </td>
 </tr></tbody></table>
 <?php } else { ?>
 	<?php if ($Security->CanList()) { ?>
-	<?php if ($start_task_list->SearchWhere == "0=101") { ?>
+	<?php if ($stop_task_list->SearchWhere == "0=101") { ?>
 	<p><?php echo $Language->Phrase("EnterSearchCriteria") ?></p>
 	<?php } else { ?>
 	<p><?php echo $Language->Phrase("NoRecord") ?></p>
@@ -1674,16 +1695,16 @@ $start_task_list->ShowMessage();
 	<?php } ?>
 <?php } ?>
 </td>
-<?php if ($start_task_list->TotalRecs > 0) { ?>
+<?php if ($stop_task_list->TotalRecs > 0) { ?>
 <td>
 	&nbsp;&nbsp;&nbsp;&nbsp;
-<input type="hidden" name="t" value="start_task">
+<input type="hidden" name="t" value="stop_task">
 <select name="<?php echo EW_TABLE_REC_PER_PAGE ?>" class="input-small" onchange="this.form.submit();">
-<option value="10"<?php if ($start_task_list->DisplayRecs == 10) { ?> selected="selected"<?php } ?>>10</option>
-<option value="20"<?php if ($start_task_list->DisplayRecs == 20) { ?> selected="selected"<?php } ?>>20</option>
-<option value="50"<?php if ($start_task_list->DisplayRecs == 50) { ?> selected="selected"<?php } ?>>50</option>
-<option value="100"<?php if ($start_task_list->DisplayRecs == 100) { ?> selected="selected"<?php } ?>>100</option>
-<option value="ALL"<?php if ($start_task->getRecordsPerPage() == -1) { ?> selected="selected"<?php } ?>><?php echo $Language->Phrase("AllRecords") ?></option>
+<option value="10"<?php if ($stop_task_list->DisplayRecs == 10) { ?> selected="selected"<?php } ?>>10</option>
+<option value="20"<?php if ($stop_task_list->DisplayRecs == 20) { ?> selected="selected"<?php } ?>>20</option>
+<option value="50"<?php if ($stop_task_list->DisplayRecs == 50) { ?> selected="selected"<?php } ?>>50</option>
+<option value="100"<?php if ($stop_task_list->DisplayRecs == 100) { ?> selected="selected"<?php } ?>>100</option>
+<option value="ALL"<?php if ($stop_task->getRecordsPerPage() == -1) { ?> selected="selected"<?php } ?>><?php echo $Language->Phrase("AllRecords") ?></option>
 </select>
 </td>
 <?php } ?>
@@ -1692,138 +1713,228 @@ $start_task_list->ShowMessage();
 <?php } ?>
 <div class="ewListOtherOptions">
 <?php
-	foreach ($start_task_list->OtherOptions as &$option)
+	foreach ($stop_task_list->OtherOptions as &$option)
 		$option->Render("body");
 ?>
 </div>
 </div>
 <?php } ?>
-<form name="fstart_tasklist" id="fstart_tasklist" class="ewForm form-horizontal" action="<?php echo ew_CurrentPage() ?>" method="post">
-<input type="hidden" name="t" value="start_task">
-<div id="gmp_start_task" class="ewGridMiddlePanel">
-<?php if ($start_task_list->TotalRecs > 0) { ?>
-<table id="tbl_start_tasklist" class="ewTable ewTableSeparate">
-<?php echo $start_task->TableCustomInnerHtml ?>
+<form name="fstop_tasklist" id="fstop_tasklist" class="ewForm form-horizontal" action="<?php echo ew_CurrentPage() ?>" method="post">
+<input type="hidden" name="t" value="stop_task">
+<div id="gmp_stop_task" class="ewGridMiddlePanel">
+<?php if ($stop_task_list->TotalRecs > 0) { ?>
+<table id="tbl_stop_tasklist" class="ewTable ewTableSeparate">
+<?php echo $stop_task->TableCustomInnerHtml ?>
 <thead><!-- Table header -->
 	<tr class="ewTableHeader">
 <?php
 
 // Render list options
-$start_task_list->RenderListOptions();
+$stop_task_list->RenderListOptions();
 
 // Render list options (header, left)
-$start_task_list->ListOptions->Render("header", "left");
+$stop_task_list->ListOptions->Render("header", "left");
 ?>
-<?php if ($start_task->id->Visible) { // id ?>
-	<?php if ($start_task->SortUrl($start_task->id) == "") { ?>
-		<td><div id="elh_start_task_id" class="start_task_id"><div class="ewTableHeaderCaption"><?php echo $start_task->id->FldCaption() ?></div></div></td>
+<?php if ($stop_task->id->Visible) { // id ?>
+	<?php if ($stop_task->SortUrl($stop_task->id) == "") { ?>
+		<td><div id="elh_stop_task_id" class="stop_task_id"><div class="ewTableHeaderCaption"><?php echo $stop_task->id->FldCaption() ?></div></div></td>
 	<?php } else { ?>
-		<td><div class="ewPointer" onclick="ew_Sort(event,'<?php echo $start_task->SortUrl($start_task->id) ?>',1);"><div id="elh_start_task_id" class="start_task_id">
-			<div class="ewTableHeaderBtn"><span class="ewTableHeaderCaption"><?php echo $start_task->id->FldCaption() ?></span><span class="ewTableHeaderSort"><?php if ($start_task->id->getSort() == "ASC") { ?><span class="caret ewSortUp"></span><?php } elseif ($start_task->id->getSort() == "DESC") { ?><span class="caret"></span><?php } ?></span></div>
+		<td><div class="ewPointer" onclick="ew_Sort(event,'<?php echo $stop_task->SortUrl($stop_task->id) ?>',1);"><div id="elh_stop_task_id" class="stop_task_id">
+			<div class="ewTableHeaderBtn"><span class="ewTableHeaderCaption"><?php echo $stop_task->id->FldCaption() ?></span><span class="ewTableHeaderSort"><?php if ($stop_task->id->getSort() == "ASC") { ?><span class="caret ewSortUp"></span><?php } elseif ($stop_task->id->getSort() == "DESC") { ?><span class="caret"></span><?php } ?></span></div>
         </div></div></td>
 	<?php } ?>
 <?php } ?>		
-<?php if ($start_task->server_id_mysqladmin->Visible) { // server_id_mysqladmin ?>
-	<?php if ($start_task->SortUrl($start_task->server_id_mysqladmin) == "") { ?>
-		<td><div id="elh_start_task_server_id_mysqladmin" class="start_task_server_id_mysqladmin"><div class="ewTableHeaderCaption"><?php echo $start_task->server_id_mysqladmin->FldCaption() ?></div></div></td>
+<?php if ($stop_task->server_id_mysqladmin->Visible) { // server_id_mysqladmin ?>
+	<?php if ($stop_task->SortUrl($stop_task->server_id_mysqladmin) == "") { ?>
+		<td><div id="elh_stop_task_server_id_mysqladmin" class="stop_task_server_id_mysqladmin"><div class="ewTableHeaderCaption"><?php echo $stop_task->server_id_mysqladmin->FldCaption() ?></div></div></td>
 	<?php } else { ?>
-		<td><div class="ewPointer" onclick="ew_Sort(event,'<?php echo $start_task->SortUrl($start_task->server_id_mysqladmin) ?>',1);"><div id="elh_start_task_server_id_mysqladmin" class="start_task_server_id_mysqladmin">
-			<div class="ewTableHeaderBtn"><span class="ewTableHeaderCaption"><?php echo $start_task->server_id_mysqladmin->FldCaption() ?></span><span class="ewTableHeaderSort"><?php if ($start_task->server_id_mysqladmin->getSort() == "ASC") { ?><span class="caret ewSortUp"></span><?php } elseif ($start_task->server_id_mysqladmin->getSort() == "DESC") { ?><span class="caret"></span><?php } ?></span></div>
+		<td><div class="ewPointer" onclick="ew_Sort(event,'<?php echo $stop_task->SortUrl($stop_task->server_id_mysqladmin) ?>',1);"><div id="elh_stop_task_server_id_mysqladmin" class="stop_task_server_id_mysqladmin">
+			<div class="ewTableHeaderBtn"><span class="ewTableHeaderCaption"><?php echo $stop_task->server_id_mysqladmin->FldCaption() ?><?php echo $Language->Phrase("SrchLegend") ?></span><span class="ewTableHeaderSort"><?php if ($stop_task->server_id_mysqladmin->getSort() == "ASC") { ?><span class="caret ewSortUp"></span><?php } elseif ($stop_task->server_id_mysqladmin->getSort() == "DESC") { ?><span class="caret"></span><?php } ?></span></div>
+        </div></div></td>
+	<?php } ?>
+<?php } ?>		
+<?php if ($stop_task->HOSTNAME->Visible) { // HOSTNAME ?>
+	<?php if ($stop_task->SortUrl($stop_task->HOSTNAME) == "") { ?>
+		<td><div id="elh_stop_task_HOSTNAME" class="stop_task_HOSTNAME"><div class="ewTableHeaderCaption"><?php echo $stop_task->HOSTNAME->FldCaption() ?></div></div></td>
+	<?php } else { ?>
+		<td><div class="ewPointer" onclick="ew_Sort(event,'<?php echo $stop_task->SortUrl($stop_task->HOSTNAME) ?>',1);"><div id="elh_stop_task_HOSTNAME" class="stop_task_HOSTNAME">
+			<div class="ewTableHeaderBtn"><span class="ewTableHeaderCaption"><?php echo $stop_task->HOSTNAME->FldCaption() ?><?php echo $Language->Phrase("SrchLegend") ?></span><span class="ewTableHeaderSort"><?php if ($stop_task->HOSTNAME->getSort() == "ASC") { ?><span class="caret ewSortUp"></span><?php } elseif ($stop_task->HOSTNAME->getSort() == "DESC") { ?><span class="caret"></span><?php } ?></span></div>
+        </div></div></td>
+	<?php } ?>
+<?php } ?>		
+<?php if ($stop_task->USERNAME->Visible) { // USERNAME ?>
+	<?php if ($stop_task->SortUrl($stop_task->USERNAME) == "") { ?>
+		<td><div id="elh_stop_task_USERNAME" class="stop_task_USERNAME"><div class="ewTableHeaderCaption"><?php echo $stop_task->USERNAME->FldCaption() ?></div></div></td>
+	<?php } else { ?>
+		<td><div class="ewPointer" onclick="ew_Sort(event,'<?php echo $stop_task->SortUrl($stop_task->USERNAME) ?>',1);"><div id="elh_stop_task_USERNAME" class="stop_task_USERNAME">
+			<div class="ewTableHeaderBtn"><span class="ewTableHeaderCaption"><?php echo $stop_task->USERNAME->FldCaption() ?><?php echo $Language->Phrase("SrchLegend") ?></span><span class="ewTableHeaderSort"><?php if ($stop_task->USERNAME->getSort() == "ASC") { ?><span class="caret ewSortUp"></span><?php } elseif ($stop_task->USERNAME->getSort() == "DESC") { ?><span class="caret"></span><?php } ?></span></div>
+        </div></div></td>
+	<?php } ?>
+<?php } ?>		
+<?php if ($stop_task->PASSWORD->Visible) { // PASSWORD ?>
+	<?php if ($stop_task->SortUrl($stop_task->PASSWORD) == "") { ?>
+		<td><div id="elh_stop_task_PASSWORD" class="stop_task_PASSWORD"><div class="ewTableHeaderCaption"><?php echo $stop_task->PASSWORD->FldCaption() ?></div></div></td>
+	<?php } else { ?>
+		<td><div class="ewPointer" onclick="ew_Sort(event,'<?php echo $stop_task->SortUrl($stop_task->PASSWORD) ?>',1);"><div id="elh_stop_task_PASSWORD" class="stop_task_PASSWORD">
+			<div class="ewTableHeaderBtn"><span class="ewTableHeaderCaption"><?php echo $stop_task->PASSWORD->FldCaption() ?><?php echo $Language->Phrase("SrchLegend") ?></span><span class="ewTableHeaderSort"><?php if ($stop_task->PASSWORD->getSort() == "ASC") { ?><span class="caret ewSortUp"></span><?php } elseif ($stop_task->PASSWORD->getSort() == "DESC") { ?><span class="caret"></span><?php } ?></span></div>
+        </div></div></td>
+	<?php } ?>
+<?php } ?>		
+<?php if ($stop_task->DATABASE->Visible) { // DATABASE ?>
+	<?php if ($stop_task->SortUrl($stop_task->DATABASE) == "") { ?>
+		<td><div id="elh_stop_task_DATABASE" class="stop_task_DATABASE"><div class="ewTableHeaderCaption"><?php echo $stop_task->DATABASE->FldCaption() ?></div></div></td>
+	<?php } else { ?>
+		<td><div class="ewPointer" onclick="ew_Sort(event,'<?php echo $stop_task->SortUrl($stop_task->DATABASE) ?>',1);"><div id="elh_stop_task_DATABASE" class="stop_task_DATABASE">
+			<div class="ewTableHeaderBtn"><span class="ewTableHeaderCaption"><?php echo $stop_task->DATABASE->FldCaption() ?><?php echo $Language->Phrase("SrchLegend") ?></span><span class="ewTableHeaderSort"><?php if ($stop_task->DATABASE->getSort() == "ASC") { ?><span class="caret ewSortUp"></span><?php } elseif ($stop_task->DATABASE->getSort() == "DESC") { ?><span class="caret"></span><?php } ?></span></div>
+        </div></div></td>
+	<?php } ?>
+<?php } ?>		
+<?php if ($stop_task->FILEPATH->Visible) { // FILEPATH ?>
+	<?php if ($stop_task->SortUrl($stop_task->FILEPATH) == "") { ?>
+		<td><div id="elh_stop_task_FILEPATH" class="stop_task_FILEPATH"><div class="ewTableHeaderCaption"><?php echo $stop_task->FILEPATH->FldCaption() ?></div></div></td>
+	<?php } else { ?>
+		<td><div class="ewPointer" onclick="ew_Sort(event,'<?php echo $stop_task->SortUrl($stop_task->FILEPATH) ?>',1);"><div id="elh_stop_task_FILEPATH" class="stop_task_FILEPATH">
+			<div class="ewTableHeaderBtn"><span class="ewTableHeaderCaption"><?php echo $stop_task->FILEPATH->FldCaption() ?><?php echo $Language->Phrase("SrchLegend") ?></span><span class="ewTableHeaderSort"><?php if ($stop_task->FILEPATH->getSort() == "ASC") { ?><span class="caret ewSortUp"></span><?php } elseif ($stop_task->FILEPATH->getSort() == "DESC") { ?><span class="caret"></span><?php } ?></span></div>
+        </div></div></td>
+	<?php } ?>
+<?php } ?>		
+<?php if ($stop_task->FILENAME->Visible) { // FILENAME ?>
+	<?php if ($stop_task->SortUrl($stop_task->FILENAME) == "") { ?>
+		<td><div id="elh_stop_task_FILENAME" class="stop_task_FILENAME"><div class="ewTableHeaderCaption"><?php echo $stop_task->FILENAME->FldCaption() ?></div></div></td>
+	<?php } else { ?>
+		<td><div class="ewPointer" onclick="ew_Sort(event,'<?php echo $stop_task->SortUrl($stop_task->FILENAME) ?>',1);"><div id="elh_stop_task_FILENAME" class="stop_task_FILENAME">
+			<div class="ewTableHeaderBtn"><span class="ewTableHeaderCaption"><?php echo $stop_task->FILENAME->FldCaption() ?><?php echo $Language->Phrase("SrchLegend") ?></span><span class="ewTableHeaderSort"><?php if ($stop_task->FILENAME->getSort() == "ASC") { ?><span class="caret ewSortUp"></span><?php } elseif ($stop_task->FILENAME->getSort() == "DESC") { ?><span class="caret"></span><?php } ?></span></div>
         </div></div></td>
 	<?php } ?>
 <?php } ?>		
 <?php
 
 // Render list options (header, right)
-$start_task_list->ListOptions->Render("header", "right");
+$stop_task_list->ListOptions->Render("header", "right");
 ?>
 	</tr>
 </thead>
 <tbody>
 <?php
-if ($start_task->ExportAll && $start_task->Export <> "") {
-	$start_task_list->StopRec = $start_task_list->TotalRecs;
+if ($stop_task->ExportAll && $stop_task->Export <> "") {
+	$stop_task_list->StopRec = $stop_task_list->TotalRecs;
 } else {
 
 	// Set the last record to display
-	if ($start_task_list->TotalRecs > $start_task_list->StartRec + $start_task_list->DisplayRecs - 1)
-		$start_task_list->StopRec = $start_task_list->StartRec + $start_task_list->DisplayRecs - 1;
+	if ($stop_task_list->TotalRecs > $stop_task_list->StartRec + $stop_task_list->DisplayRecs - 1)
+		$stop_task_list->StopRec = $stop_task_list->StartRec + $stop_task_list->DisplayRecs - 1;
 	else
-		$start_task_list->StopRec = $start_task_list->TotalRecs;
+		$stop_task_list->StopRec = $stop_task_list->TotalRecs;
 }
-$start_task_list->RecCnt = $start_task_list->StartRec - 1;
-if ($start_task_list->Recordset && !$start_task_list->Recordset->EOF) {
-	$start_task_list->Recordset->MoveFirst();
-	if (!$bSelectLimit && $start_task_list->StartRec > 1)
-		$start_task_list->Recordset->Move($start_task_list->StartRec - 1);
-} elseif (!$start_task->AllowAddDeleteRow && $start_task_list->StopRec == 0) {
-	$start_task_list->StopRec = $start_task->GridAddRowCount;
+$stop_task_list->RecCnt = $stop_task_list->StartRec - 1;
+if ($stop_task_list->Recordset && !$stop_task_list->Recordset->EOF) {
+	$stop_task_list->Recordset->MoveFirst();
+	if (!$bSelectLimit && $stop_task_list->StartRec > 1)
+		$stop_task_list->Recordset->Move($stop_task_list->StartRec - 1);
+} elseif (!$stop_task->AllowAddDeleteRow && $stop_task_list->StopRec == 0) {
+	$stop_task_list->StopRec = $stop_task->GridAddRowCount;
 }
 
 // Initialize aggregate
-$start_task->RowType = EW_ROWTYPE_AGGREGATEINIT;
-$start_task->ResetAttrs();
-$start_task_list->RenderRow();
-while ($start_task_list->RecCnt < $start_task_list->StopRec) {
-	$start_task_list->RecCnt++;
-	if (intval($start_task_list->RecCnt) >= intval($start_task_list->StartRec)) {
-		$start_task_list->RowCnt++;
+$stop_task->RowType = EW_ROWTYPE_AGGREGATEINIT;
+$stop_task->ResetAttrs();
+$stop_task_list->RenderRow();
+while ($stop_task_list->RecCnt < $stop_task_list->StopRec) {
+	$stop_task_list->RecCnt++;
+	if (intval($stop_task_list->RecCnt) >= intval($stop_task_list->StartRec)) {
+		$stop_task_list->RowCnt++;
 
 		// Set up key count
-		$start_task_list->KeyCount = $start_task_list->RowIndex;
+		$stop_task_list->KeyCount = $stop_task_list->RowIndex;
 
 		// Init row class and style
-		$start_task->ResetAttrs();
-		$start_task->CssClass = "";
-		if ($start_task->CurrentAction == "gridadd") {
+		$stop_task->ResetAttrs();
+		$stop_task->CssClass = "";
+		if ($stop_task->CurrentAction == "gridadd") {
 		} else {
-			$start_task_list->LoadRowValues($start_task_list->Recordset); // Load row values
+			$stop_task_list->LoadRowValues($stop_task_list->Recordset); // Load row values
 		}
-		$start_task->RowType = EW_ROWTYPE_VIEW; // Render view
+		$stop_task->RowType = EW_ROWTYPE_VIEW; // Render view
 
 		// Set up row id / data-rowindex
-		$start_task->RowAttrs = array_merge($start_task->RowAttrs, array('data-rowindex'=>$start_task_list->RowCnt, 'id'=>'r' . $start_task_list->RowCnt . '_start_task', 'data-rowtype'=>$start_task->RowType));
+		$stop_task->RowAttrs = array_merge($stop_task->RowAttrs, array('data-rowindex'=>$stop_task_list->RowCnt, 'id'=>'r' . $stop_task_list->RowCnt . '_stop_task', 'data-rowtype'=>$stop_task->RowType));
 
 		// Render row
-		$start_task_list->RenderRow();
+		$stop_task_list->RenderRow();
 
 		// Render list options
-		$start_task_list->RenderListOptions();
+		$stop_task_list->RenderListOptions();
 ?>
-	<tr<?php echo $start_task->RowAttributes() ?>>
+	<tr<?php echo $stop_task->RowAttributes() ?>>
 <?php
 
 // Render list options (body, left)
-$start_task_list->ListOptions->Render("body", "left", $start_task_list->RowCnt);
+$stop_task_list->ListOptions->Render("body", "left", $stop_task_list->RowCnt);
 ?>
-	<?php if ($start_task->id->Visible) { // id ?>
-		<td<?php echo $start_task->id->CellAttributes() ?>>
-<span<?php echo $start_task->id->ViewAttributes() ?>>
-<?php echo $start_task->id->ListViewValue() ?></span>
-<a id="<?php echo $start_task_list->PageObjName . "_row_" . $start_task_list->RowCnt ?>"></a></td>
+	<?php if ($stop_task->id->Visible) { // id ?>
+		<td<?php echo $stop_task->id->CellAttributes() ?>>
+<span<?php echo $stop_task->id->ViewAttributes() ?>>
+<?php echo $stop_task->id->ListViewValue() ?></span>
+<a id="<?php echo $stop_task_list->PageObjName . "_row_" . $stop_task_list->RowCnt ?>"></a></td>
 	<?php } ?>
-	<?php if ($start_task->server_id_mysqladmin->Visible) { // server_id_mysqladmin ?>
-		<td<?php echo $start_task->server_id_mysqladmin->CellAttributes() ?>>
-<span<?php echo $start_task->server_id_mysqladmin->ViewAttributes() ?>>
-<?php echo $start_task->server_id_mysqladmin->ListViewValue() ?></span>
-<a id="<?php echo $start_task_list->PageObjName . "_row_" . $start_task_list->RowCnt ?>"></a></td>
+	<?php if ($stop_task->server_id_mysqladmin->Visible) { // server_id_mysqladmin ?>
+		<td<?php echo $stop_task->server_id_mysqladmin->CellAttributes() ?>>
+<span<?php echo $stop_task->server_id_mysqladmin->ViewAttributes() ?>>
+<?php echo $stop_task->server_id_mysqladmin->ListViewValue() ?></span>
+<a id="<?php echo $stop_task_list->PageObjName . "_row_" . $stop_task_list->RowCnt ?>"></a></td>
+	<?php } ?>
+	<?php if ($stop_task->HOSTNAME->Visible) { // HOSTNAME ?>
+		<td<?php echo $stop_task->HOSTNAME->CellAttributes() ?>>
+<span<?php echo $stop_task->HOSTNAME->ViewAttributes() ?>>
+<?php echo $stop_task->HOSTNAME->ListViewValue() ?></span>
+<a id="<?php echo $stop_task_list->PageObjName . "_row_" . $stop_task_list->RowCnt ?>"></a></td>
+	<?php } ?>
+	<?php if ($stop_task->USERNAME->Visible) { // USERNAME ?>
+		<td<?php echo $stop_task->USERNAME->CellAttributes() ?>>
+<span<?php echo $stop_task->USERNAME->ViewAttributes() ?>>
+<?php echo $stop_task->USERNAME->ListViewValue() ?></span>
+<a id="<?php echo $stop_task_list->PageObjName . "_row_" . $stop_task_list->RowCnt ?>"></a></td>
+	<?php } ?>
+	<?php if ($stop_task->PASSWORD->Visible) { // PASSWORD ?>
+		<td<?php echo $stop_task->PASSWORD->CellAttributes() ?>>
+<span<?php echo $stop_task->PASSWORD->ViewAttributes() ?>>
+<?php echo $stop_task->PASSWORD->ListViewValue() ?></span>
+<a id="<?php echo $stop_task_list->PageObjName . "_row_" . $stop_task_list->RowCnt ?>"></a></td>
+	<?php } ?>
+	<?php if ($stop_task->DATABASE->Visible) { // DATABASE ?>
+		<td<?php echo $stop_task->DATABASE->CellAttributes() ?>>
+<span<?php echo $stop_task->DATABASE->ViewAttributes() ?>>
+<?php echo $stop_task->DATABASE->ListViewValue() ?></span>
+<a id="<?php echo $stop_task_list->PageObjName . "_row_" . $stop_task_list->RowCnt ?>"></a></td>
+	<?php } ?>
+	<?php if ($stop_task->FILEPATH->Visible) { // FILEPATH ?>
+		<td<?php echo $stop_task->FILEPATH->CellAttributes() ?>>
+<span<?php echo $stop_task->FILEPATH->ViewAttributes() ?>>
+<?php echo $stop_task->FILEPATH->ListViewValue() ?></span>
+<a id="<?php echo $stop_task_list->PageObjName . "_row_" . $stop_task_list->RowCnt ?>"></a></td>
+	<?php } ?>
+	<?php if ($stop_task->FILENAME->Visible) { // FILENAME ?>
+		<td<?php echo $stop_task->FILENAME->CellAttributes() ?>>
+<span<?php echo $stop_task->FILENAME->ViewAttributes() ?>>
+<?php echo $stop_task->FILENAME->ListViewValue() ?></span>
+<a id="<?php echo $stop_task_list->PageObjName . "_row_" . $stop_task_list->RowCnt ?>"></a></td>
 	<?php } ?>
 <?php
 
 // Render list options (body, right)
-$start_task_list->ListOptions->Render("body", "right", $start_task_list->RowCnt);
+$stop_task_list->ListOptions->Render("body", "right", $stop_task_list->RowCnt);
 ?>
 	</tr>
 <?php
 	}
-	if ($start_task->CurrentAction <> "gridadd")
-		$start_task_list->Recordset->MoveNext();
+	if ($stop_task->CurrentAction <> "gridadd")
+		$stop_task_list->Recordset->MoveNext();
 }
 ?>
 </tbody>
 </table>
 <?php } ?>
-<?php if ($start_task->CurrentAction == "") { ?>
+<?php if ($stop_task->CurrentAction == "") { ?>
 <input type="hidden" name="a_list" id="a_list" value="">
 <?php } ?>
 </div>
@@ -1831,45 +1942,45 @@ $start_task_list->ListOptions->Render("body", "right", $start_task_list->RowCnt)
 <?php
 
 // Close recordset
-if ($start_task_list->Recordset)
-	$start_task_list->Recordset->Close();
+if ($stop_task_list->Recordset)
+	$stop_task_list->Recordset->Close();
 ?>
-<?php if ($start_task_list->TotalRecs > 0) { ?>
-<?php if ($start_task->Export == "") { ?>
+<?php if ($stop_task_list->TotalRecs > 0) { ?>
+<?php if ($stop_task->Export == "") { ?>
 <div class="ewGridLowerPanel">
-<?php if ($start_task->CurrentAction <> "gridadd" && $start_task->CurrentAction <> "gridedit") { ?>
+<?php if ($stop_task->CurrentAction <> "gridadd" && $stop_task->CurrentAction <> "gridedit") { ?>
 <form name="ewPagerForm" class="ewForm form-horizontal" action="<?php echo ew_CurrentPage() ?>">
 <table class="ewPager">
 <tr><td>
-<?php if (!isset($start_task_list->Pager)) $start_task_list->Pager = new cNumericPager($start_task_list->StartRec, $start_task_list->DisplayRecs, $start_task_list->TotalRecs, $start_task_list->RecRange) ?>
-<?php if ($start_task_list->Pager->RecordCount > 0) { ?>
+<?php if (!isset($stop_task_list->Pager)) $stop_task_list->Pager = new cNumericPager($stop_task_list->StartRec, $stop_task_list->DisplayRecs, $stop_task_list->TotalRecs, $stop_task_list->RecRange) ?>
+<?php if ($stop_task_list->Pager->RecordCount > 0) { ?>
 <table cellspacing="0" class="ewStdTable"><tbody><tr><td>
 <div class="pagination"><ul>
-	<?php if ($start_task_list->Pager->FirstButton->Enabled) { ?>
-	<li><a href="<?php echo $start_task_list->PageUrl() ?>start=<?php echo $start_task_list->Pager->FirstButton->Start ?>"><?php echo $Language->Phrase("PagerFirst") ?></a></li>
+	<?php if ($stop_task_list->Pager->FirstButton->Enabled) { ?>
+	<li><a href="<?php echo $stop_task_list->PageUrl() ?>start=<?php echo $stop_task_list->Pager->FirstButton->Start ?>"><?php echo $Language->Phrase("PagerFirst") ?></a></li>
 	<?php } ?>
-	<?php if ($start_task_list->Pager->PrevButton->Enabled) { ?>
-	<li><a href="<?php echo $start_task_list->PageUrl() ?>start=<?php echo $start_task_list->Pager->PrevButton->Start ?>"><?php echo $Language->Phrase("PagerPrevious") ?></a></li>
+	<?php if ($stop_task_list->Pager->PrevButton->Enabled) { ?>
+	<li><a href="<?php echo $stop_task_list->PageUrl() ?>start=<?php echo $stop_task_list->Pager->PrevButton->Start ?>"><?php echo $Language->Phrase("PagerPrevious") ?></a></li>
 	<?php } ?>
-	<?php foreach ($start_task_list->Pager->Items as $PagerItem) { ?>
-		<li<?php if (!$PagerItem->Enabled) { echo " class=\" active\""; } ?>><a href="<?php if ($PagerItem->Enabled) { echo $start_task_list->PageUrl() . "start=" . $PagerItem->Start; } else { echo "#"; } ?>"><?php echo $PagerItem->Text ?></a></li>
+	<?php foreach ($stop_task_list->Pager->Items as $PagerItem) { ?>
+		<li<?php if (!$PagerItem->Enabled) { echo " class=\" active\""; } ?>><a href="<?php if ($PagerItem->Enabled) { echo $stop_task_list->PageUrl() . "start=" . $PagerItem->Start; } else { echo "#"; } ?>"><?php echo $PagerItem->Text ?></a></li>
 	<?php } ?>
-	<?php if ($start_task_list->Pager->NextButton->Enabled) { ?>
-	<li><a href="<?php echo $start_task_list->PageUrl() ?>start=<?php echo $start_task_list->Pager->NextButton->Start ?>"><?php echo $Language->Phrase("PagerNext") ?></a></li>
+	<?php if ($stop_task_list->Pager->NextButton->Enabled) { ?>
+	<li><a href="<?php echo $stop_task_list->PageUrl() ?>start=<?php echo $stop_task_list->Pager->NextButton->Start ?>"><?php echo $Language->Phrase("PagerNext") ?></a></li>
 	<?php } ?>
-	<?php if ($start_task_list->Pager->LastButton->Enabled) { ?>
-	<li><a href="<?php echo $start_task_list->PageUrl() ?>start=<?php echo $start_task_list->Pager->LastButton->Start ?>"><?php echo $Language->Phrase("PagerLast") ?></a></li>
+	<?php if ($stop_task_list->Pager->LastButton->Enabled) { ?>
+	<li><a href="<?php echo $stop_task_list->PageUrl() ?>start=<?php echo $stop_task_list->Pager->LastButton->Start ?>"><?php echo $Language->Phrase("PagerLast") ?></a></li>
 	<?php } ?>
 </ul></div>
 </td>
 <td>
-	<?php if ($start_task_list->Pager->ButtonCount > 0) { ?>&nbsp;&nbsp;&nbsp;&nbsp;<?php } ?>
-	<?php echo $Language->Phrase("Record") ?>&nbsp;<?php echo $start_task_list->Pager->FromIndex ?>&nbsp;<?php echo $Language->Phrase("To") ?>&nbsp;<?php echo $start_task_list->Pager->ToIndex ?>&nbsp;<?php echo $Language->Phrase("Of") ?>&nbsp;<?php echo $start_task_list->Pager->RecordCount ?>
+	<?php if ($stop_task_list->Pager->ButtonCount > 0) { ?>&nbsp;&nbsp;&nbsp;&nbsp;<?php } ?>
+	<?php echo $Language->Phrase("Record") ?>&nbsp;<?php echo $stop_task_list->Pager->FromIndex ?>&nbsp;<?php echo $Language->Phrase("To") ?>&nbsp;<?php echo $stop_task_list->Pager->ToIndex ?>&nbsp;<?php echo $Language->Phrase("Of") ?>&nbsp;<?php echo $stop_task_list->Pager->RecordCount ?>
 </td>
 </tr></tbody></table>
 <?php } else { ?>
 	<?php if ($Security->CanList()) { ?>
-	<?php if ($start_task_list->SearchWhere == "0=101") { ?>
+	<?php if ($stop_task_list->SearchWhere == "0=101") { ?>
 	<p><?php echo $Language->Phrase("EnterSearchCriteria") ?></p>
 	<?php } else { ?>
 	<p><?php echo $Language->Phrase("NoRecord") ?></p>
@@ -1879,16 +1990,16 @@ if ($start_task_list->Recordset)
 	<?php } ?>
 <?php } ?>
 </td>
-<?php if ($start_task_list->TotalRecs > 0) { ?>
+<?php if ($stop_task_list->TotalRecs > 0) { ?>
 <td>
 	&nbsp;&nbsp;&nbsp;&nbsp;
-<input type="hidden" name="t" value="start_task">
+<input type="hidden" name="t" value="stop_task">
 <select name="<?php echo EW_TABLE_REC_PER_PAGE ?>" class="input-small" onchange="this.form.submit();">
-<option value="10"<?php if ($start_task_list->DisplayRecs == 10) { ?> selected="selected"<?php } ?>>10</option>
-<option value="20"<?php if ($start_task_list->DisplayRecs == 20) { ?> selected="selected"<?php } ?>>20</option>
-<option value="50"<?php if ($start_task_list->DisplayRecs == 50) { ?> selected="selected"<?php } ?>>50</option>
-<option value="100"<?php if ($start_task_list->DisplayRecs == 100) { ?> selected="selected"<?php } ?>>100</option>
-<option value="ALL"<?php if ($start_task->getRecordsPerPage() == -1) { ?> selected="selected"<?php } ?>><?php echo $Language->Phrase("AllRecords") ?></option>
+<option value="10"<?php if ($stop_task_list->DisplayRecs == 10) { ?> selected="selected"<?php } ?>>10</option>
+<option value="20"<?php if ($stop_task_list->DisplayRecs == 20) { ?> selected="selected"<?php } ?>>20</option>
+<option value="50"<?php if ($stop_task_list->DisplayRecs == 50) { ?> selected="selected"<?php } ?>>50</option>
+<option value="100"<?php if ($stop_task_list->DisplayRecs == 100) { ?> selected="selected"<?php } ?>>100</option>
+<option value="ALL"<?php if ($stop_task->getRecordsPerPage() == -1) { ?> selected="selected"<?php } ?>><?php echo $Language->Phrase("AllRecords") ?></option>
 </select>
 </td>
 <?php } ?>
@@ -1897,7 +2008,7 @@ if ($start_task_list->Recordset)
 <?php } ?>
 <div class="ewListOtherOptions">
 <?php
-	foreach ($start_task_list->OtherOptions as &$option)
+	foreach ($stop_task_list->OtherOptions as &$option)
 		$option->Render("body", "bottom");
 ?>
 </div>
@@ -1905,21 +2016,21 @@ if ($start_task_list->Recordset)
 <?php } ?>
 <?php } ?>
 </td></tr></table>
-<?php if ($start_task->Export == "") { ?>
+<?php if ($stop_task->Export == "") { ?>
 <script type="text/javascript">
-fstart_tasklistsrch.Init();
-fstart_tasklist.Init();
+fstop_tasklistsrch.Init();
+fstop_tasklist.Init();
 <?php if (EW_MOBILE_REFLOW && ew_IsMobile()) { ?>
 ew_Reflow();
 <?php } ?>
 </script>
 <?php } ?>
 <?php
-$start_task_list->ShowPageFooter();
+$stop_task_list->ShowPageFooter();
 if (EW_DEBUG_ENABLED)
 	echo ew_DebugMsg();
 ?>
-<?php if ($start_task->Export == "") { ?>
+<?php if ($stop_task->Export == "") { ?>
 <script type="text/javascript">
 
 // Write your table-specific startup script here
@@ -1929,5 +2040,5 @@ if (EW_DEBUG_ENABLED)
 <?php } ?>
 <?php include_once "footer.php" ?>
 <?php
-$start_task_list->Page_Terminate();
+$stop_task_list->Page_Terminate();
 ?>

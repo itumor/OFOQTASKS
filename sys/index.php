@@ -229,6 +229,18 @@ class cdefault {
 			$this->Page_Terminate("restart_tasklist.php");
 		if ($Security->AllowList(CurrentProjectID() . 'listandstart_task'))
 			$this->Page_Terminate("listandstart_tasklist.php");
+		if ($Security->AllowList(CurrentProjectID() . 'backup_task'))
+			$this->Page_Terminate("backup_tasklist.php");
+		if ($Security->AllowList(CurrentProjectID() . 'create_task'))
+			$this->Page_Terminate("create_tasklist.php");
+		if ($Security->AllowList(CurrentProjectID() . 'drop_task'))
+			$this->Page_Terminate("drop_tasklist.php");
+		if ($Security->AllowList(CurrentProjectID() . 'restore_task'))
+			$this->Page_Terminate("restore_tasklist.php");
+		if ($Security->AllowList(CurrentProjectID() . 'stop_task'))
+			$this->Page_Terminate("stop_tasklist.php");
+		if ($Security->AllowList(CurrentProjectID() . 'update_task'))
+			$this->Page_Terminate("update_tasklist.php");
 		if ($Security->IsLoggedIn()) {
 			$this->setFailureMessage($Language->Phrase("NoPermission") . "<br><br><a href=\"logout.php\">" . $Language->Phrase("BackToLogin") . "</a>");
 		} else {

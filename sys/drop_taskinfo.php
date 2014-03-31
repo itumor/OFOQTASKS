@@ -1,12 +1,12 @@
 <?php
 
 // Global variable for table object
-$start_task = NULL;
+$drop_task = NULL;
 
 //
-// Table class for start_task
+// Table class for drop_task
 //
-class cstart_task extends cTable {
+class cdrop_task extends cTable {
 	var $id;
 	var $server_id_mysqladmin;
 	var $HOSTNAME;
@@ -24,8 +24,8 @@ class cstart_task extends cTable {
 
 		// Language object
 		if (!isset($Language)) $Language = new cLanguage();
-		$this->TableVar = 'start_task';
-		$this->TableName = 'start_task';
+		$this->TableVar = 'drop_task';
+		$this->TableName = 'drop_task';
 		$this->TableType = 'TABLE';
 		$this->ExportAll = TRUE;
 		$this->ExportPageBreakCount = 0; // Page break per every n record (PDF only)
@@ -41,36 +41,36 @@ class cstart_task extends cTable {
 		$this->BasicSearch = new cBasicSearch($this->TableVar);
 
 		// id
-		$this->id = new cField('start_task', 'start_task', 'x_id', 'id', '`id`', '`id`', 19, -1, FALSE, '`id`', FALSE, FALSE, FALSE, 'FORMATTED TEXT');
+		$this->id = new cField('drop_task', 'drop_task', 'x_id', 'id', '`id`', '`id`', 19, -1, FALSE, '`id`', FALSE, FALSE, FALSE, 'FORMATTED TEXT');
 		$this->id->FldDefaultErrMsg = $Language->Phrase("IncorrectInteger");
 		$this->fields['id'] = &$this->id;
 
 		// server_id_mysqladmin
-		$this->server_id_mysqladmin = new cField('start_task', 'start_task', 'x_server_id_mysqladmin', 'server_id_mysqladmin', '`server_id_mysqladmin`', '`server_id_mysqladmin`', 200, -1, FALSE, '`server_id_mysqladmin`', FALSE, FALSE, FALSE, 'FORMATTED TEXT');
+		$this->server_id_mysqladmin = new cField('drop_task', 'drop_task', 'x_server_id_mysqladmin', 'server_id_mysqladmin', '`server_id_mysqladmin`', '`server_id_mysqladmin`', 200, -1, FALSE, '`server_id_mysqladmin`', FALSE, FALSE, FALSE, 'FORMATTED TEXT');
 		$this->fields['server_id_mysqladmin'] = &$this->server_id_mysqladmin;
 
 		// HOSTNAME
-		$this->HOSTNAME = new cField('start_task', 'start_task', 'x_HOSTNAME', 'HOSTNAME', '`HOSTNAME`', '`HOSTNAME`', 200, -1, FALSE, '`HOSTNAME`', FALSE, FALSE, FALSE, 'FORMATTED TEXT');
+		$this->HOSTNAME = new cField('drop_task', 'drop_task', 'x_HOSTNAME', 'HOSTNAME', '`HOSTNAME`', '`HOSTNAME`', 200, -1, FALSE, '`HOSTNAME`', FALSE, FALSE, FALSE, 'FORMATTED TEXT');
 		$this->fields['HOSTNAME'] = &$this->HOSTNAME;
 
 		// USERNAME
-		$this->USERNAME = new cField('start_task', 'start_task', 'x_USERNAME', 'USERNAME', '`USERNAME`', '`USERNAME`', 200, -1, FALSE, '`USERNAME`', FALSE, FALSE, FALSE, 'FORMATTED TEXT');
+		$this->USERNAME = new cField('drop_task', 'drop_task', 'x_USERNAME', 'USERNAME', '`USERNAME`', '`USERNAME`', 200, -1, FALSE, '`USERNAME`', FALSE, FALSE, FALSE, 'FORMATTED TEXT');
 		$this->fields['USERNAME'] = &$this->USERNAME;
 
 		// PASSWORD
-		$this->PASSWORD = new cField('start_task', 'start_task', 'x_PASSWORD', 'PASSWORD', '`PASSWORD`', '`PASSWORD`', 200, -1, FALSE, '`PASSWORD`', FALSE, FALSE, FALSE, 'FORMATTED TEXT');
+		$this->PASSWORD = new cField('drop_task', 'drop_task', 'x_PASSWORD', 'PASSWORD', '`PASSWORD`', '`PASSWORD`', 200, -1, FALSE, '`PASSWORD`', FALSE, FALSE, FALSE, 'FORMATTED TEXT');
 		$this->fields['PASSWORD'] = &$this->PASSWORD;
 
 		// DATABASE
-		$this->DATABASE = new cField('start_task', 'start_task', 'x_DATABASE', 'DATABASE', '`DATABASE`', '`DATABASE`', 200, -1, FALSE, '`DATABASE`', FALSE, FALSE, FALSE, 'FORMATTED TEXT');
+		$this->DATABASE = new cField('drop_task', 'drop_task', 'x_DATABASE', 'DATABASE', '`DATABASE`', '`DATABASE`', 200, -1, FALSE, '`DATABASE`', FALSE, FALSE, FALSE, 'FORMATTED TEXT');
 		$this->fields['DATABASE'] = &$this->DATABASE;
 
 		// FILEPATH
-		$this->FILEPATH = new cField('start_task', 'start_task', 'x_FILEPATH', 'FILEPATH', '`FILEPATH`', '`FILEPATH`', 200, -1, FALSE, '`FILEPATH`', FALSE, FALSE, FALSE, 'FORMATTED TEXT');
+		$this->FILEPATH = new cField('drop_task', 'drop_task', 'x_FILEPATH', 'FILEPATH', '`FILEPATH`', '`FILEPATH`', 200, -1, FALSE, '`FILEPATH`', FALSE, FALSE, FALSE, 'FORMATTED TEXT');
 		$this->fields['FILEPATH'] = &$this->FILEPATH;
 
 		// FILENAME
-		$this->FILENAME = new cField('start_task', 'start_task', 'x_FILENAME', 'FILENAME', '`FILENAME`', '`FILENAME`', 200, -1, FALSE, '`FILENAME`', FALSE, FALSE, FALSE, 'FORMATTED TEXT');
+		$this->FILENAME = new cField('drop_task', 'drop_task', 'x_FILENAME', 'FILENAME', '`FILENAME`', '`FILENAME`', 200, -1, FALSE, '`FILENAME`', FALSE, FALSE, FALSE, 'FORMATTED TEXT');
 		$this->fields['FILENAME'] = &$this->FILENAME;
 	}
 
@@ -93,7 +93,7 @@ class cstart_task extends cTable {
 
 	// Table level SQL
 	function SqlFrom() { // From
-		return "`start_task`";
+		return "`drop_task`";
 	}
 
 	function SqlSelect() { // Select
@@ -265,7 +265,7 @@ class cstart_task extends cTable {
 	}
 
 	// Update Table
-	var $UpdateTable = "`start_task`";
+	var $UpdateTable = "`drop_task`";
 
 	// INSERT statement
 	function InsertSQL(&$rs) {
@@ -360,7 +360,7 @@ class cstart_task extends cTable {
 		if (@$_SESSION[$name] <> "") {
 			return $_SESSION[$name];
 		} else {
-			return "start_tasklist.php";
+			return "drop_tasklist.php";
 		}
 	}
 
@@ -370,25 +370,25 @@ class cstart_task extends cTable {
 
 	// List URL
 	function GetListUrl() {
-		return "start_tasklist.php";
+		return "drop_tasklist.php";
 	}
 
 	// View URL
 	function GetViewUrl($parm = "") {
 		if ($parm <> "")
-			return $this->KeyUrl("start_taskview.php", $this->UrlParm($parm));
+			return $this->KeyUrl("drop_taskview.php", $this->UrlParm($parm));
 		else
-			return $this->KeyUrl("start_taskview.php", $this->UrlParm(EW_TABLE_SHOW_DETAIL . "="));
+			return $this->KeyUrl("drop_taskview.php", $this->UrlParm(EW_TABLE_SHOW_DETAIL . "="));
 	}
 
 	// Add URL
 	function GetAddUrl() {
-		return "start_taskadd.php";
+		return "drop_taskadd.php";
 	}
 
 	// Edit URL
 	function GetEditUrl($parm = "") {
-		return $this->KeyUrl("start_taskedit.php", $this->UrlParm($parm));
+		return $this->KeyUrl("drop_taskedit.php", $this->UrlParm($parm));
 	}
 
 	// Inline edit URL
@@ -398,7 +398,7 @@ class cstart_task extends cTable {
 
 	// Copy URL
 	function GetCopyUrl($parm = "") {
-		return $this->KeyUrl("start_taskadd.php", $this->UrlParm($parm));
+		return $this->KeyUrl("drop_taskadd.php", $this->UrlParm($parm));
 	}
 
 	// Inline copy URL
@@ -408,7 +408,7 @@ class cstart_task extends cTable {
 
 	// Delete URL
 	function GetDeleteUrl() {
-		return $this->KeyUrl("start_taskdelete.php", $this->UrlParm());
+		return $this->KeyUrl("drop_taskdelete.php", $this->UrlParm());
 	}
 
 	// Add key value to URL
@@ -522,27 +522,7 @@ class cstart_task extends cTable {
 		$this->id->ViewCustomAttributes = "";
 
 		// server_id_mysqladmin
-		if (strval($this->server_id_mysqladmin->CurrentValue) <> "") {
-			$sFilterWrk = "`server_id`" . ew_SearchString("=", $this->server_id_mysqladmin->CurrentValue, EW_DATATYPE_NUMBER);
-		$sSqlWrk = "SELECT `server_id`, `server_name` AS `DispFld`, '' AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld` FROM `server`";
-		$sWhereWrk = "";
-		if ($sFilterWrk <> "") {
-			ew_AddFilter($sWhereWrk, $sFilterWrk);
-		}
-
-		// Call Lookup selecting
-		$this->Lookup_Selecting($this->server_id_mysqladmin, $sWhereWrk);
-		if ($sWhereWrk <> "") $sSqlWrk .= " WHERE " . $sWhereWrk;
-			$rswrk = $conn->Execute($sSqlWrk);
-			if ($rswrk && !$rswrk->EOF) { // Lookup values found
-				$this->server_id_mysqladmin->ViewValue = $rswrk->fields('DispFld');
-				$rswrk->Close();
-			} else {
-				$this->server_id_mysqladmin->ViewValue = $this->server_id_mysqladmin->CurrentValue;
-			}
-		} else {
-			$this->server_id_mysqladmin->ViewValue = NULL;
-		}
+		$this->server_id_mysqladmin->ViewValue = $this->server_id_mysqladmin->CurrentValue;
 		$this->server_id_mysqladmin->ViewCustomAttributes = "";
 
 		// HOSTNAME
@@ -750,16 +730,10 @@ class cstart_task extends cTable {
 		return TRUE;
 	}
 
-	// Row Inserted event  
+	// Row Inserted event
 	function Row_Inserted($rsold, &$rsnew) {
 
-		//echo "Row Inserted" 
-			   // echo $rsnew["server_id_mysqladmin"];die;  
-
-	$parameters = array(
-	'server_id_mysqladmin'=>$rsnew["server_id_mysqladmin"],
-	);      
-	add_cron_task("start",$parameters);
+		//echo "Row Inserted"
 	}
 
 	// Row Updating event
