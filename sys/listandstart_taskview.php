@@ -554,8 +554,10 @@ class clistandstart_task_view extends clistandstart_task {
 		$this->id->setDbValue($rs->fields('id'));
 		$this->server_id_mysqladmin->setDbValue($rs->fields('server_id_mysqladmin'));
 		$this->HOSTNAME->setDbValue($rs->fields('HOSTNAME'));
-		$this->USERNAME->setDbValue($rs->fields('USERNAME'));
 		$this->PASSWORD->setDbValue($rs->fields('PASSWORD'));
+		$this->datetime->setDbValue($rs->fields('datetime'));
+		$this->DBUSERNAME->setDbValue($rs->fields('DBUSERNAME'));
+		$this->username->setDbValue($rs->fields('username'));
 	}
 
 	// Load DbValue from recordset
@@ -565,8 +567,10 @@ class clistandstart_task_view extends clistandstart_task {
 		$this->id->DbValue = $row['id'];
 		$this->server_id_mysqladmin->DbValue = $row['server_id_mysqladmin'];
 		$this->HOSTNAME->DbValue = $row['HOSTNAME'];
-		$this->USERNAME->DbValue = $row['USERNAME'];
 		$this->PASSWORD->DbValue = $row['PASSWORD'];
+		$this->datetime->DbValue = $row['datetime'];
+		$this->DBUSERNAME->DbValue = $row['DBUSERNAME'];
+		$this->username->DbValue = $row['username'];
 	}
 
 	// Render row values based on field settings
@@ -589,8 +593,10 @@ class clistandstart_task_view extends clistandstart_task {
 		// id
 		// server_id_mysqladmin
 		// HOSTNAME
-		// USERNAME
 		// PASSWORD
+		// datetime
+		// DBUSERNAME
+		// username
 
 		if ($this->RowType == EW_ROWTYPE_VIEW) { // View row
 
@@ -646,13 +652,21 @@ class clistandstart_task_view extends clistandstart_task {
 			}
 			$this->HOSTNAME->ViewCustomAttributes = "";
 
-			// USERNAME
-			$this->USERNAME->ViewValue = $this->USERNAME->CurrentValue;
-			$this->USERNAME->ViewCustomAttributes = "";
-
 			// PASSWORD
 			$this->PASSWORD->ViewValue = "********";
 			$this->PASSWORD->ViewCustomAttributes = "";
+
+			// datetime
+			$this->datetime->ViewValue = $this->datetime->CurrentValue;
+			$this->datetime->ViewCustomAttributes = "";
+
+			// DBUSERNAME
+			$this->DBUSERNAME->ViewValue = $this->DBUSERNAME->CurrentValue;
+			$this->DBUSERNAME->ViewCustomAttributes = "";
+
+			// username
+			$this->username->ViewValue = $this->username->CurrentValue;
+			$this->username->ViewCustomAttributes = "";
 
 			// id
 			$this->id->LinkCustomAttributes = "";
@@ -669,15 +683,25 @@ class clistandstart_task_view extends clistandstart_task {
 			$this->HOSTNAME->HrefValue = "";
 			$this->HOSTNAME->TooltipValue = "";
 
-			// USERNAME
-			$this->USERNAME->LinkCustomAttributes = "";
-			$this->USERNAME->HrefValue = "";
-			$this->USERNAME->TooltipValue = "";
-
 			// PASSWORD
 			$this->PASSWORD->LinkCustomAttributes = "";
 			$this->PASSWORD->HrefValue = "";
 			$this->PASSWORD->TooltipValue = "";
+
+			// datetime
+			$this->datetime->LinkCustomAttributes = "";
+			$this->datetime->HrefValue = "";
+			$this->datetime->TooltipValue = "";
+
+			// DBUSERNAME
+			$this->DBUSERNAME->LinkCustomAttributes = "";
+			$this->DBUSERNAME->HrefValue = "";
+			$this->DBUSERNAME->TooltipValue = "";
+
+			// username
+			$this->username->LinkCustomAttributes = "";
+			$this->username->HrefValue = "";
+			$this->username->TooltipValue = "";
 		}
 
 		// Call Row Rendered event
@@ -1126,17 +1150,6 @@ $listandstart_task_view->ShowMessage();
 </td>
 	</tr>
 <?php } ?>
-<?php if ($listandstart_task->USERNAME->Visible) { // USERNAME ?>
-	<tr id="r_USERNAME">
-		<td><span id="elh_listandstart_task_USERNAME"><?php echo $listandstart_task->USERNAME->FldCaption() ?></span></td>
-		<td<?php echo $listandstart_task->USERNAME->CellAttributes() ?>>
-<span id="el_listandstart_task_USERNAME" class="control-group">
-<span<?php echo $listandstart_task->USERNAME->ViewAttributes() ?>>
-<?php echo $listandstart_task->USERNAME->ViewValue ?></span>
-</span>
-</td>
-	</tr>
-<?php } ?>
 <?php if ($listandstart_task->PASSWORD->Visible) { // PASSWORD ?>
 	<tr id="r_PASSWORD">
 		<td><span id="elh_listandstart_task_PASSWORD"><?php echo $listandstart_task->PASSWORD->FldCaption() ?></span></td>
@@ -1144,6 +1157,39 @@ $listandstart_task_view->ShowMessage();
 <span id="el_listandstart_task_PASSWORD" class="control-group">
 <span<?php echo $listandstart_task->PASSWORD->ViewAttributes() ?>>
 <?php echo $listandstart_task->PASSWORD->ViewValue ?></span>
+</span>
+</td>
+	</tr>
+<?php } ?>
+<?php if ($listandstart_task->datetime->Visible) { // datetime ?>
+	<tr id="r_datetime">
+		<td><span id="elh_listandstart_task_datetime"><?php echo $listandstart_task->datetime->FldCaption() ?></span></td>
+		<td<?php echo $listandstart_task->datetime->CellAttributes() ?>>
+<span id="el_listandstart_task_datetime" class="control-group">
+<span<?php echo $listandstart_task->datetime->ViewAttributes() ?>>
+<?php echo $listandstart_task->datetime->ViewValue ?></span>
+</span>
+</td>
+	</tr>
+<?php } ?>
+<?php if ($listandstart_task->DBUSERNAME->Visible) { // DBUSERNAME ?>
+	<tr id="r_DBUSERNAME">
+		<td><span id="elh_listandstart_task_DBUSERNAME"><?php echo $listandstart_task->DBUSERNAME->FldCaption() ?></span></td>
+		<td<?php echo $listandstart_task->DBUSERNAME->CellAttributes() ?>>
+<span id="el_listandstart_task_DBUSERNAME" class="control-group">
+<span<?php echo $listandstart_task->DBUSERNAME->ViewAttributes() ?>>
+<?php echo $listandstart_task->DBUSERNAME->ViewValue ?></span>
+</span>
+</td>
+	</tr>
+<?php } ?>
+<?php if ($listandstart_task->username->Visible) { // username ?>
+	<tr id="r_username">
+		<td><span id="elh_listandstart_task_username"><?php echo $listandstart_task->username->FldCaption() ?></span></td>
+		<td<?php echo $listandstart_task->username->CellAttributes() ?>>
+<span id="el_listandstart_task_username" class="control-group">
+<span<?php echo $listandstart_task->username->ViewAttributes() ?>>
+<?php echo $listandstart_task->username->ViewValue ?></span>
 </span>
 </td>
 	</tr>

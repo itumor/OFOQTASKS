@@ -354,8 +354,10 @@ class clistandstart_task_delete extends clistandstart_task {
 		$this->id->setDbValue($rs->fields('id'));
 		$this->server_id_mysqladmin->setDbValue($rs->fields('server_id_mysqladmin'));
 		$this->HOSTNAME->setDbValue($rs->fields('HOSTNAME'));
-		$this->USERNAME->setDbValue($rs->fields('USERNAME'));
 		$this->PASSWORD->setDbValue($rs->fields('PASSWORD'));
+		$this->datetime->setDbValue($rs->fields('datetime'));
+		$this->DBUSERNAME->setDbValue($rs->fields('DBUSERNAME'));
+		$this->username->setDbValue($rs->fields('username'));
 	}
 
 	// Load DbValue from recordset
@@ -365,8 +367,10 @@ class clistandstart_task_delete extends clistandstart_task {
 		$this->id->DbValue = $row['id'];
 		$this->server_id_mysqladmin->DbValue = $row['server_id_mysqladmin'];
 		$this->HOSTNAME->DbValue = $row['HOSTNAME'];
-		$this->USERNAME->DbValue = $row['USERNAME'];
 		$this->PASSWORD->DbValue = $row['PASSWORD'];
+		$this->datetime->DbValue = $row['datetime'];
+		$this->DBUSERNAME->DbValue = $row['DBUSERNAME'];
+		$this->username->DbValue = $row['username'];
 	}
 
 	// Render row values based on field settings
@@ -383,8 +387,10 @@ class clistandstart_task_delete extends clistandstart_task {
 		// id
 		// server_id_mysqladmin
 		// HOSTNAME
-		// USERNAME
 		// PASSWORD
+		// datetime
+		// DBUSERNAME
+		// username
 
 		if ($this->RowType == EW_ROWTYPE_VIEW) { // View row
 
@@ -440,13 +446,21 @@ class clistandstart_task_delete extends clistandstart_task {
 			}
 			$this->HOSTNAME->ViewCustomAttributes = "";
 
-			// USERNAME
-			$this->USERNAME->ViewValue = $this->USERNAME->CurrentValue;
-			$this->USERNAME->ViewCustomAttributes = "";
-
 			// PASSWORD
 			$this->PASSWORD->ViewValue = "********";
 			$this->PASSWORD->ViewCustomAttributes = "";
+
+			// datetime
+			$this->datetime->ViewValue = $this->datetime->CurrentValue;
+			$this->datetime->ViewCustomAttributes = "";
+
+			// DBUSERNAME
+			$this->DBUSERNAME->ViewValue = $this->DBUSERNAME->CurrentValue;
+			$this->DBUSERNAME->ViewCustomAttributes = "";
+
+			// username
+			$this->username->ViewValue = $this->username->CurrentValue;
+			$this->username->ViewCustomAttributes = "";
 
 			// id
 			$this->id->LinkCustomAttributes = "";
@@ -463,15 +477,25 @@ class clistandstart_task_delete extends clistandstart_task {
 			$this->HOSTNAME->HrefValue = "";
 			$this->HOSTNAME->TooltipValue = "";
 
-			// USERNAME
-			$this->USERNAME->LinkCustomAttributes = "";
-			$this->USERNAME->HrefValue = "";
-			$this->USERNAME->TooltipValue = "";
-
 			// PASSWORD
 			$this->PASSWORD->LinkCustomAttributes = "";
 			$this->PASSWORD->HrefValue = "";
 			$this->PASSWORD->TooltipValue = "";
+
+			// datetime
+			$this->datetime->LinkCustomAttributes = "";
+			$this->datetime->HrefValue = "";
+			$this->datetime->TooltipValue = "";
+
+			// DBUSERNAME
+			$this->DBUSERNAME->LinkCustomAttributes = "";
+			$this->DBUSERNAME->HrefValue = "";
+			$this->DBUSERNAME->TooltipValue = "";
+
+			// username
+			$this->username->LinkCustomAttributes = "";
+			$this->username->HrefValue = "";
+			$this->username->TooltipValue = "";
 		}
 
 		// Call Row Rendered event
@@ -724,11 +748,17 @@ $listandstart_task_delete->ShowMessage();
 <?php if ($listandstart_task->HOSTNAME->Visible) { // HOSTNAME ?>
 		<td><span id="elh_listandstart_task_HOSTNAME" class="listandstart_task_HOSTNAME"><?php echo $listandstart_task->HOSTNAME->FldCaption() ?></span></td>
 <?php } ?>
-<?php if ($listandstart_task->USERNAME->Visible) { // USERNAME ?>
-		<td><span id="elh_listandstart_task_USERNAME" class="listandstart_task_USERNAME"><?php echo $listandstart_task->USERNAME->FldCaption() ?></span></td>
-<?php } ?>
 <?php if ($listandstart_task->PASSWORD->Visible) { // PASSWORD ?>
 		<td><span id="elh_listandstart_task_PASSWORD" class="listandstart_task_PASSWORD"><?php echo $listandstart_task->PASSWORD->FldCaption() ?></span></td>
+<?php } ?>
+<?php if ($listandstart_task->datetime->Visible) { // datetime ?>
+		<td><span id="elh_listandstart_task_datetime" class="listandstart_task_datetime"><?php echo $listandstart_task->datetime->FldCaption() ?></span></td>
+<?php } ?>
+<?php if ($listandstart_task->DBUSERNAME->Visible) { // DBUSERNAME ?>
+		<td><span id="elh_listandstart_task_DBUSERNAME" class="listandstart_task_DBUSERNAME"><?php echo $listandstart_task->DBUSERNAME->FldCaption() ?></span></td>
+<?php } ?>
+<?php if ($listandstart_task->username->Visible) { // username ?>
+		<td><span id="elh_listandstart_task_username" class="listandstart_task_username"><?php echo $listandstart_task->username->FldCaption() ?></span></td>
 <?php } ?>
 	</tr>
 	</thead>
@@ -775,19 +805,35 @@ while (!$listandstart_task_delete->Recordset->EOF) {
 </span>
 </td>
 <?php } ?>
-<?php if ($listandstart_task->USERNAME->Visible) { // USERNAME ?>
-		<td<?php echo $listandstart_task->USERNAME->CellAttributes() ?>>
-<span id="el<?php echo $listandstart_task_delete->RowCnt ?>_listandstart_task_USERNAME" class="control-group listandstart_task_USERNAME">
-<span<?php echo $listandstart_task->USERNAME->ViewAttributes() ?>>
-<?php echo $listandstart_task->USERNAME->ListViewValue() ?></span>
-</span>
-</td>
-<?php } ?>
 <?php if ($listandstart_task->PASSWORD->Visible) { // PASSWORD ?>
 		<td<?php echo $listandstart_task->PASSWORD->CellAttributes() ?>>
 <span id="el<?php echo $listandstart_task_delete->RowCnt ?>_listandstart_task_PASSWORD" class="control-group listandstart_task_PASSWORD">
 <span<?php echo $listandstart_task->PASSWORD->ViewAttributes() ?>>
 <?php echo $listandstart_task->PASSWORD->ListViewValue() ?></span>
+</span>
+</td>
+<?php } ?>
+<?php if ($listandstart_task->datetime->Visible) { // datetime ?>
+		<td<?php echo $listandstart_task->datetime->CellAttributes() ?>>
+<span id="el<?php echo $listandstart_task_delete->RowCnt ?>_listandstart_task_datetime" class="control-group listandstart_task_datetime">
+<span<?php echo $listandstart_task->datetime->ViewAttributes() ?>>
+<?php echo $listandstart_task->datetime->ListViewValue() ?></span>
+</span>
+</td>
+<?php } ?>
+<?php if ($listandstart_task->DBUSERNAME->Visible) { // DBUSERNAME ?>
+		<td<?php echo $listandstart_task->DBUSERNAME->CellAttributes() ?>>
+<span id="el<?php echo $listandstart_task_delete->RowCnt ?>_listandstart_task_DBUSERNAME" class="control-group listandstart_task_DBUSERNAME">
+<span<?php echo $listandstart_task->DBUSERNAME->ViewAttributes() ?>>
+<?php echo $listandstart_task->DBUSERNAME->ListViewValue() ?></span>
+</span>
+</td>
+<?php } ?>
+<?php if ($listandstart_task->username->Visible) { // username ?>
+		<td<?php echo $listandstart_task->username->CellAttributes() ?>>
+<span id="el<?php echo $listandstart_task_delete->RowCnt ?>_listandstart_task_username" class="control-group listandstart_task_username">
+<span<?php echo $listandstart_task->username->ViewAttributes() ?>>
+<?php echo $listandstart_task->username->ListViewValue() ?></span>
 </span>
 </td>
 <?php } ?>

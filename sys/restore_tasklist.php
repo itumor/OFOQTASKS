@@ -583,11 +583,12 @@ class crestore_task_list extends crestore_task {
 		$sWhere = "";
 		$this->BuildBasicSearchSQL($sWhere, $this->server_id_mysqladmin, $Keyword);
 		$this->BuildBasicSearchSQL($sWhere, $this->HOSTNAME, $Keyword);
-		$this->BuildBasicSearchSQL($sWhere, $this->USERNAME, $Keyword);
 		$this->BuildBasicSearchSQL($sWhere, $this->PASSWORD, $Keyword);
 		$this->BuildBasicSearchSQL($sWhere, $this->DATABASE, $Keyword);
 		$this->BuildBasicSearchSQL($sWhere, $this->FILEPATH, $Keyword);
 		$this->BuildBasicSearchSQL($sWhere, $this->FILENAME, $Keyword);
+		$this->BuildBasicSearchSQL($sWhere, $this->DBUSERNAME, $Keyword);
+		$this->BuildBasicSearchSQL($sWhere, $this->username, $Keyword);
 		return $sWhere;
 	}
 
@@ -682,11 +683,13 @@ class crestore_task_list extends crestore_task {
 			$this->UpdateSort($this->id); // id
 			$this->UpdateSort($this->server_id_mysqladmin); // server_id_mysqladmin
 			$this->UpdateSort($this->HOSTNAME); // HOSTNAME
-			$this->UpdateSort($this->USERNAME); // USERNAME
 			$this->UpdateSort($this->PASSWORD); // PASSWORD
 			$this->UpdateSort($this->DATABASE); // DATABASE
 			$this->UpdateSort($this->FILEPATH); // FILEPATH
 			$this->UpdateSort($this->FILENAME); // FILENAME
+			$this->UpdateSort($this->datetime); // datetime
+			$this->UpdateSort($this->DBUSERNAME); // DBUSERNAME
+			$this->UpdateSort($this->username); // username
 			$this->setStartRecordNumber(1); // Reset start position
 		}
 	}
@@ -722,11 +725,13 @@ class crestore_task_list extends crestore_task {
 				$this->id->setSort("");
 				$this->server_id_mysqladmin->setSort("");
 				$this->HOSTNAME->setSort("");
-				$this->USERNAME->setSort("");
 				$this->PASSWORD->setSort("");
 				$this->DATABASE->setSort("");
 				$this->FILEPATH->setSort("");
 				$this->FILENAME->setSort("");
+				$this->datetime->setSort("");
+				$this->DBUSERNAME->setSort("");
+				$this->username->setSort("");
 			}
 
 			// Reset start position
@@ -1020,11 +1025,13 @@ class crestore_task_list extends crestore_task {
 		$this->id->setDbValue($rs->fields('id'));
 		$this->server_id_mysqladmin->setDbValue($rs->fields('server_id_mysqladmin'));
 		$this->HOSTNAME->setDbValue($rs->fields('HOSTNAME'));
-		$this->USERNAME->setDbValue($rs->fields('USERNAME'));
 		$this->PASSWORD->setDbValue($rs->fields('PASSWORD'));
 		$this->DATABASE->setDbValue($rs->fields('DATABASE'));
 		$this->FILEPATH->setDbValue($rs->fields('FILEPATH'));
 		$this->FILENAME->setDbValue($rs->fields('FILENAME'));
+		$this->datetime->setDbValue($rs->fields('datetime'));
+		$this->DBUSERNAME->setDbValue($rs->fields('DBUSERNAME'));
+		$this->username->setDbValue($rs->fields('username'));
 	}
 
 	// Load DbValue from recordset
@@ -1034,11 +1041,13 @@ class crestore_task_list extends crestore_task {
 		$this->id->DbValue = $row['id'];
 		$this->server_id_mysqladmin->DbValue = $row['server_id_mysqladmin'];
 		$this->HOSTNAME->DbValue = $row['HOSTNAME'];
-		$this->USERNAME->DbValue = $row['USERNAME'];
 		$this->PASSWORD->DbValue = $row['PASSWORD'];
 		$this->DATABASE->DbValue = $row['DATABASE'];
 		$this->FILEPATH->DbValue = $row['FILEPATH'];
 		$this->FILENAME->DbValue = $row['FILENAME'];
+		$this->datetime->DbValue = $row['datetime'];
+		$this->DBUSERNAME->DbValue = $row['DBUSERNAME'];
+		$this->username->DbValue = $row['username'];
 	}
 
 	// Load old record
@@ -1083,11 +1092,13 @@ class crestore_task_list extends crestore_task {
 		// id
 		// server_id_mysqladmin
 		// HOSTNAME
-		// USERNAME
 		// PASSWORD
 		// DATABASE
 		// FILEPATH
 		// FILENAME
+		// datetime
+		// DBUSERNAME
+		// username
 
 		if ($this->RowType == EW_ROWTYPE_VIEW) { // View row
 
@@ -1102,10 +1113,6 @@ class crestore_task_list extends crestore_task {
 			// HOSTNAME
 			$this->HOSTNAME->ViewValue = $this->HOSTNAME->CurrentValue;
 			$this->HOSTNAME->ViewCustomAttributes = "";
-
-			// USERNAME
-			$this->USERNAME->ViewValue = $this->USERNAME->CurrentValue;
-			$this->USERNAME->ViewCustomAttributes = "";
 
 			// PASSWORD
 			$this->PASSWORD->ViewValue = $this->PASSWORD->CurrentValue;
@@ -1123,6 +1130,18 @@ class crestore_task_list extends crestore_task {
 			$this->FILENAME->ViewValue = $this->FILENAME->CurrentValue;
 			$this->FILENAME->ViewCustomAttributes = "";
 
+			// datetime
+			$this->datetime->ViewValue = $this->datetime->CurrentValue;
+			$this->datetime->ViewCustomAttributes = "";
+
+			// DBUSERNAME
+			$this->DBUSERNAME->ViewValue = $this->DBUSERNAME->CurrentValue;
+			$this->DBUSERNAME->ViewCustomAttributes = "";
+
+			// username
+			$this->username->ViewValue = $this->username->CurrentValue;
+			$this->username->ViewCustomAttributes = "";
+
 			// id
 			$this->id->LinkCustomAttributes = "";
 			$this->id->HrefValue = "";
@@ -1137,11 +1156,6 @@ class crestore_task_list extends crestore_task {
 			$this->HOSTNAME->LinkCustomAttributes = "";
 			$this->HOSTNAME->HrefValue = "";
 			$this->HOSTNAME->TooltipValue = "";
-
-			// USERNAME
-			$this->USERNAME->LinkCustomAttributes = "";
-			$this->USERNAME->HrefValue = "";
-			$this->USERNAME->TooltipValue = "";
 
 			// PASSWORD
 			$this->PASSWORD->LinkCustomAttributes = "";
@@ -1162,6 +1176,21 @@ class crestore_task_list extends crestore_task {
 			$this->FILENAME->LinkCustomAttributes = "";
 			$this->FILENAME->HrefValue = "";
 			$this->FILENAME->TooltipValue = "";
+
+			// datetime
+			$this->datetime->LinkCustomAttributes = "";
+			$this->datetime->HrefValue = "";
+			$this->datetime->TooltipValue = "";
+
+			// DBUSERNAME
+			$this->DBUSERNAME->LinkCustomAttributes = "";
+			$this->DBUSERNAME->HrefValue = "";
+			$this->DBUSERNAME->TooltipValue = "";
+
+			// username
+			$this->username->LinkCustomAttributes = "";
+			$this->username->HrefValue = "";
+			$this->username->TooltipValue = "";
 		}
 
 		// Call Row Rendered event
@@ -1762,15 +1791,6 @@ $restore_task_list->ListOptions->Render("header", "left");
         </div></div></td>
 	<?php } ?>
 <?php } ?>		
-<?php if ($restore_task->USERNAME->Visible) { // USERNAME ?>
-	<?php if ($restore_task->SortUrl($restore_task->USERNAME) == "") { ?>
-		<td><div id="elh_restore_task_USERNAME" class="restore_task_USERNAME"><div class="ewTableHeaderCaption"><?php echo $restore_task->USERNAME->FldCaption() ?></div></div></td>
-	<?php } else { ?>
-		<td><div class="ewPointer" onclick="ew_Sort(event,'<?php echo $restore_task->SortUrl($restore_task->USERNAME) ?>',1);"><div id="elh_restore_task_USERNAME" class="restore_task_USERNAME">
-			<div class="ewTableHeaderBtn"><span class="ewTableHeaderCaption"><?php echo $restore_task->USERNAME->FldCaption() ?><?php echo $Language->Phrase("SrchLegend") ?></span><span class="ewTableHeaderSort"><?php if ($restore_task->USERNAME->getSort() == "ASC") { ?><span class="caret ewSortUp"></span><?php } elseif ($restore_task->USERNAME->getSort() == "DESC") { ?><span class="caret"></span><?php } ?></span></div>
-        </div></div></td>
-	<?php } ?>
-<?php } ?>		
 <?php if ($restore_task->PASSWORD->Visible) { // PASSWORD ?>
 	<?php if ($restore_task->SortUrl($restore_task->PASSWORD) == "") { ?>
 		<td><div id="elh_restore_task_PASSWORD" class="restore_task_PASSWORD"><div class="ewTableHeaderCaption"><?php echo $restore_task->PASSWORD->FldCaption() ?></div></div></td>
@@ -1804,6 +1824,33 @@ $restore_task_list->ListOptions->Render("header", "left");
 	<?php } else { ?>
 		<td><div class="ewPointer" onclick="ew_Sort(event,'<?php echo $restore_task->SortUrl($restore_task->FILENAME) ?>',1);"><div id="elh_restore_task_FILENAME" class="restore_task_FILENAME">
 			<div class="ewTableHeaderBtn"><span class="ewTableHeaderCaption"><?php echo $restore_task->FILENAME->FldCaption() ?><?php echo $Language->Phrase("SrchLegend") ?></span><span class="ewTableHeaderSort"><?php if ($restore_task->FILENAME->getSort() == "ASC") { ?><span class="caret ewSortUp"></span><?php } elseif ($restore_task->FILENAME->getSort() == "DESC") { ?><span class="caret"></span><?php } ?></span></div>
+        </div></div></td>
+	<?php } ?>
+<?php } ?>		
+<?php if ($restore_task->datetime->Visible) { // datetime ?>
+	<?php if ($restore_task->SortUrl($restore_task->datetime) == "") { ?>
+		<td><div id="elh_restore_task_datetime" class="restore_task_datetime"><div class="ewTableHeaderCaption"><?php echo $restore_task->datetime->FldCaption() ?></div></div></td>
+	<?php } else { ?>
+		<td><div class="ewPointer" onclick="ew_Sort(event,'<?php echo $restore_task->SortUrl($restore_task->datetime) ?>',1);"><div id="elh_restore_task_datetime" class="restore_task_datetime">
+			<div class="ewTableHeaderBtn"><span class="ewTableHeaderCaption"><?php echo $restore_task->datetime->FldCaption() ?></span><span class="ewTableHeaderSort"><?php if ($restore_task->datetime->getSort() == "ASC") { ?><span class="caret ewSortUp"></span><?php } elseif ($restore_task->datetime->getSort() == "DESC") { ?><span class="caret"></span><?php } ?></span></div>
+        </div></div></td>
+	<?php } ?>
+<?php } ?>		
+<?php if ($restore_task->DBUSERNAME->Visible) { // DBUSERNAME ?>
+	<?php if ($restore_task->SortUrl($restore_task->DBUSERNAME) == "") { ?>
+		<td><div id="elh_restore_task_DBUSERNAME" class="restore_task_DBUSERNAME"><div class="ewTableHeaderCaption"><?php echo $restore_task->DBUSERNAME->FldCaption() ?></div></div></td>
+	<?php } else { ?>
+		<td><div class="ewPointer" onclick="ew_Sort(event,'<?php echo $restore_task->SortUrl($restore_task->DBUSERNAME) ?>',1);"><div id="elh_restore_task_DBUSERNAME" class="restore_task_DBUSERNAME">
+			<div class="ewTableHeaderBtn"><span class="ewTableHeaderCaption"><?php echo $restore_task->DBUSERNAME->FldCaption() ?><?php echo $Language->Phrase("SrchLegend") ?></span><span class="ewTableHeaderSort"><?php if ($restore_task->DBUSERNAME->getSort() == "ASC") { ?><span class="caret ewSortUp"></span><?php } elseif ($restore_task->DBUSERNAME->getSort() == "DESC") { ?><span class="caret"></span><?php } ?></span></div>
+        </div></div></td>
+	<?php } ?>
+<?php } ?>		
+<?php if ($restore_task->username->Visible) { // username ?>
+	<?php if ($restore_task->SortUrl($restore_task->username) == "") { ?>
+		<td><div id="elh_restore_task_username" class="restore_task_username"><div class="ewTableHeaderCaption"><?php echo $restore_task->username->FldCaption() ?></div></div></td>
+	<?php } else { ?>
+		<td><div class="ewPointer" onclick="ew_Sort(event,'<?php echo $restore_task->SortUrl($restore_task->username) ?>',1);"><div id="elh_restore_task_username" class="restore_task_username">
+			<div class="ewTableHeaderBtn"><span class="ewTableHeaderCaption"><?php echo $restore_task->username->FldCaption() ?><?php echo $Language->Phrase("SrchLegend") ?></span><span class="ewTableHeaderSort"><?php if ($restore_task->username->getSort() == "ASC") { ?><span class="caret ewSortUp"></span><?php } elseif ($restore_task->username->getSort() == "DESC") { ?><span class="caret"></span><?php } ?></span></div>
         </div></div></td>
 	<?php } ?>
 <?php } ?>		
@@ -1889,12 +1936,6 @@ $restore_task_list->ListOptions->Render("body", "left", $restore_task_list->RowC
 <?php echo $restore_task->HOSTNAME->ListViewValue() ?></span>
 <a id="<?php echo $restore_task_list->PageObjName . "_row_" . $restore_task_list->RowCnt ?>"></a></td>
 	<?php } ?>
-	<?php if ($restore_task->USERNAME->Visible) { // USERNAME ?>
-		<td<?php echo $restore_task->USERNAME->CellAttributes() ?>>
-<span<?php echo $restore_task->USERNAME->ViewAttributes() ?>>
-<?php echo $restore_task->USERNAME->ListViewValue() ?></span>
-<a id="<?php echo $restore_task_list->PageObjName . "_row_" . $restore_task_list->RowCnt ?>"></a></td>
-	<?php } ?>
 	<?php if ($restore_task->PASSWORD->Visible) { // PASSWORD ?>
 		<td<?php echo $restore_task->PASSWORD->CellAttributes() ?>>
 <span<?php echo $restore_task->PASSWORD->ViewAttributes() ?>>
@@ -1917,6 +1958,24 @@ $restore_task_list->ListOptions->Render("body", "left", $restore_task_list->RowC
 		<td<?php echo $restore_task->FILENAME->CellAttributes() ?>>
 <span<?php echo $restore_task->FILENAME->ViewAttributes() ?>>
 <?php echo $restore_task->FILENAME->ListViewValue() ?></span>
+<a id="<?php echo $restore_task_list->PageObjName . "_row_" . $restore_task_list->RowCnt ?>"></a></td>
+	<?php } ?>
+	<?php if ($restore_task->datetime->Visible) { // datetime ?>
+		<td<?php echo $restore_task->datetime->CellAttributes() ?>>
+<span<?php echo $restore_task->datetime->ViewAttributes() ?>>
+<?php echo $restore_task->datetime->ListViewValue() ?></span>
+<a id="<?php echo $restore_task_list->PageObjName . "_row_" . $restore_task_list->RowCnt ?>"></a></td>
+	<?php } ?>
+	<?php if ($restore_task->DBUSERNAME->Visible) { // DBUSERNAME ?>
+		<td<?php echo $restore_task->DBUSERNAME->CellAttributes() ?>>
+<span<?php echo $restore_task->DBUSERNAME->ViewAttributes() ?>>
+<?php echo $restore_task->DBUSERNAME->ListViewValue() ?></span>
+<a id="<?php echo $restore_task_list->PageObjName . "_row_" . $restore_task_list->RowCnt ?>"></a></td>
+	<?php } ?>
+	<?php if ($restore_task->username->Visible) { // username ?>
+		<td<?php echo $restore_task->username->CellAttributes() ?>>
+<span<?php echo $restore_task->username->ViewAttributes() ?>>
+<?php echo $restore_task->username->ListViewValue() ?></span>
 <a id="<?php echo $restore_task_list->PageObjName . "_row_" . $restore_task_list->RowCnt ?>"></a></td>
 	<?php } ?>
 <?php

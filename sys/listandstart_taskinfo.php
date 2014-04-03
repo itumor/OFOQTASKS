@@ -10,8 +10,10 @@ class clistandstart_task extends cTable {
 	var $id;
 	var $server_id_mysqladmin;
 	var $HOSTNAME;
-	var $USERNAME;
 	var $PASSWORD;
+	var $datetime;
+	var $DBUSERNAME;
+	var $username;
 
 	//
 	// Table class constructor
@@ -50,13 +52,21 @@ class clistandstart_task extends cTable {
 		$this->HOSTNAME = new cField('listandstart_task', 'listandstart_task', 'x_HOSTNAME', 'HOSTNAME', '`HOSTNAME`', '`HOSTNAME`', 200, -1, FALSE, '`HOSTNAME`', FALSE, FALSE, FALSE, 'FORMATTED TEXT');
 		$this->fields['HOSTNAME'] = &$this->HOSTNAME;
 
-		// USERNAME
-		$this->USERNAME = new cField('listandstart_task', 'listandstart_task', 'x_USERNAME', 'USERNAME', '`USERNAME`', '`USERNAME`', 200, -1, FALSE, '`USERNAME`', FALSE, FALSE, FALSE, 'FORMATTED TEXT');
-		$this->fields['USERNAME'] = &$this->USERNAME;
-
 		// PASSWORD
 		$this->PASSWORD = new cField('listandstart_task', 'listandstart_task', 'x_PASSWORD', 'PASSWORD', '`PASSWORD`', '`PASSWORD`', 200, -1, FALSE, '`PASSWORD`', FALSE, FALSE, FALSE, 'FORMATTED TEXT');
 		$this->fields['PASSWORD'] = &$this->PASSWORD;
+
+		// datetime
+		$this->datetime = new cField('listandstart_task', 'listandstart_task', 'x_datetime', 'datetime', '`datetime`', 'DATE_FORMAT(`datetime`, \'%d/%m/%Y %H:%i:%s\')', 135, -1, FALSE, '`datetime`', FALSE, FALSE, FALSE, 'FORMATTED TEXT');
+		$this->fields['datetime'] = &$this->datetime;
+
+		// DBUSERNAME
+		$this->DBUSERNAME = new cField('listandstart_task', 'listandstart_task', 'x_DBUSERNAME', 'DBUSERNAME', '`DBUSERNAME`', '`DBUSERNAME`', 200, -1, FALSE, '`DBUSERNAME`', FALSE, FALSE, FALSE, 'FORMATTED TEXT');
+		$this->fields['DBUSERNAME'] = &$this->DBUSERNAME;
+
+		// username
+		$this->username = new cField('listandstart_task', 'listandstart_task', 'x_username', 'username', '`username`', '`username`', 200, -1, FALSE, '`username`', FALSE, FALSE, FALSE, 'FORMATTED TEXT');
+		$this->fields['username'] = &$this->username;
 	}
 
 	// Single column sort
@@ -478,8 +488,10 @@ class clistandstart_task extends cTable {
 		$this->id->setDbValue($rs->fields('id'));
 		$this->server_id_mysqladmin->setDbValue($rs->fields('server_id_mysqladmin'));
 		$this->HOSTNAME->setDbValue($rs->fields('HOSTNAME'));
-		$this->USERNAME->setDbValue($rs->fields('USERNAME'));
 		$this->PASSWORD->setDbValue($rs->fields('PASSWORD'));
+		$this->datetime->setDbValue($rs->fields('datetime'));
+		$this->DBUSERNAME->setDbValue($rs->fields('DBUSERNAME'));
+		$this->username->setDbValue($rs->fields('username'));
 	}
 
 	// Render list row values
@@ -493,8 +505,10 @@ class clistandstart_task extends cTable {
 		// id
 		// server_id_mysqladmin
 		// HOSTNAME
-		// USERNAME
 		// PASSWORD
+		// datetime
+		// DBUSERNAME
+		// username
 		// id
 
 		$this->id->ViewValue = $this->id->CurrentValue;
@@ -548,13 +562,21 @@ class clistandstart_task extends cTable {
 		}
 		$this->HOSTNAME->ViewCustomAttributes = "";
 
-		// USERNAME
-		$this->USERNAME->ViewValue = $this->USERNAME->CurrentValue;
-		$this->USERNAME->ViewCustomAttributes = "";
-
 		// PASSWORD
 		$this->PASSWORD->ViewValue = "********";
 		$this->PASSWORD->ViewCustomAttributes = "";
+
+		// datetime
+		$this->datetime->ViewValue = $this->datetime->CurrentValue;
+		$this->datetime->ViewCustomAttributes = "";
+
+		// DBUSERNAME
+		$this->DBUSERNAME->ViewValue = $this->DBUSERNAME->CurrentValue;
+		$this->DBUSERNAME->ViewCustomAttributes = "";
+
+		// username
+		$this->username->ViewValue = $this->username->CurrentValue;
+		$this->username->ViewCustomAttributes = "";
 
 		// id
 		$this->id->LinkCustomAttributes = "";
@@ -571,15 +593,25 @@ class clistandstart_task extends cTable {
 		$this->HOSTNAME->HrefValue = "";
 		$this->HOSTNAME->TooltipValue = "";
 
-		// USERNAME
-		$this->USERNAME->LinkCustomAttributes = "";
-		$this->USERNAME->HrefValue = "";
-		$this->USERNAME->TooltipValue = "";
-
 		// PASSWORD
 		$this->PASSWORD->LinkCustomAttributes = "";
 		$this->PASSWORD->HrefValue = "";
 		$this->PASSWORD->TooltipValue = "";
+
+		// datetime
+		$this->datetime->LinkCustomAttributes = "";
+		$this->datetime->HrefValue = "";
+		$this->datetime->TooltipValue = "";
+
+		// DBUSERNAME
+		$this->DBUSERNAME->LinkCustomAttributes = "";
+		$this->DBUSERNAME->HrefValue = "";
+		$this->DBUSERNAME->TooltipValue = "";
+
+		// username
+		$this->username->LinkCustomAttributes = "";
+		$this->username->HrefValue = "";
+		$this->username->TooltipValue = "";
 
 		// Call Row Rendered event
 		$this->Row_Rendered();
@@ -606,14 +638,18 @@ class clistandstart_task extends cTable {
 				if ($this->id->Exportable) $Doc->ExportCaption($this->id);
 				if ($this->server_id_mysqladmin->Exportable) $Doc->ExportCaption($this->server_id_mysqladmin);
 				if ($this->HOSTNAME->Exportable) $Doc->ExportCaption($this->HOSTNAME);
-				if ($this->USERNAME->Exportable) $Doc->ExportCaption($this->USERNAME);
 				if ($this->PASSWORD->Exportable) $Doc->ExportCaption($this->PASSWORD);
+				if ($this->datetime->Exportable) $Doc->ExportCaption($this->datetime);
+				if ($this->DBUSERNAME->Exportable) $Doc->ExportCaption($this->DBUSERNAME);
+				if ($this->username->Exportable) $Doc->ExportCaption($this->username);
 			} else {
 				if ($this->id->Exportable) $Doc->ExportCaption($this->id);
 				if ($this->server_id_mysqladmin->Exportable) $Doc->ExportCaption($this->server_id_mysqladmin);
 				if ($this->HOSTNAME->Exportable) $Doc->ExportCaption($this->HOSTNAME);
-				if ($this->USERNAME->Exportable) $Doc->ExportCaption($this->USERNAME);
 				if ($this->PASSWORD->Exportable) $Doc->ExportCaption($this->PASSWORD);
+				if ($this->datetime->Exportable) $Doc->ExportCaption($this->datetime);
+				if ($this->DBUSERNAME->Exportable) $Doc->ExportCaption($this->DBUSERNAME);
+				if ($this->username->Exportable) $Doc->ExportCaption($this->username);
 			}
 			$Doc->EndExportRow();
 		}
@@ -646,14 +682,18 @@ class clistandstart_task extends cTable {
 					if ($this->id->Exportable) $Doc->ExportField($this->id);
 					if ($this->server_id_mysqladmin->Exportable) $Doc->ExportField($this->server_id_mysqladmin);
 					if ($this->HOSTNAME->Exportable) $Doc->ExportField($this->HOSTNAME);
-					if ($this->USERNAME->Exportable) $Doc->ExportField($this->USERNAME);
 					if ($this->PASSWORD->Exportable) $Doc->ExportField($this->PASSWORD);
+					if ($this->datetime->Exportable) $Doc->ExportField($this->datetime);
+					if ($this->DBUSERNAME->Exportable) $Doc->ExportField($this->DBUSERNAME);
+					if ($this->username->Exportable) $Doc->ExportField($this->username);
 				} else {
 					if ($this->id->Exportable) $Doc->ExportField($this->id);
 					if ($this->server_id_mysqladmin->Exportable) $Doc->ExportField($this->server_id_mysqladmin);
 					if ($this->HOSTNAME->Exportable) $Doc->ExportField($this->HOSTNAME);
-					if ($this->USERNAME->Exportable) $Doc->ExportField($this->USERNAME);
 					if ($this->PASSWORD->Exportable) $Doc->ExportField($this->PASSWORD);
+					if ($this->datetime->Exportable) $Doc->ExportField($this->datetime);
+					if ($this->DBUSERNAME->Exportable) $Doc->ExportField($this->DBUSERNAME);
+					if ($this->username->Exportable) $Doc->ExportField($this->username);
 				}
 				$Doc->EndExportRow();
 			}

@@ -583,11 +583,10 @@ class cdrop_task_list extends cdrop_task {
 		$sWhere = "";
 		$this->BuildBasicSearchSQL($sWhere, $this->server_id_mysqladmin, $Keyword);
 		$this->BuildBasicSearchSQL($sWhere, $this->HOSTNAME, $Keyword);
-		$this->BuildBasicSearchSQL($sWhere, $this->USERNAME, $Keyword);
 		$this->BuildBasicSearchSQL($sWhere, $this->PASSWORD, $Keyword);
 		$this->BuildBasicSearchSQL($sWhere, $this->DATABASE, $Keyword);
-		$this->BuildBasicSearchSQL($sWhere, $this->FILEPATH, $Keyword);
-		$this->BuildBasicSearchSQL($sWhere, $this->FILENAME, $Keyword);
+		$this->BuildBasicSearchSQL($sWhere, $this->DBUSERNAME, $Keyword);
+		$this->BuildBasicSearchSQL($sWhere, $this->username, $Keyword);
 		return $sWhere;
 	}
 
@@ -682,11 +681,11 @@ class cdrop_task_list extends cdrop_task {
 			$this->UpdateSort($this->id); // id
 			$this->UpdateSort($this->server_id_mysqladmin); // server_id_mysqladmin
 			$this->UpdateSort($this->HOSTNAME); // HOSTNAME
-			$this->UpdateSort($this->USERNAME); // USERNAME
 			$this->UpdateSort($this->PASSWORD); // PASSWORD
 			$this->UpdateSort($this->DATABASE); // DATABASE
-			$this->UpdateSort($this->FILEPATH); // FILEPATH
-			$this->UpdateSort($this->FILENAME); // FILENAME
+			$this->UpdateSort($this->datetime); // datetime
+			$this->UpdateSort($this->DBUSERNAME); // DBUSERNAME
+			$this->UpdateSort($this->username); // username
 			$this->setStartRecordNumber(1); // Reset start position
 		}
 	}
@@ -722,11 +721,11 @@ class cdrop_task_list extends cdrop_task {
 				$this->id->setSort("");
 				$this->server_id_mysqladmin->setSort("");
 				$this->HOSTNAME->setSort("");
-				$this->USERNAME->setSort("");
 				$this->PASSWORD->setSort("");
 				$this->DATABASE->setSort("");
-				$this->FILEPATH->setSort("");
-				$this->FILENAME->setSort("");
+				$this->datetime->setSort("");
+				$this->DBUSERNAME->setSort("");
+				$this->username->setSort("");
 			}
 
 			// Reset start position
@@ -1020,11 +1019,11 @@ class cdrop_task_list extends cdrop_task {
 		$this->id->setDbValue($rs->fields('id'));
 		$this->server_id_mysqladmin->setDbValue($rs->fields('server_id_mysqladmin'));
 		$this->HOSTNAME->setDbValue($rs->fields('HOSTNAME'));
-		$this->USERNAME->setDbValue($rs->fields('USERNAME'));
 		$this->PASSWORD->setDbValue($rs->fields('PASSWORD'));
 		$this->DATABASE->setDbValue($rs->fields('DATABASE'));
-		$this->FILEPATH->setDbValue($rs->fields('FILEPATH'));
-		$this->FILENAME->setDbValue($rs->fields('FILENAME'));
+		$this->datetime->setDbValue($rs->fields('datetime'));
+		$this->DBUSERNAME->setDbValue($rs->fields('DBUSERNAME'));
+		$this->username->setDbValue($rs->fields('username'));
 	}
 
 	// Load DbValue from recordset
@@ -1034,11 +1033,11 @@ class cdrop_task_list extends cdrop_task {
 		$this->id->DbValue = $row['id'];
 		$this->server_id_mysqladmin->DbValue = $row['server_id_mysqladmin'];
 		$this->HOSTNAME->DbValue = $row['HOSTNAME'];
-		$this->USERNAME->DbValue = $row['USERNAME'];
 		$this->PASSWORD->DbValue = $row['PASSWORD'];
 		$this->DATABASE->DbValue = $row['DATABASE'];
-		$this->FILEPATH->DbValue = $row['FILEPATH'];
-		$this->FILENAME->DbValue = $row['FILENAME'];
+		$this->datetime->DbValue = $row['datetime'];
+		$this->DBUSERNAME->DbValue = $row['DBUSERNAME'];
+		$this->username->DbValue = $row['username'];
 	}
 
 	// Load old record
@@ -1083,11 +1082,11 @@ class cdrop_task_list extends cdrop_task {
 		// id
 		// server_id_mysqladmin
 		// HOSTNAME
-		// USERNAME
 		// PASSWORD
 		// DATABASE
-		// FILEPATH
-		// FILENAME
+		// datetime
+		// DBUSERNAME
+		// username
 
 		if ($this->RowType == EW_ROWTYPE_VIEW) { // View row
 
@@ -1103,10 +1102,6 @@ class cdrop_task_list extends cdrop_task {
 			$this->HOSTNAME->ViewValue = $this->HOSTNAME->CurrentValue;
 			$this->HOSTNAME->ViewCustomAttributes = "";
 
-			// USERNAME
-			$this->USERNAME->ViewValue = $this->USERNAME->CurrentValue;
-			$this->USERNAME->ViewCustomAttributes = "";
-
 			// PASSWORD
 			$this->PASSWORD->ViewValue = $this->PASSWORD->CurrentValue;
 			$this->PASSWORD->ViewCustomAttributes = "";
@@ -1115,13 +1110,17 @@ class cdrop_task_list extends cdrop_task {
 			$this->DATABASE->ViewValue = $this->DATABASE->CurrentValue;
 			$this->DATABASE->ViewCustomAttributes = "";
 
-			// FILEPATH
-			$this->FILEPATH->ViewValue = $this->FILEPATH->CurrentValue;
-			$this->FILEPATH->ViewCustomAttributes = "";
+			// datetime
+			$this->datetime->ViewValue = $this->datetime->CurrentValue;
+			$this->datetime->ViewCustomAttributes = "";
 
-			// FILENAME
-			$this->FILENAME->ViewValue = $this->FILENAME->CurrentValue;
-			$this->FILENAME->ViewCustomAttributes = "";
+			// DBUSERNAME
+			$this->DBUSERNAME->ViewValue = $this->DBUSERNAME->CurrentValue;
+			$this->DBUSERNAME->ViewCustomAttributes = "";
+
+			// username
+			$this->username->ViewValue = $this->username->CurrentValue;
+			$this->username->ViewCustomAttributes = "";
 
 			// id
 			$this->id->LinkCustomAttributes = "";
@@ -1138,11 +1137,6 @@ class cdrop_task_list extends cdrop_task {
 			$this->HOSTNAME->HrefValue = "";
 			$this->HOSTNAME->TooltipValue = "";
 
-			// USERNAME
-			$this->USERNAME->LinkCustomAttributes = "";
-			$this->USERNAME->HrefValue = "";
-			$this->USERNAME->TooltipValue = "";
-
 			// PASSWORD
 			$this->PASSWORD->LinkCustomAttributes = "";
 			$this->PASSWORD->HrefValue = "";
@@ -1153,15 +1147,20 @@ class cdrop_task_list extends cdrop_task {
 			$this->DATABASE->HrefValue = "";
 			$this->DATABASE->TooltipValue = "";
 
-			// FILEPATH
-			$this->FILEPATH->LinkCustomAttributes = "";
-			$this->FILEPATH->HrefValue = "";
-			$this->FILEPATH->TooltipValue = "";
+			// datetime
+			$this->datetime->LinkCustomAttributes = "";
+			$this->datetime->HrefValue = "";
+			$this->datetime->TooltipValue = "";
 
-			// FILENAME
-			$this->FILENAME->LinkCustomAttributes = "";
-			$this->FILENAME->HrefValue = "";
-			$this->FILENAME->TooltipValue = "";
+			// DBUSERNAME
+			$this->DBUSERNAME->LinkCustomAttributes = "";
+			$this->DBUSERNAME->HrefValue = "";
+			$this->DBUSERNAME->TooltipValue = "";
+
+			// username
+			$this->username->LinkCustomAttributes = "";
+			$this->username->HrefValue = "";
+			$this->username->TooltipValue = "";
 		}
 
 		// Call Row Rendered event
@@ -1762,15 +1761,6 @@ $drop_task_list->ListOptions->Render("header", "left");
         </div></div></td>
 	<?php } ?>
 <?php } ?>		
-<?php if ($drop_task->USERNAME->Visible) { // USERNAME ?>
-	<?php if ($drop_task->SortUrl($drop_task->USERNAME) == "") { ?>
-		<td><div id="elh_drop_task_USERNAME" class="drop_task_USERNAME"><div class="ewTableHeaderCaption"><?php echo $drop_task->USERNAME->FldCaption() ?></div></div></td>
-	<?php } else { ?>
-		<td><div class="ewPointer" onclick="ew_Sort(event,'<?php echo $drop_task->SortUrl($drop_task->USERNAME) ?>',1);"><div id="elh_drop_task_USERNAME" class="drop_task_USERNAME">
-			<div class="ewTableHeaderBtn"><span class="ewTableHeaderCaption"><?php echo $drop_task->USERNAME->FldCaption() ?><?php echo $Language->Phrase("SrchLegend") ?></span><span class="ewTableHeaderSort"><?php if ($drop_task->USERNAME->getSort() == "ASC") { ?><span class="caret ewSortUp"></span><?php } elseif ($drop_task->USERNAME->getSort() == "DESC") { ?><span class="caret"></span><?php } ?></span></div>
-        </div></div></td>
-	<?php } ?>
-<?php } ?>		
 <?php if ($drop_task->PASSWORD->Visible) { // PASSWORD ?>
 	<?php if ($drop_task->SortUrl($drop_task->PASSWORD) == "") { ?>
 		<td><div id="elh_drop_task_PASSWORD" class="drop_task_PASSWORD"><div class="ewTableHeaderCaption"><?php echo $drop_task->PASSWORD->FldCaption() ?></div></div></td>
@@ -1789,21 +1779,30 @@ $drop_task_list->ListOptions->Render("header", "left");
         </div></div></td>
 	<?php } ?>
 <?php } ?>		
-<?php if ($drop_task->FILEPATH->Visible) { // FILEPATH ?>
-	<?php if ($drop_task->SortUrl($drop_task->FILEPATH) == "") { ?>
-		<td><div id="elh_drop_task_FILEPATH" class="drop_task_FILEPATH"><div class="ewTableHeaderCaption"><?php echo $drop_task->FILEPATH->FldCaption() ?></div></div></td>
+<?php if ($drop_task->datetime->Visible) { // datetime ?>
+	<?php if ($drop_task->SortUrl($drop_task->datetime) == "") { ?>
+		<td><div id="elh_drop_task_datetime" class="drop_task_datetime"><div class="ewTableHeaderCaption"><?php echo $drop_task->datetime->FldCaption() ?></div></div></td>
 	<?php } else { ?>
-		<td><div class="ewPointer" onclick="ew_Sort(event,'<?php echo $drop_task->SortUrl($drop_task->FILEPATH) ?>',1);"><div id="elh_drop_task_FILEPATH" class="drop_task_FILEPATH">
-			<div class="ewTableHeaderBtn"><span class="ewTableHeaderCaption"><?php echo $drop_task->FILEPATH->FldCaption() ?><?php echo $Language->Phrase("SrchLegend") ?></span><span class="ewTableHeaderSort"><?php if ($drop_task->FILEPATH->getSort() == "ASC") { ?><span class="caret ewSortUp"></span><?php } elseif ($drop_task->FILEPATH->getSort() == "DESC") { ?><span class="caret"></span><?php } ?></span></div>
+		<td><div class="ewPointer" onclick="ew_Sort(event,'<?php echo $drop_task->SortUrl($drop_task->datetime) ?>',1);"><div id="elh_drop_task_datetime" class="drop_task_datetime">
+			<div class="ewTableHeaderBtn"><span class="ewTableHeaderCaption"><?php echo $drop_task->datetime->FldCaption() ?></span><span class="ewTableHeaderSort"><?php if ($drop_task->datetime->getSort() == "ASC") { ?><span class="caret ewSortUp"></span><?php } elseif ($drop_task->datetime->getSort() == "DESC") { ?><span class="caret"></span><?php } ?></span></div>
         </div></div></td>
 	<?php } ?>
 <?php } ?>		
-<?php if ($drop_task->FILENAME->Visible) { // FILENAME ?>
-	<?php if ($drop_task->SortUrl($drop_task->FILENAME) == "") { ?>
-		<td><div id="elh_drop_task_FILENAME" class="drop_task_FILENAME"><div class="ewTableHeaderCaption"><?php echo $drop_task->FILENAME->FldCaption() ?></div></div></td>
+<?php if ($drop_task->DBUSERNAME->Visible) { // DBUSERNAME ?>
+	<?php if ($drop_task->SortUrl($drop_task->DBUSERNAME) == "") { ?>
+		<td><div id="elh_drop_task_DBUSERNAME" class="drop_task_DBUSERNAME"><div class="ewTableHeaderCaption"><?php echo $drop_task->DBUSERNAME->FldCaption() ?></div></div></td>
 	<?php } else { ?>
-		<td><div class="ewPointer" onclick="ew_Sort(event,'<?php echo $drop_task->SortUrl($drop_task->FILENAME) ?>',1);"><div id="elh_drop_task_FILENAME" class="drop_task_FILENAME">
-			<div class="ewTableHeaderBtn"><span class="ewTableHeaderCaption"><?php echo $drop_task->FILENAME->FldCaption() ?><?php echo $Language->Phrase("SrchLegend") ?></span><span class="ewTableHeaderSort"><?php if ($drop_task->FILENAME->getSort() == "ASC") { ?><span class="caret ewSortUp"></span><?php } elseif ($drop_task->FILENAME->getSort() == "DESC") { ?><span class="caret"></span><?php } ?></span></div>
+		<td><div class="ewPointer" onclick="ew_Sort(event,'<?php echo $drop_task->SortUrl($drop_task->DBUSERNAME) ?>',1);"><div id="elh_drop_task_DBUSERNAME" class="drop_task_DBUSERNAME">
+			<div class="ewTableHeaderBtn"><span class="ewTableHeaderCaption"><?php echo $drop_task->DBUSERNAME->FldCaption() ?><?php echo $Language->Phrase("SrchLegend") ?></span><span class="ewTableHeaderSort"><?php if ($drop_task->DBUSERNAME->getSort() == "ASC") { ?><span class="caret ewSortUp"></span><?php } elseif ($drop_task->DBUSERNAME->getSort() == "DESC") { ?><span class="caret"></span><?php } ?></span></div>
+        </div></div></td>
+	<?php } ?>
+<?php } ?>		
+<?php if ($drop_task->username->Visible) { // username ?>
+	<?php if ($drop_task->SortUrl($drop_task->username) == "") { ?>
+		<td><div id="elh_drop_task_username" class="drop_task_username"><div class="ewTableHeaderCaption"><?php echo $drop_task->username->FldCaption() ?></div></div></td>
+	<?php } else { ?>
+		<td><div class="ewPointer" onclick="ew_Sort(event,'<?php echo $drop_task->SortUrl($drop_task->username) ?>',1);"><div id="elh_drop_task_username" class="drop_task_username">
+			<div class="ewTableHeaderBtn"><span class="ewTableHeaderCaption"><?php echo $drop_task->username->FldCaption() ?><?php echo $Language->Phrase("SrchLegend") ?></span><span class="ewTableHeaderSort"><?php if ($drop_task->username->getSort() == "ASC") { ?><span class="caret ewSortUp"></span><?php } elseif ($drop_task->username->getSort() == "DESC") { ?><span class="caret"></span><?php } ?></span></div>
         </div></div></td>
 	<?php } ?>
 <?php } ?>		
@@ -1889,12 +1888,6 @@ $drop_task_list->ListOptions->Render("body", "left", $drop_task_list->RowCnt);
 <?php echo $drop_task->HOSTNAME->ListViewValue() ?></span>
 <a id="<?php echo $drop_task_list->PageObjName . "_row_" . $drop_task_list->RowCnt ?>"></a></td>
 	<?php } ?>
-	<?php if ($drop_task->USERNAME->Visible) { // USERNAME ?>
-		<td<?php echo $drop_task->USERNAME->CellAttributes() ?>>
-<span<?php echo $drop_task->USERNAME->ViewAttributes() ?>>
-<?php echo $drop_task->USERNAME->ListViewValue() ?></span>
-<a id="<?php echo $drop_task_list->PageObjName . "_row_" . $drop_task_list->RowCnt ?>"></a></td>
-	<?php } ?>
 	<?php if ($drop_task->PASSWORD->Visible) { // PASSWORD ?>
 		<td<?php echo $drop_task->PASSWORD->CellAttributes() ?>>
 <span<?php echo $drop_task->PASSWORD->ViewAttributes() ?>>
@@ -1907,16 +1900,22 @@ $drop_task_list->ListOptions->Render("body", "left", $drop_task_list->RowCnt);
 <?php echo $drop_task->DATABASE->ListViewValue() ?></span>
 <a id="<?php echo $drop_task_list->PageObjName . "_row_" . $drop_task_list->RowCnt ?>"></a></td>
 	<?php } ?>
-	<?php if ($drop_task->FILEPATH->Visible) { // FILEPATH ?>
-		<td<?php echo $drop_task->FILEPATH->CellAttributes() ?>>
-<span<?php echo $drop_task->FILEPATH->ViewAttributes() ?>>
-<?php echo $drop_task->FILEPATH->ListViewValue() ?></span>
+	<?php if ($drop_task->datetime->Visible) { // datetime ?>
+		<td<?php echo $drop_task->datetime->CellAttributes() ?>>
+<span<?php echo $drop_task->datetime->ViewAttributes() ?>>
+<?php echo $drop_task->datetime->ListViewValue() ?></span>
 <a id="<?php echo $drop_task_list->PageObjName . "_row_" . $drop_task_list->RowCnt ?>"></a></td>
 	<?php } ?>
-	<?php if ($drop_task->FILENAME->Visible) { // FILENAME ?>
-		<td<?php echo $drop_task->FILENAME->CellAttributes() ?>>
-<span<?php echo $drop_task->FILENAME->ViewAttributes() ?>>
-<?php echo $drop_task->FILENAME->ListViewValue() ?></span>
+	<?php if ($drop_task->DBUSERNAME->Visible) { // DBUSERNAME ?>
+		<td<?php echo $drop_task->DBUSERNAME->CellAttributes() ?>>
+<span<?php echo $drop_task->DBUSERNAME->ViewAttributes() ?>>
+<?php echo $drop_task->DBUSERNAME->ListViewValue() ?></span>
+<a id="<?php echo $drop_task_list->PageObjName . "_row_" . $drop_task_list->RowCnt ?>"></a></td>
+	<?php } ?>
+	<?php if ($drop_task->username->Visible) { // username ?>
+		<td<?php echo $drop_task->username->CellAttributes() ?>>
+<span<?php echo $drop_task->username->ViewAttributes() ?>>
+<?php echo $drop_task->username->ListViewValue() ?></span>
 <a id="<?php echo $drop_task_list->PageObjName . "_row_" . $drop_task_list->RowCnt ?>"></a></td>
 	<?php } ?>
 <?php

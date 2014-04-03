@@ -583,8 +583,9 @@ class clistandstart_task_list extends clistandstart_task {
 		$sWhere = "";
 		$this->BuildBasicSearchSQL($sWhere, $this->server_id_mysqladmin, $Keyword);
 		$this->BuildBasicSearchSQL($sWhere, $this->HOSTNAME, $Keyword);
-		$this->BuildBasicSearchSQL($sWhere, $this->USERNAME, $Keyword);
 		$this->BuildBasicSearchSQL($sWhere, $this->PASSWORD, $Keyword);
+		$this->BuildBasicSearchSQL($sWhere, $this->DBUSERNAME, $Keyword);
+		$this->BuildBasicSearchSQL($sWhere, $this->username, $Keyword);
 		return $sWhere;
 	}
 
@@ -679,8 +680,10 @@ class clistandstart_task_list extends clistandstart_task {
 			$this->UpdateSort($this->id); // id
 			$this->UpdateSort($this->server_id_mysqladmin); // server_id_mysqladmin
 			$this->UpdateSort($this->HOSTNAME); // HOSTNAME
-			$this->UpdateSort($this->USERNAME); // USERNAME
 			$this->UpdateSort($this->PASSWORD); // PASSWORD
+			$this->UpdateSort($this->datetime); // datetime
+			$this->UpdateSort($this->DBUSERNAME); // DBUSERNAME
+			$this->UpdateSort($this->username); // username
 			$this->setStartRecordNumber(1); // Reset start position
 		}
 	}
@@ -716,8 +719,10 @@ class clistandstart_task_list extends clistandstart_task {
 				$this->id->setSort("");
 				$this->server_id_mysqladmin->setSort("");
 				$this->HOSTNAME->setSort("");
-				$this->USERNAME->setSort("");
 				$this->PASSWORD->setSort("");
+				$this->datetime->setSort("");
+				$this->DBUSERNAME->setSort("");
+				$this->username->setSort("");
 			}
 
 			// Reset start position
@@ -1011,8 +1016,10 @@ class clistandstart_task_list extends clistandstart_task {
 		$this->id->setDbValue($rs->fields('id'));
 		$this->server_id_mysqladmin->setDbValue($rs->fields('server_id_mysqladmin'));
 		$this->HOSTNAME->setDbValue($rs->fields('HOSTNAME'));
-		$this->USERNAME->setDbValue($rs->fields('USERNAME'));
 		$this->PASSWORD->setDbValue($rs->fields('PASSWORD'));
+		$this->datetime->setDbValue($rs->fields('datetime'));
+		$this->DBUSERNAME->setDbValue($rs->fields('DBUSERNAME'));
+		$this->username->setDbValue($rs->fields('username'));
 	}
 
 	// Load DbValue from recordset
@@ -1022,8 +1029,10 @@ class clistandstart_task_list extends clistandstart_task {
 		$this->id->DbValue = $row['id'];
 		$this->server_id_mysqladmin->DbValue = $row['server_id_mysqladmin'];
 		$this->HOSTNAME->DbValue = $row['HOSTNAME'];
-		$this->USERNAME->DbValue = $row['USERNAME'];
 		$this->PASSWORD->DbValue = $row['PASSWORD'];
+		$this->datetime->DbValue = $row['datetime'];
+		$this->DBUSERNAME->DbValue = $row['DBUSERNAME'];
+		$this->username->DbValue = $row['username'];
 	}
 
 	// Load old record
@@ -1068,8 +1077,10 @@ class clistandstart_task_list extends clistandstart_task {
 		// id
 		// server_id_mysqladmin
 		// HOSTNAME
-		// USERNAME
 		// PASSWORD
+		// datetime
+		// DBUSERNAME
+		// username
 
 		if ($this->RowType == EW_ROWTYPE_VIEW) { // View row
 
@@ -1125,13 +1136,21 @@ class clistandstart_task_list extends clistandstart_task {
 			}
 			$this->HOSTNAME->ViewCustomAttributes = "";
 
-			// USERNAME
-			$this->USERNAME->ViewValue = $this->USERNAME->CurrentValue;
-			$this->USERNAME->ViewCustomAttributes = "";
-
 			// PASSWORD
 			$this->PASSWORD->ViewValue = "********";
 			$this->PASSWORD->ViewCustomAttributes = "";
+
+			// datetime
+			$this->datetime->ViewValue = $this->datetime->CurrentValue;
+			$this->datetime->ViewCustomAttributes = "";
+
+			// DBUSERNAME
+			$this->DBUSERNAME->ViewValue = $this->DBUSERNAME->CurrentValue;
+			$this->DBUSERNAME->ViewCustomAttributes = "";
+
+			// username
+			$this->username->ViewValue = $this->username->CurrentValue;
+			$this->username->ViewCustomAttributes = "";
 
 			// id
 			$this->id->LinkCustomAttributes = "";
@@ -1148,15 +1167,25 @@ class clistandstart_task_list extends clistandstart_task {
 			$this->HOSTNAME->HrefValue = "";
 			$this->HOSTNAME->TooltipValue = "";
 
-			// USERNAME
-			$this->USERNAME->LinkCustomAttributes = "";
-			$this->USERNAME->HrefValue = "";
-			$this->USERNAME->TooltipValue = "";
-
 			// PASSWORD
 			$this->PASSWORD->LinkCustomAttributes = "";
 			$this->PASSWORD->HrefValue = "";
 			$this->PASSWORD->TooltipValue = "";
+
+			// datetime
+			$this->datetime->LinkCustomAttributes = "";
+			$this->datetime->HrefValue = "";
+			$this->datetime->TooltipValue = "";
+
+			// DBUSERNAME
+			$this->DBUSERNAME->LinkCustomAttributes = "";
+			$this->DBUSERNAME->HrefValue = "";
+			$this->DBUSERNAME->TooltipValue = "";
+
+			// username
+			$this->username->LinkCustomAttributes = "";
+			$this->username->HrefValue = "";
+			$this->username->TooltipValue = "";
 		}
 
 		// Call Row Rendered event
@@ -1759,21 +1788,39 @@ $listandstart_task_list->ListOptions->Render("header", "left");
         </div></div></td>
 	<?php } ?>
 <?php } ?>		
-<?php if ($listandstart_task->USERNAME->Visible) { // USERNAME ?>
-	<?php if ($listandstart_task->SortUrl($listandstart_task->USERNAME) == "") { ?>
-		<td><div id="elh_listandstart_task_USERNAME" class="listandstart_task_USERNAME"><div class="ewTableHeaderCaption"><?php echo $listandstart_task->USERNAME->FldCaption() ?></div></div></td>
-	<?php } else { ?>
-		<td><div class="ewPointer" onclick="ew_Sort(event,'<?php echo $listandstart_task->SortUrl($listandstart_task->USERNAME) ?>',1);"><div id="elh_listandstart_task_USERNAME" class="listandstart_task_USERNAME">
-			<div class="ewTableHeaderBtn"><span class="ewTableHeaderCaption"><?php echo $listandstart_task->USERNAME->FldCaption() ?><?php echo $Language->Phrase("SrchLegend") ?></span><span class="ewTableHeaderSort"><?php if ($listandstart_task->USERNAME->getSort() == "ASC") { ?><span class="caret ewSortUp"></span><?php } elseif ($listandstart_task->USERNAME->getSort() == "DESC") { ?><span class="caret"></span><?php } ?></span></div>
-        </div></div></td>
-	<?php } ?>
-<?php } ?>		
 <?php if ($listandstart_task->PASSWORD->Visible) { // PASSWORD ?>
 	<?php if ($listandstart_task->SortUrl($listandstart_task->PASSWORD) == "") { ?>
 		<td><div id="elh_listandstart_task_PASSWORD" class="listandstart_task_PASSWORD"><div class="ewTableHeaderCaption"><?php echo $listandstart_task->PASSWORD->FldCaption() ?></div></div></td>
 	<?php } else { ?>
 		<td><div class="ewPointer" onclick="ew_Sort(event,'<?php echo $listandstart_task->SortUrl($listandstart_task->PASSWORD) ?>',1);"><div id="elh_listandstart_task_PASSWORD" class="listandstart_task_PASSWORD">
 			<div class="ewTableHeaderBtn"><span class="ewTableHeaderCaption"><?php echo $listandstart_task->PASSWORD->FldCaption() ?></span><span class="ewTableHeaderSort"><?php if ($listandstart_task->PASSWORD->getSort() == "ASC") { ?><span class="caret ewSortUp"></span><?php } elseif ($listandstart_task->PASSWORD->getSort() == "DESC") { ?><span class="caret"></span><?php } ?></span></div>
+        </div></div></td>
+	<?php } ?>
+<?php } ?>		
+<?php if ($listandstart_task->datetime->Visible) { // datetime ?>
+	<?php if ($listandstart_task->SortUrl($listandstart_task->datetime) == "") { ?>
+		<td><div id="elh_listandstart_task_datetime" class="listandstart_task_datetime"><div class="ewTableHeaderCaption"><?php echo $listandstart_task->datetime->FldCaption() ?></div></div></td>
+	<?php } else { ?>
+		<td><div class="ewPointer" onclick="ew_Sort(event,'<?php echo $listandstart_task->SortUrl($listandstart_task->datetime) ?>',1);"><div id="elh_listandstart_task_datetime" class="listandstart_task_datetime">
+			<div class="ewTableHeaderBtn"><span class="ewTableHeaderCaption"><?php echo $listandstart_task->datetime->FldCaption() ?></span><span class="ewTableHeaderSort"><?php if ($listandstart_task->datetime->getSort() == "ASC") { ?><span class="caret ewSortUp"></span><?php } elseif ($listandstart_task->datetime->getSort() == "DESC") { ?><span class="caret"></span><?php } ?></span></div>
+        </div></div></td>
+	<?php } ?>
+<?php } ?>		
+<?php if ($listandstart_task->DBUSERNAME->Visible) { // DBUSERNAME ?>
+	<?php if ($listandstart_task->SortUrl($listandstart_task->DBUSERNAME) == "") { ?>
+		<td><div id="elh_listandstart_task_DBUSERNAME" class="listandstart_task_DBUSERNAME"><div class="ewTableHeaderCaption"><?php echo $listandstart_task->DBUSERNAME->FldCaption() ?></div></div></td>
+	<?php } else { ?>
+		<td><div class="ewPointer" onclick="ew_Sort(event,'<?php echo $listandstart_task->SortUrl($listandstart_task->DBUSERNAME) ?>',1);"><div id="elh_listandstart_task_DBUSERNAME" class="listandstart_task_DBUSERNAME">
+			<div class="ewTableHeaderBtn"><span class="ewTableHeaderCaption"><?php echo $listandstart_task->DBUSERNAME->FldCaption() ?><?php echo $Language->Phrase("SrchLegend") ?></span><span class="ewTableHeaderSort"><?php if ($listandstart_task->DBUSERNAME->getSort() == "ASC") { ?><span class="caret ewSortUp"></span><?php } elseif ($listandstart_task->DBUSERNAME->getSort() == "DESC") { ?><span class="caret"></span><?php } ?></span></div>
+        </div></div></td>
+	<?php } ?>
+<?php } ?>		
+<?php if ($listandstart_task->username->Visible) { // username ?>
+	<?php if ($listandstart_task->SortUrl($listandstart_task->username) == "") { ?>
+		<td><div id="elh_listandstart_task_username" class="listandstart_task_username"><div class="ewTableHeaderCaption"><?php echo $listandstart_task->username->FldCaption() ?></div></div></td>
+	<?php } else { ?>
+		<td><div class="ewPointer" onclick="ew_Sort(event,'<?php echo $listandstart_task->SortUrl($listandstart_task->username) ?>',1);"><div id="elh_listandstart_task_username" class="listandstart_task_username">
+			<div class="ewTableHeaderBtn"><span class="ewTableHeaderCaption"><?php echo $listandstart_task->username->FldCaption() ?><?php echo $Language->Phrase("SrchLegend") ?></span><span class="ewTableHeaderSort"><?php if ($listandstart_task->username->getSort() == "ASC") { ?><span class="caret ewSortUp"></span><?php } elseif ($listandstart_task->username->getSort() == "DESC") { ?><span class="caret"></span><?php } ?></span></div>
         </div></div></td>
 	<?php } ?>
 <?php } ?>		
@@ -1859,16 +1906,28 @@ $listandstart_task_list->ListOptions->Render("body", "left", $listandstart_task_
 <?php echo $listandstart_task->HOSTNAME->ListViewValue() ?></span>
 <a id="<?php echo $listandstart_task_list->PageObjName . "_row_" . $listandstart_task_list->RowCnt ?>"></a></td>
 	<?php } ?>
-	<?php if ($listandstart_task->USERNAME->Visible) { // USERNAME ?>
-		<td<?php echo $listandstart_task->USERNAME->CellAttributes() ?>>
-<span<?php echo $listandstart_task->USERNAME->ViewAttributes() ?>>
-<?php echo $listandstart_task->USERNAME->ListViewValue() ?></span>
-<a id="<?php echo $listandstart_task_list->PageObjName . "_row_" . $listandstart_task_list->RowCnt ?>"></a></td>
-	<?php } ?>
 	<?php if ($listandstart_task->PASSWORD->Visible) { // PASSWORD ?>
 		<td<?php echo $listandstart_task->PASSWORD->CellAttributes() ?>>
 <span<?php echo $listandstart_task->PASSWORD->ViewAttributes() ?>>
 <?php echo $listandstart_task->PASSWORD->ListViewValue() ?></span>
+<a id="<?php echo $listandstart_task_list->PageObjName . "_row_" . $listandstart_task_list->RowCnt ?>"></a></td>
+	<?php } ?>
+	<?php if ($listandstart_task->datetime->Visible) { // datetime ?>
+		<td<?php echo $listandstart_task->datetime->CellAttributes() ?>>
+<span<?php echo $listandstart_task->datetime->ViewAttributes() ?>>
+<?php echo $listandstart_task->datetime->ListViewValue() ?></span>
+<a id="<?php echo $listandstart_task_list->PageObjName . "_row_" . $listandstart_task_list->RowCnt ?>"></a></td>
+	<?php } ?>
+	<?php if ($listandstart_task->DBUSERNAME->Visible) { // DBUSERNAME ?>
+		<td<?php echo $listandstart_task->DBUSERNAME->CellAttributes() ?>>
+<span<?php echo $listandstart_task->DBUSERNAME->ViewAttributes() ?>>
+<?php echo $listandstart_task->DBUSERNAME->ListViewValue() ?></span>
+<a id="<?php echo $listandstart_task_list->PageObjName . "_row_" . $listandstart_task_list->RowCnt ?>"></a></td>
+	<?php } ?>
+	<?php if ($listandstart_task->username->Visible) { // username ?>
+		<td<?php echo $listandstart_task->username->CellAttributes() ?>>
+<span<?php echo $listandstart_task->username->ViewAttributes() ?>>
+<?php echo $listandstart_task->username->ListViewValue() ?></span>
 <a id="<?php echo $listandstart_task_list->PageObjName . "_row_" . $listandstart_task_list->RowCnt ?>"></a></td>
 	<?php } ?>
 <?php

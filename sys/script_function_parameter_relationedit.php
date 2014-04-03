@@ -5,7 +5,7 @@ ob_start(); // Turn on output buffering
 <?php include_once "ewcfg10.php" ?>
 <?php include_once "ewmysql10.php" ?>
 <?php include_once "phpfn10.php" ?>
-<?php include_once "stop_taskinfo.php" ?>
+<?php include_once "script_function_parameter_relationinfo.php" ?>
 <?php include_once "_logininfo.php" ?>
 <?php include_once "userfn10.php" ?>
 <?php
@@ -14,9 +14,9 @@ ob_start(); // Turn on output buffering
 // Page class
 //
 
-$stop_task_edit = NULL; // Initialize page object first
+$script_function_parameter_relation_edit = NULL; // Initialize page object first
 
-class cstop_task_edit extends cstop_task {
+class cscript_function_parameter_relation_edit extends cscript_function_parameter_relation {
 
 	// Page ID
 	var $PageID = 'edit';
@@ -25,10 +25,10 @@ class cstop_task_edit extends cstop_task {
 	var $ProjectID = "{3246B9FA-4C51-4733-8040-34B188FCD87E}";
 
 	// Table name
-	var $TableName = 'stop_task';
+	var $TableName = 'script_function_parameter_relation';
 
 	// Page object name
-	var $PageObjName = 'stop_task_edit';
+	var $PageObjName = 'script_function_parameter_relation_edit';
 
 	// Page name
 	function PageName() {
@@ -171,10 +171,10 @@ class cstop_task_edit extends cstop_task {
 		// Parent constuctor
 		parent::__construct();
 
-		// Table object (stop_task)
-		if (!isset($GLOBALS["stop_task"])) {
-			$GLOBALS["stop_task"] = &$this;
-			$GLOBALS["Table"] = &$GLOBALS["stop_task"];
+		// Table object (script_function_parameter_relation)
+		if (!isset($GLOBALS["script_function_parameter_relation"])) {
+			$GLOBALS["script_function_parameter_relation"] = &$this;
+			$GLOBALS["Table"] = &$GLOBALS["script_function_parameter_relation"];
 		}
 
 		// Table object (_login)
@@ -186,7 +186,7 @@ class cstop_task_edit extends cstop_task {
 
 		// Table name (for backward compatibility)
 		if (!defined("EW_TABLE_NAME"))
-			define("EW_TABLE_NAME", 'stop_task', TRUE);
+			define("EW_TABLE_NAME", 'script_function_parameter_relation', TRUE);
 
 		// Start timer
 		if (!isset($GLOBALS["gTimer"])) $GLOBALS["gTimer"] = new cTimer();
@@ -218,7 +218,7 @@ class cstop_task_edit extends cstop_task {
 		if (!$Security->CanEdit()) {
 			$Security->SaveLastUrl();
 			$this->setFailureMessage($Language->Phrase("NoPermission")); // Set no permission
-			$this->Page_Terminate("stop_tasklist.php");
+			$this->Page_Terminate("script_function_parameter_relationlist.php");
 		}
 		$Security->UserID_Loading();
 		if ($Security->IsLoggedIn()) $Security->LoadUserID();
@@ -227,7 +227,7 @@ class cstop_task_edit extends cstop_task {
 		// Create form object
 		$objForm = new cFormObj();
 		$this->CurrentAction = (@$_GET["a"] <> "") ? $_GET["a"] : @$_POST["a_list"]; // Set up curent action
-		$this->id->Visible = !$this->IsAdd() && !$this->IsCopy() && !$this->IsGridAdd();
+		$this->script_function_parameter_relation->Visible = !$this->IsAdd() && !$this->IsCopy() && !$this->IsGridAdd();
 
 		// Global Page Loading event (in userfn*.php)
 		Page_Loading();
@@ -284,9 +284,9 @@ class cstop_task_edit extends cstop_task {
 		$bMatchRecord = FALSE;
 
 		// Load key from QueryString
-		if (@$_GET["id"] <> "") {
-			$this->id->setQueryStringValue($_GET["id"]);
-			$this->RecKey["id"] = $this->id->QueryStringValue;
+		if (@$_GET["script_function_parameter_relation"] <> "") {
+			$this->script_function_parameter_relation->setQueryStringValue($_GET["script_function_parameter_relation"]);
+			$this->RecKey["script_function_parameter_relation"] = $this->script_function_parameter_relation->QueryStringValue;
 		} else {
 			$bLoadCurrentRecord = TRUE;
 		}
@@ -301,7 +301,7 @@ class cstop_task_edit extends cstop_task {
 		if ($this->TotalRecs <= 0) { // No record found
 			if ($this->getSuccessMessage() == "" && $this->getFailureMessage() == "")
 				$this->setFailureMessage($Language->Phrase("NoRecord")); // Set no record message
-			$this->Page_Terminate("stop_tasklist.php"); // Return to list page
+			$this->Page_Terminate("script_function_parameter_relationlist.php"); // Return to list page
 		} elseif ($bLoadCurrentRecord) { // Load current record position
 			$this->SetUpStartRec(); // Set up start record position
 
@@ -312,7 +312,7 @@ class cstop_task_edit extends cstop_task {
 			}
 		} else { // Match key values
 			while (!$this->Recordset->EOF) {
-				if (strval($this->id->CurrentValue) == strval($this->Recordset->fields('id'))) {
+				if (strval($this->script_function_parameter_relation->CurrentValue) == strval($this->Recordset->fields('script_function_parameter_relation'))) {
 					$this->setStartRecordNumber($this->StartRec); // Save record position
 					$bMatchRecord = TRUE;
 					break;
@@ -345,7 +345,7 @@ class cstop_task_edit extends cstop_task {
 				if (!$bMatchRecord) {
 					if ($this->getSuccessMessage() == "" && $this->getFailureMessage() == "")
 						$this->setFailureMessage($Language->Phrase("NoRecord")); // Set no record message
-					$this->Page_Terminate("stop_tasklist.php"); // Return to list page
+					$this->Page_Terminate("script_function_parameter_relationlist.php"); // Return to list page
 				} else {
 					$this->LoadRowValues($this->Recordset); // Load row values
 				}
@@ -356,7 +356,7 @@ class cstop_task_edit extends cstop_task {
 					if ($this->getSuccessMessage() == "")
 						$this->setSuccessMessage($Language->Phrase("UpdateSuccess")); // Update success
 					$sReturnUrl = $this->getReturnUrl();
-					if (ew_GetPageName($sReturnUrl) == "stop_taskview.php")
+					if (ew_GetPageName($sReturnUrl) == "script_function_parameter_relationview.php")
 						$sReturnUrl = $this->GetViewUrl(); // View paging, return to View page directly
 					$this->Page_Terminate($sReturnUrl); // Return to caller
 				} else {
@@ -419,17 +419,13 @@ class cstop_task_edit extends cstop_task {
 
 		// Load from form
 		global $objForm;
-		if (!$this->id->FldIsDetailKey)
-			$this->id->setFormValue($objForm->GetValue("x_id"));
-		if (!$this->server_id_mysqladmin->FldIsDetailKey) {
-			$this->server_id_mysqladmin->setFormValue($objForm->GetValue("x_server_id_mysqladmin"));
+		if (!$this->script_function_parameter_relation->FldIsDetailKey)
+			$this->script_function_parameter_relation->setFormValue($objForm->GetValue("x_script_function_parameter_relation"));
+		if (!$this->parameter_id->FldIsDetailKey) {
+			$this->parameter_id->setFormValue($objForm->GetValue("x_parameter_id"));
 		}
-		if (!$this->datetime->FldIsDetailKey) {
-			$this->datetime->setFormValue($objForm->GetValue("x_datetime"));
-			$this->datetime->CurrentValue = ew_UnFormatDateTime($this->datetime->CurrentValue, 0);
-		}
-		if (!$this->username->FldIsDetailKey) {
-			$this->username->setFormValue($objForm->GetValue("x_username"));
+		if (!$this->script_function_id->FldIsDetailKey) {
+			$this->script_function_id->setFormValue($objForm->GetValue("x_script_function_id"));
 		}
 	}
 
@@ -437,11 +433,9 @@ class cstop_task_edit extends cstop_task {
 	function RestoreFormValues() {
 		global $objForm;
 		$this->LoadRow();
-		$this->id->CurrentValue = $this->id->FormValue;
-		$this->server_id_mysqladmin->CurrentValue = $this->server_id_mysqladmin->FormValue;
-		$this->datetime->CurrentValue = $this->datetime->FormValue;
-		$this->datetime->CurrentValue = ew_UnFormatDateTime($this->datetime->CurrentValue, 0);
-		$this->username->CurrentValue = $this->username->FormValue;
+		$this->script_function_parameter_relation->CurrentValue = $this->script_function_parameter_relation->FormValue;
+		$this->parameter_id->CurrentValue = $this->parameter_id->FormValue;
+		$this->script_function_id->CurrentValue = $this->script_function_id->FormValue;
 	}
 
 	// Load recordset
@@ -493,20 +487,18 @@ class cstop_task_edit extends cstop_task {
 		// Call Row Selected event
 		$row = &$rs->fields;
 		$this->Row_Selected($row);
-		$this->id->setDbValue($rs->fields('id'));
-		$this->server_id_mysqladmin->setDbValue($rs->fields('server_id_mysqladmin'));
-		$this->datetime->setDbValue($rs->fields('datetime'));
-		$this->username->setDbValue($rs->fields('username'));
+		$this->script_function_parameter_relation->setDbValue($rs->fields('script_function_parameter_relation'));
+		$this->parameter_id->setDbValue($rs->fields('parameter_id'));
+		$this->script_function_id->setDbValue($rs->fields('script_function_id'));
 	}
 
 	// Load DbValue from recordset
 	function LoadDbValues(&$rs) {
 		if (!$rs || !is_array($rs) && $rs->EOF) return;
 		$row = is_array($rs) ? $rs : $rs->fields;
-		$this->id->DbValue = $row['id'];
-		$this->server_id_mysqladmin->DbValue = $row['server_id_mysqladmin'];
-		$this->datetime->DbValue = $row['datetime'];
-		$this->username->DbValue = $row['username'];
+		$this->script_function_parameter_relation->DbValue = $row['script_function_parameter_relation'];
+		$this->parameter_id->DbValue = $row['parameter_id'];
+		$this->script_function_id->DbValue = $row['script_function_id'];
 	}
 
 	// Render row values based on field settings
@@ -520,83 +512,139 @@ class cstop_task_edit extends cstop_task {
 		$this->Row_Rendering();
 
 		// Common render codes for all row types
-		// id
-		// server_id_mysqladmin
-		// datetime
-		// username
+		// script_function_parameter_relation
+		// parameter_id
+		// script_function_id
 
 		if ($this->RowType == EW_ROWTYPE_VIEW) { // View row
 
-			// id
-			$this->id->ViewValue = $this->id->CurrentValue;
-			$this->id->ViewCustomAttributes = "";
+			// script_function_parameter_relation
+			$this->script_function_parameter_relation->ViewValue = $this->script_function_parameter_relation->CurrentValue;
+			$this->script_function_parameter_relation->ViewCustomAttributes = "";
 
-			// server_id_mysqladmin
-			$this->server_id_mysqladmin->ViewValue = $this->server_id_mysqladmin->CurrentValue;
-			$this->server_id_mysqladmin->ViewCustomAttributes = "";
+			// parameter_id
+			if (strval($this->parameter_id->CurrentValue) <> "") {
+				$sFilterWrk = "`parameter_id`" . ew_SearchString("=", $this->parameter_id->CurrentValue, EW_DATATYPE_NUMBER);
+			$sSqlWrk = "SELECT `parameter_id`, `parameter_name` AS `DispFld`, '' AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld` FROM `parameter`";
+			$sWhereWrk = "";
+			if ($sFilterWrk <> "") {
+				ew_AddFilter($sWhereWrk, $sFilterWrk);
+			}
 
-			// datetime
-			$this->datetime->ViewValue = $this->datetime->CurrentValue;
-			$this->datetime->ViewCustomAttributes = "";
+			// Call Lookup selecting
+			$this->Lookup_Selecting($this->parameter_id, $sWhereWrk);
+			if ($sWhereWrk <> "") $sSqlWrk .= " WHERE " . $sWhereWrk;
+				$rswrk = $conn->Execute($sSqlWrk);
+				if ($rswrk && !$rswrk->EOF) { // Lookup values found
+					$this->parameter_id->ViewValue = $rswrk->fields('DispFld');
+					$rswrk->Close();
+				} else {
+					$this->parameter_id->ViewValue = $this->parameter_id->CurrentValue;
+				}
+			} else {
+				$this->parameter_id->ViewValue = NULL;
+			}
+			$this->parameter_id->ViewCustomAttributes = "";
 
-			// username
-			$this->username->ViewValue = $this->username->CurrentValue;
-			$this->username->ViewCustomAttributes = "";
+			// script_function_id
+			if (strval($this->script_function_id->CurrentValue) <> "") {
+				$sFilterWrk = "`script_function_id`" . ew_SearchString("=", $this->script_function_id->CurrentValue, EW_DATATYPE_NUMBER);
+			$sSqlWrk = "SELECT `script_function_id`, `script_function_name` AS `DispFld`, '' AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld` FROM `script_function`";
+			$sWhereWrk = "";
+			if ($sFilterWrk <> "") {
+				ew_AddFilter($sWhereWrk, $sFilterWrk);
+			}
 
-			// id
-			$this->id->LinkCustomAttributes = "";
-			$this->id->HrefValue = "";
-			$this->id->TooltipValue = "";
+			// Call Lookup selecting
+			$this->Lookup_Selecting($this->script_function_id, $sWhereWrk);
+			if ($sWhereWrk <> "") $sSqlWrk .= " WHERE " . $sWhereWrk;
+				$rswrk = $conn->Execute($sSqlWrk);
+				if ($rswrk && !$rswrk->EOF) { // Lookup values found
+					$this->script_function_id->ViewValue = $rswrk->fields('DispFld');
+					$rswrk->Close();
+				} else {
+					$this->script_function_id->ViewValue = $this->script_function_id->CurrentValue;
+				}
+			} else {
+				$this->script_function_id->ViewValue = NULL;
+			}
+			$this->script_function_id->ViewCustomAttributes = "";
 
-			// server_id_mysqladmin
-			$this->server_id_mysqladmin->LinkCustomAttributes = "";
-			$this->server_id_mysqladmin->HrefValue = "";
-			$this->server_id_mysqladmin->TooltipValue = "";
+			// script_function_parameter_relation
+			$this->script_function_parameter_relation->LinkCustomAttributes = "";
+			$this->script_function_parameter_relation->HrefValue = "";
+			$this->script_function_parameter_relation->TooltipValue = "";
 
-			// datetime
-			$this->datetime->LinkCustomAttributes = "";
-			$this->datetime->HrefValue = "";
-			$this->datetime->TooltipValue = "";
+			// parameter_id
+			$this->parameter_id->LinkCustomAttributes = "";
+			$this->parameter_id->HrefValue = "";
+			$this->parameter_id->TooltipValue = "";
 
-			// username
-			$this->username->LinkCustomAttributes = "";
-			$this->username->HrefValue = "";
-			$this->username->TooltipValue = "";
+			// script_function_id
+			$this->script_function_id->LinkCustomAttributes = "";
+			$this->script_function_id->HrefValue = "";
+			$this->script_function_id->TooltipValue = "";
 		} elseif ($this->RowType == EW_ROWTYPE_EDIT) { // Edit row
 
-			// id
-			$this->id->EditCustomAttributes = "";
-			$this->id->EditValue = $this->id->CurrentValue;
-			$this->id->ViewCustomAttributes = "";
+			// script_function_parameter_relation
+			$this->script_function_parameter_relation->EditCustomAttributes = "";
+			$this->script_function_parameter_relation->EditValue = $this->script_function_parameter_relation->CurrentValue;
+			$this->script_function_parameter_relation->ViewCustomAttributes = "";
 
-			// server_id_mysqladmin
-			$this->server_id_mysqladmin->EditCustomAttributes = "";
-			$this->server_id_mysqladmin->EditValue = ew_HtmlEncode($this->server_id_mysqladmin->CurrentValue);
-			$this->server_id_mysqladmin->PlaceHolder = ew_HtmlEncode(ew_RemoveHtml($this->server_id_mysqladmin->FldCaption()));
+			// parameter_id
+			$this->parameter_id->EditCustomAttributes = "";
+			if (trim(strval($this->parameter_id->CurrentValue)) == "") {
+				$sFilterWrk = "0=1";
+			} else {
+				$sFilterWrk = "`parameter_id`" . ew_SearchString("=", $this->parameter_id->CurrentValue, EW_DATATYPE_NUMBER);
+			}
+			$sSqlWrk = "SELECT `parameter_id`, `parameter_name` AS `DispFld`, '' AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld`, '' AS `SelectFilterFld`, '' AS `SelectFilterFld2`, '' AS `SelectFilterFld3`, '' AS `SelectFilterFld4` FROM `parameter`";
+			$sWhereWrk = "";
+			if ($sFilterWrk <> "") {
+				ew_AddFilter($sWhereWrk, $sFilterWrk);
+			}
 
-			// datetime
-			$this->datetime->EditCustomAttributes = "";
-			$this->datetime->EditValue = ew_HtmlEncode($this->datetime->CurrentValue);
-			$this->datetime->PlaceHolder = ew_HtmlEncode(ew_RemoveHtml($this->datetime->FldCaption()));
+			// Call Lookup selecting
+			$this->Lookup_Selecting($this->parameter_id, $sWhereWrk);
+			if ($sWhereWrk <> "") $sSqlWrk .= " WHERE " . $sWhereWrk;
+			$rswrk = $conn->Execute($sSqlWrk);
+			$arwrk = ($rswrk) ? $rswrk->GetRows() : array();
+			if ($rswrk) $rswrk->Close();
+			array_unshift($arwrk, array("", $Language->Phrase("PleaseSelect"), "", "", "", "", "", "", ""));
+			$this->parameter_id->EditValue = $arwrk;
 
-			// username
-			$this->username->EditCustomAttributes = "";
-			$this->username->EditValue = ew_HtmlEncode($this->username->CurrentValue);
-			$this->username->PlaceHolder = ew_HtmlEncode(ew_RemoveHtml($this->username->FldCaption()));
+			// script_function_id
+			$this->script_function_id->EditCustomAttributes = "";
+			if (trim(strval($this->script_function_id->CurrentValue)) == "") {
+				$sFilterWrk = "0=1";
+			} else {
+				$sFilterWrk = "`script_function_id`" . ew_SearchString("=", $this->script_function_id->CurrentValue, EW_DATATYPE_NUMBER);
+			}
+			$sSqlWrk = "SELECT `script_function_id`, `script_function_name` AS `DispFld`, '' AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld`, '' AS `SelectFilterFld`, '' AS `SelectFilterFld2`, '' AS `SelectFilterFld3`, '' AS `SelectFilterFld4` FROM `script_function`";
+			$sWhereWrk = "";
+			if ($sFilterWrk <> "") {
+				ew_AddFilter($sWhereWrk, $sFilterWrk);
+			}
+
+			// Call Lookup selecting
+			$this->Lookup_Selecting($this->script_function_id, $sWhereWrk);
+			if ($sWhereWrk <> "") $sSqlWrk .= " WHERE " . $sWhereWrk;
+			$rswrk = $conn->Execute($sSqlWrk);
+			$arwrk = ($rswrk) ? $rswrk->GetRows() : array();
+			if ($rswrk) $rswrk->Close();
+			array_unshift($arwrk, array("", $Language->Phrase("PleaseSelect"), "", "", "", "", "", "", ""));
+			$this->script_function_id->EditValue = $arwrk;
 
 			// Edit refer script
-			// id
+			// script_function_parameter_relation
 
-			$this->id->HrefValue = "";
+			$this->script_function_parameter_relation->HrefValue = "";
 
-			// server_id_mysqladmin
-			$this->server_id_mysqladmin->HrefValue = "";
+			// parameter_id
+			$this->parameter_id->HrefValue = "";
 
-			// datetime
-			$this->datetime->HrefValue = "";
-
-			// username
-			$this->username->HrefValue = "";
+			// script_function_id
+			$this->script_function_id->HrefValue = "";
 		}
 		if ($this->RowType == EW_ROWTYPE_ADD ||
 			$this->RowType == EW_ROWTYPE_EDIT ||
@@ -619,15 +667,6 @@ class cstop_task_edit extends cstop_task {
 		// Check if validation required
 		if (!EW_SERVER_VALIDATE)
 			return ($gsFormError == "");
-		if (!$this->server_id_mysqladmin->FldIsDetailKey && !is_null($this->server_id_mysqladmin->FormValue) && $this->server_id_mysqladmin->FormValue == "") {
-			ew_AddMessage($gsFormError, $Language->Phrase("EnterRequiredField") . " - " . $this->server_id_mysqladmin->FldCaption());
-		}
-		if (!$this->datetime->FldIsDetailKey && !is_null($this->datetime->FormValue) && $this->datetime->FormValue == "") {
-			ew_AddMessage($gsFormError, $Language->Phrase("EnterRequiredField") . " - " . $this->datetime->FldCaption());
-		}
-		if (!$this->username->FldIsDetailKey && !is_null($this->username->FormValue) && $this->username->FormValue == "") {
-			ew_AddMessage($gsFormError, $Language->Phrase("EnterRequiredField") . " - " . $this->username->FldCaption());
-		}
 
 		// Return validate result
 		$ValidateForm = ($gsFormError == "");
@@ -661,14 +700,11 @@ class cstop_task_edit extends cstop_task {
 			$this->LoadDbValues($rsold);
 			$rsnew = array();
 
-			// server_id_mysqladmin
-			$this->server_id_mysqladmin->SetDbValueDef($rsnew, $this->server_id_mysqladmin->CurrentValue, "", $this->server_id_mysqladmin->ReadOnly);
+			// parameter_id
+			$this->parameter_id->SetDbValueDef($rsnew, $this->parameter_id->CurrentValue, NULL, $this->parameter_id->ReadOnly);
 
-			// datetime
-			$this->datetime->SetDbValueDef($rsnew, $this->datetime->CurrentValue, ew_CurrentDate(), $this->datetime->ReadOnly);
-
-			// username
-			$this->username->SetDbValueDef($rsnew, $this->username->CurrentValue, "", $this->username->ReadOnly);
+			// script_function_id
+			$this->script_function_id->SetDbValueDef($rsnew, $this->script_function_id->CurrentValue, NULL, $this->script_function_id->ReadOnly);
 
 			// Call Row Updating event
 			$bUpdateRow = $this->Row_Updating($rsold, $rsnew);
@@ -707,7 +743,7 @@ class cstop_task_edit extends cstop_task {
 		global $Breadcrumb, $Language;
 		$Breadcrumb = new cBreadcrumb();
 		$PageCaption = $this->TableCaption();
-		$Breadcrumb->Add("list", "<span id=\"ewPageCaption\">" . $PageCaption . "</span>", "stop_tasklist.php", $this->TableVar);
+		$Breadcrumb->Add("list", "<span id=\"ewPageCaption\">" . $PageCaption . "</span>", "script_function_parameter_relationlist.php", $this->TableVar);
 		$PageCaption = $Language->Phrase("edit");
 		$Breadcrumb->Add("edit", "<span id=\"ewPageCaption\">" . $PageCaption . "</span>", ew_CurrentUrl(), $this->TableVar);
 	}
@@ -784,33 +820,33 @@ class cstop_task_edit extends cstop_task {
 <?php
 
 // Create page object
-if (!isset($stop_task_edit)) $stop_task_edit = new cstop_task_edit();
+if (!isset($script_function_parameter_relation_edit)) $script_function_parameter_relation_edit = new cscript_function_parameter_relation_edit();
 
 // Page init
-$stop_task_edit->Page_Init();
+$script_function_parameter_relation_edit->Page_Init();
 
 // Page main
-$stop_task_edit->Page_Main();
+$script_function_parameter_relation_edit->Page_Main();
 
 // Global Page Rendering event (in userfn*.php)
 Page_Rendering();
 
 // Page Rendering event
-$stop_task_edit->Page_Render();
+$script_function_parameter_relation_edit->Page_Render();
 ?>
 <?php include_once "header.php" ?>
 <script type="text/javascript">
 
 // Page object
-var stop_task_edit = new ew_Page("stop_task_edit");
-stop_task_edit.PageID = "edit"; // Page ID
-var EW_PAGE_ID = stop_task_edit.PageID; // For backward compatibility
+var script_function_parameter_relation_edit = new ew_Page("script_function_parameter_relation_edit");
+script_function_parameter_relation_edit.PageID = "edit"; // Page ID
+var EW_PAGE_ID = script_function_parameter_relation_edit.PageID; // For backward compatibility
 
 // Form object
-var fstop_taskedit = new ew_Form("fstop_taskedit");
+var fscript_function_parameter_relationedit = new ew_Form("fscript_function_parameter_relationedit");
 
 // Validate form
-fstop_taskedit.Validate = function() {
+fscript_function_parameter_relationedit.Validate = function() {
 	if (!this.ValidateRequired)
 		return true; // Ignore validation
 	var $ = jQuery, fobj = this.GetForm(), $fobj = $(fobj);
@@ -825,15 +861,6 @@ fstop_taskedit.Validate = function() {
 	for (var i = startcnt; i <= rowcnt; i++) {
 		var infix = ($k[0]) ? String(i) : "";
 		$fobj.data("rowindex", infix);
-			elm = this.GetElements("x" + infix + "_server_id_mysqladmin");
-			if (elm && !ew_HasValue(elm))
-				return this.OnError(elm, ewLanguage.Phrase("EnterRequiredField") + " - <?php echo ew_JsEncode2($stop_task->server_id_mysqladmin->FldCaption()) ?>");
-			elm = this.GetElements("x" + infix + "_datetime");
-			if (elm && !ew_HasValue(elm))
-				return this.OnError(elm, ewLanguage.Phrase("EnterRequiredField") + " - <?php echo ew_JsEncode2($stop_task->datetime->FldCaption()) ?>");
-			elm = this.GetElements("x" + infix + "_username");
-			if (elm && !ew_HasValue(elm))
-				return this.OnError(elm, ewLanguage.Phrase("EnterRequiredField") + " - <?php echo ew_JsEncode2($stop_task->username->FldCaption()) ?>");
 
 			// Set up row object
 			ew_ElementsToRow(fobj);
@@ -855,7 +882,7 @@ fstop_taskedit.Validate = function() {
 }
 
 // Form_CustomValidate event
-fstop_taskedit.Form_CustomValidate = 
+fscript_function_parameter_relationedit.Form_CustomValidate = 
  function(fobj) { // DO NOT CHANGE THIS LINE!
 
  	// Your custom validation code here, return false if invalid. 
@@ -864,45 +891,47 @@ fstop_taskedit.Form_CustomValidate =
 
 // Use JavaScript validation or not
 <?php if (EW_CLIENT_VALIDATE) { ?>
-fstop_taskedit.ValidateRequired = true;
+fscript_function_parameter_relationedit.ValidateRequired = true;
 <?php } else { ?>
-fstop_taskedit.ValidateRequired = false; 
+fscript_function_parameter_relationedit.ValidateRequired = false; 
 <?php } ?>
 
 // Dynamic selection lists
-// Form object for search
+fscript_function_parameter_relationedit.Lists["x_parameter_id"] = {"LinkField":"x_parameter_id","Ajax":true,"AutoFill":false,"DisplayFields":["x_parameter_name","","",""],"ParentFields":[],"FilterFields":[],"Options":[]};
+fscript_function_parameter_relationedit.Lists["x_script_function_id"] = {"LinkField":"x_script_function_id","Ajax":true,"AutoFill":false,"DisplayFields":["x_script_function_name","","",""],"ParentFields":[],"FilterFields":[],"Options":[]};
 
+// Form object for search
 </script>
 <script type="text/javascript">
 
 // Write your client script here, no need to add script tags.
 </script>
 <?php $Breadcrumb->Render(); ?>
-<?php $stop_task_edit->ShowPageHeader(); ?>
+<?php $script_function_parameter_relation_edit->ShowPageHeader(); ?>
 <?php
-$stop_task_edit->ShowMessage();
+$script_function_parameter_relation_edit->ShowMessage();
 ?>
 <form name="ewPagerForm" class="ewForm form-horizontal" action="<?php echo ew_CurrentPage() ?>">
 <table class="ewPager">
 <tr><td>
-<?php if (!isset($stop_task_edit->Pager)) $stop_task_edit->Pager = new cNumericPager($stop_task_edit->StartRec, $stop_task_edit->DisplayRecs, $stop_task_edit->TotalRecs, $stop_task_edit->RecRange) ?>
-<?php if ($stop_task_edit->Pager->RecordCount > 0) { ?>
+<?php if (!isset($script_function_parameter_relation_edit->Pager)) $script_function_parameter_relation_edit->Pager = new cNumericPager($script_function_parameter_relation_edit->StartRec, $script_function_parameter_relation_edit->DisplayRecs, $script_function_parameter_relation_edit->TotalRecs, $script_function_parameter_relation_edit->RecRange) ?>
+<?php if ($script_function_parameter_relation_edit->Pager->RecordCount > 0) { ?>
 <table cellspacing="0" class="ewStdTable"><tbody><tr><td>
 <div class="pagination"><ul>
-	<?php if ($stop_task_edit->Pager->FirstButton->Enabled) { ?>
-	<li><a href="<?php echo $stop_task_edit->PageUrl() ?>start=<?php echo $stop_task_edit->Pager->FirstButton->Start ?>"><?php echo $Language->Phrase("PagerFirst") ?></a></li>
+	<?php if ($script_function_parameter_relation_edit->Pager->FirstButton->Enabled) { ?>
+	<li><a href="<?php echo $script_function_parameter_relation_edit->PageUrl() ?>start=<?php echo $script_function_parameter_relation_edit->Pager->FirstButton->Start ?>"><?php echo $Language->Phrase("PagerFirst") ?></a></li>
 	<?php } ?>
-	<?php if ($stop_task_edit->Pager->PrevButton->Enabled) { ?>
-	<li><a href="<?php echo $stop_task_edit->PageUrl() ?>start=<?php echo $stop_task_edit->Pager->PrevButton->Start ?>"><?php echo $Language->Phrase("PagerPrevious") ?></a></li>
+	<?php if ($script_function_parameter_relation_edit->Pager->PrevButton->Enabled) { ?>
+	<li><a href="<?php echo $script_function_parameter_relation_edit->PageUrl() ?>start=<?php echo $script_function_parameter_relation_edit->Pager->PrevButton->Start ?>"><?php echo $Language->Phrase("PagerPrevious") ?></a></li>
 	<?php } ?>
-	<?php foreach ($stop_task_edit->Pager->Items as $PagerItem) { ?>
-		<li<?php if (!$PagerItem->Enabled) { echo " class=\" active\""; } ?>><a href="<?php if ($PagerItem->Enabled) { echo $stop_task_edit->PageUrl() . "start=" . $PagerItem->Start; } else { echo "#"; } ?>"><?php echo $PagerItem->Text ?></a></li>
+	<?php foreach ($script_function_parameter_relation_edit->Pager->Items as $PagerItem) { ?>
+		<li<?php if (!$PagerItem->Enabled) { echo " class=\" active\""; } ?>><a href="<?php if ($PagerItem->Enabled) { echo $script_function_parameter_relation_edit->PageUrl() . "start=" . $PagerItem->Start; } else { echo "#"; } ?>"><?php echo $PagerItem->Text ?></a></li>
 	<?php } ?>
-	<?php if ($stop_task_edit->Pager->NextButton->Enabled) { ?>
-	<li><a href="<?php echo $stop_task_edit->PageUrl() ?>start=<?php echo $stop_task_edit->Pager->NextButton->Start ?>"><?php echo $Language->Phrase("PagerNext") ?></a></li>
+	<?php if ($script_function_parameter_relation_edit->Pager->NextButton->Enabled) { ?>
+	<li><a href="<?php echo $script_function_parameter_relation_edit->PageUrl() ?>start=<?php echo $script_function_parameter_relation_edit->Pager->NextButton->Start ?>"><?php echo $Language->Phrase("PagerNext") ?></a></li>
 	<?php } ?>
-	<?php if ($stop_task_edit->Pager->LastButton->Enabled) { ?>
-	<li><a href="<?php echo $stop_task_edit->PageUrl() ?>start=<?php echo $stop_task_edit->Pager->LastButton->Start ?>"><?php echo $Language->Phrase("PagerLast") ?></a></li>
+	<?php if ($script_function_parameter_relation_edit->Pager->LastButton->Enabled) { ?>
+	<li><a href="<?php echo $script_function_parameter_relation_edit->PageUrl() ?>start=<?php echo $script_function_parameter_relation_edit->Pager->LastButton->Start ?>"><?php echo $Language->Phrase("PagerLast") ?></a></li>
 	<?php } ?>
 </ul></div>
 </td>
@@ -913,75 +942,117 @@ $stop_task_edit->ShowMessage();
 </td>
 </tr></table>
 </form>
-<form name="fstop_taskedit" id="fstop_taskedit" class="ewForm form-horizontal" action="<?php echo ew_CurrentPage() ?>" method="post">
-<input type="hidden" name="t" value="stop_task">
+<form name="fscript_function_parameter_relationedit" id="fscript_function_parameter_relationedit" class="ewForm form-horizontal" action="<?php echo ew_CurrentPage() ?>" method="post">
+<input type="hidden" name="t" value="script_function_parameter_relation">
 <input type="hidden" name="a_edit" id="a_edit" value="U">
 <table cellspacing="0" class="ewGrid"><tr><td>
-<table id="tbl_stop_taskedit" class="table table-bordered table-striped">
-<?php if ($stop_task->id->Visible) { // id ?>
-	<tr id="r_id">
-		<td><span id="elh_stop_task_id"><?php echo $stop_task->id->FldCaption() ?></span></td>
-		<td<?php echo $stop_task->id->CellAttributes() ?>>
-<span id="el_stop_task_id" class="control-group">
-<span<?php echo $stop_task->id->ViewAttributes() ?>>
-<?php echo $stop_task->id->EditValue ?></span>
+<table id="tbl_script_function_parameter_relationedit" class="table table-bordered table-striped">
+<?php if ($script_function_parameter_relation->script_function_parameter_relation->Visible) { // script_function_parameter_relation ?>
+	<tr id="r_script_function_parameter_relation">
+		<td><span id="elh_script_function_parameter_relation_script_function_parameter_relation"><?php echo $script_function_parameter_relation->script_function_parameter_relation->FldCaption() ?></span></td>
+		<td<?php echo $script_function_parameter_relation->script_function_parameter_relation->CellAttributes() ?>>
+<span id="el_script_function_parameter_relation_script_function_parameter_relation" class="control-group">
+<span<?php echo $script_function_parameter_relation->script_function_parameter_relation->ViewAttributes() ?>>
+<?php echo $script_function_parameter_relation->script_function_parameter_relation->EditValue ?></span>
 </span>
-<input type="hidden" data-field="x_id" name="x_id" id="x_id" value="<?php echo ew_HtmlEncode($stop_task->id->CurrentValue) ?>">
-<?php echo $stop_task->id->CustomMsg ?></td>
+<input type="hidden" data-field="x_script_function_parameter_relation" name="x_script_function_parameter_relation" id="x_script_function_parameter_relation" value="<?php echo ew_HtmlEncode($script_function_parameter_relation->script_function_parameter_relation->CurrentValue) ?>">
+<?php echo $script_function_parameter_relation->script_function_parameter_relation->CustomMsg ?></td>
 	</tr>
 <?php } ?>
-<?php if ($stop_task->server_id_mysqladmin->Visible) { // server_id_mysqladmin ?>
-	<tr id="r_server_id_mysqladmin">
-		<td><span id="elh_stop_task_server_id_mysqladmin"><?php echo $stop_task->server_id_mysqladmin->FldCaption() ?><?php echo $Language->Phrase("FieldRequiredIndicator") ?></span></td>
-		<td<?php echo $stop_task->server_id_mysqladmin->CellAttributes() ?>>
-<span id="el_stop_task_server_id_mysqladmin" class="control-group">
-<input type="text" data-field="x_server_id_mysqladmin" name="x_server_id_mysqladmin" id="x_server_id_mysqladmin" size="30" maxlength="255" placeholder="<?php echo $stop_task->server_id_mysqladmin->PlaceHolder ?>" value="<?php echo $stop_task->server_id_mysqladmin->EditValue ?>"<?php echo $stop_task->server_id_mysqladmin->EditAttributes() ?>>
+<?php if ($script_function_parameter_relation->parameter_id->Visible) { // parameter_id ?>
+	<tr id="r_parameter_id">
+		<td><span id="elh_script_function_parameter_relation_parameter_id"><?php echo $script_function_parameter_relation->parameter_id->FldCaption() ?></span></td>
+		<td<?php echo $script_function_parameter_relation->parameter_id->CellAttributes() ?>>
+<span id="el_script_function_parameter_relation_parameter_id" class="control-group">
+<select data-field="x_parameter_id" id="x_parameter_id" name="x_parameter_id"<?php echo $script_function_parameter_relation->parameter_id->EditAttributes() ?>>
+<?php
+if (is_array($script_function_parameter_relation->parameter_id->EditValue)) {
+	$arwrk = $script_function_parameter_relation->parameter_id->EditValue;
+	$rowswrk = count($arwrk);
+	$emptywrk = TRUE;
+	for ($rowcntwrk = 0; $rowcntwrk < $rowswrk; $rowcntwrk++) {
+		$selwrk = (strval($script_function_parameter_relation->parameter_id->CurrentValue) == strval($arwrk[$rowcntwrk][0])) ? " selected=\"selected\"" : "";
+		if ($selwrk <> "") $emptywrk = FALSE;
+?>
+<option value="<?php echo ew_HtmlEncode($arwrk[$rowcntwrk][0]) ?>"<?php echo $selwrk ?>>
+<?php echo $arwrk[$rowcntwrk][1] ?>
+</option>
+<?php
+	}
+}
+?>
+</select>
+<?php
+$sSqlWrk = "SELECT `parameter_id`, `parameter_name` AS `DispFld`, '' AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld` FROM `parameter`";
+$sWhereWrk = "";
+
+// Call Lookup selecting
+$script_function_parameter_relation->Lookup_Selecting($script_function_parameter_relation->parameter_id, $sWhereWrk);
+if ($sWhereWrk <> "") $sSqlWrk .= " WHERE " . $sWhereWrk;
+?>
+<input type="hidden" name="s_x_parameter_id" id="s_x_parameter_id" value="s=<?php echo ew_Encrypt($sSqlWrk) ?>&f0=<?php echo ew_Encrypt("`parameter_id` = {filter_value}"); ?>&t0=3">
 </span>
-<?php echo $stop_task->server_id_mysqladmin->CustomMsg ?></td>
+<?php echo $script_function_parameter_relation->parameter_id->CustomMsg ?></td>
 	</tr>
 <?php } ?>
-<?php if ($stop_task->datetime->Visible) { // datetime ?>
-	<tr id="r_datetime">
-		<td><span id="elh_stop_task_datetime"><?php echo $stop_task->datetime->FldCaption() ?><?php echo $Language->Phrase("FieldRequiredIndicator") ?></span></td>
-		<td<?php echo $stop_task->datetime->CellAttributes() ?>>
-<span id="el_stop_task_datetime" class="control-group">
-<input type="text" data-field="x_datetime" name="x_datetime" id="x_datetime" placeholder="<?php echo $stop_task->datetime->PlaceHolder ?>" value="<?php echo $stop_task->datetime->EditValue ?>"<?php echo $stop_task->datetime->EditAttributes() ?>>
+<?php if ($script_function_parameter_relation->script_function_id->Visible) { // script_function_id ?>
+	<tr id="r_script_function_id">
+		<td><span id="elh_script_function_parameter_relation_script_function_id"><?php echo $script_function_parameter_relation->script_function_id->FldCaption() ?></span></td>
+		<td<?php echo $script_function_parameter_relation->script_function_id->CellAttributes() ?>>
+<span id="el_script_function_parameter_relation_script_function_id" class="control-group">
+<select data-field="x_script_function_id" id="x_script_function_id" name="x_script_function_id"<?php echo $script_function_parameter_relation->script_function_id->EditAttributes() ?>>
+<?php
+if (is_array($script_function_parameter_relation->script_function_id->EditValue)) {
+	$arwrk = $script_function_parameter_relation->script_function_id->EditValue;
+	$rowswrk = count($arwrk);
+	$emptywrk = TRUE;
+	for ($rowcntwrk = 0; $rowcntwrk < $rowswrk; $rowcntwrk++) {
+		$selwrk = (strval($script_function_parameter_relation->script_function_id->CurrentValue) == strval($arwrk[$rowcntwrk][0])) ? " selected=\"selected\"" : "";
+		if ($selwrk <> "") $emptywrk = FALSE;
+?>
+<option value="<?php echo ew_HtmlEncode($arwrk[$rowcntwrk][0]) ?>"<?php echo $selwrk ?>>
+<?php echo $arwrk[$rowcntwrk][1] ?>
+</option>
+<?php
+	}
+}
+?>
+</select>
+<?php
+$sSqlWrk = "SELECT `script_function_id`, `script_function_name` AS `DispFld`, '' AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld` FROM `script_function`";
+$sWhereWrk = "";
+
+// Call Lookup selecting
+$script_function_parameter_relation->Lookup_Selecting($script_function_parameter_relation->script_function_id, $sWhereWrk);
+if ($sWhereWrk <> "") $sSqlWrk .= " WHERE " . $sWhereWrk;
+?>
+<input type="hidden" name="s_x_script_function_id" id="s_x_script_function_id" value="s=<?php echo ew_Encrypt($sSqlWrk) ?>&f0=<?php echo ew_Encrypt("`script_function_id` = {filter_value}"); ?>&t0=3">
 </span>
-<?php echo $stop_task->datetime->CustomMsg ?></td>
-	</tr>
-<?php } ?>
-<?php if ($stop_task->username->Visible) { // username ?>
-	<tr id="r_username">
-		<td><span id="elh_stop_task_username"><?php echo $stop_task->username->FldCaption() ?><?php echo $Language->Phrase("FieldRequiredIndicator") ?></span></td>
-		<td<?php echo $stop_task->username->CellAttributes() ?>>
-<span id="el_stop_task_username" class="control-group">
-<input type="text" data-field="x_username" name="x_username" id="x_username" size="30" maxlength="255" placeholder="<?php echo $stop_task->username->PlaceHolder ?>" value="<?php echo $stop_task->username->EditValue ?>"<?php echo $stop_task->username->EditAttributes() ?>>
-</span>
-<?php echo $stop_task->username->CustomMsg ?></td>
+<?php echo $script_function_parameter_relation->script_function_id->CustomMsg ?></td>
 	</tr>
 <?php } ?>
 </table>
 </td></tr></table>
 <table class="ewPager">
 <tr><td>
-<?php if (!isset($stop_task_edit->Pager)) $stop_task_edit->Pager = new cNumericPager($stop_task_edit->StartRec, $stop_task_edit->DisplayRecs, $stop_task_edit->TotalRecs, $stop_task_edit->RecRange) ?>
-<?php if ($stop_task_edit->Pager->RecordCount > 0) { ?>
+<?php if (!isset($script_function_parameter_relation_edit->Pager)) $script_function_parameter_relation_edit->Pager = new cNumericPager($script_function_parameter_relation_edit->StartRec, $script_function_parameter_relation_edit->DisplayRecs, $script_function_parameter_relation_edit->TotalRecs, $script_function_parameter_relation_edit->RecRange) ?>
+<?php if ($script_function_parameter_relation_edit->Pager->RecordCount > 0) { ?>
 <table cellspacing="0" class="ewStdTable"><tbody><tr><td>
 <div class="pagination"><ul>
-	<?php if ($stop_task_edit->Pager->FirstButton->Enabled) { ?>
-	<li><a href="<?php echo $stop_task_edit->PageUrl() ?>start=<?php echo $stop_task_edit->Pager->FirstButton->Start ?>"><?php echo $Language->Phrase("PagerFirst") ?></a></li>
+	<?php if ($script_function_parameter_relation_edit->Pager->FirstButton->Enabled) { ?>
+	<li><a href="<?php echo $script_function_parameter_relation_edit->PageUrl() ?>start=<?php echo $script_function_parameter_relation_edit->Pager->FirstButton->Start ?>"><?php echo $Language->Phrase("PagerFirst") ?></a></li>
 	<?php } ?>
-	<?php if ($stop_task_edit->Pager->PrevButton->Enabled) { ?>
-	<li><a href="<?php echo $stop_task_edit->PageUrl() ?>start=<?php echo $stop_task_edit->Pager->PrevButton->Start ?>"><?php echo $Language->Phrase("PagerPrevious") ?></a></li>
+	<?php if ($script_function_parameter_relation_edit->Pager->PrevButton->Enabled) { ?>
+	<li><a href="<?php echo $script_function_parameter_relation_edit->PageUrl() ?>start=<?php echo $script_function_parameter_relation_edit->Pager->PrevButton->Start ?>"><?php echo $Language->Phrase("PagerPrevious") ?></a></li>
 	<?php } ?>
-	<?php foreach ($stop_task_edit->Pager->Items as $PagerItem) { ?>
-		<li<?php if (!$PagerItem->Enabled) { echo " class=\" active\""; } ?>><a href="<?php if ($PagerItem->Enabled) { echo $stop_task_edit->PageUrl() . "start=" . $PagerItem->Start; } else { echo "#"; } ?>"><?php echo $PagerItem->Text ?></a></li>
+	<?php foreach ($script_function_parameter_relation_edit->Pager->Items as $PagerItem) { ?>
+		<li<?php if (!$PagerItem->Enabled) { echo " class=\" active\""; } ?>><a href="<?php if ($PagerItem->Enabled) { echo $script_function_parameter_relation_edit->PageUrl() . "start=" . $PagerItem->Start; } else { echo "#"; } ?>"><?php echo $PagerItem->Text ?></a></li>
 	<?php } ?>
-	<?php if ($stop_task_edit->Pager->NextButton->Enabled) { ?>
-	<li><a href="<?php echo $stop_task_edit->PageUrl() ?>start=<?php echo $stop_task_edit->Pager->NextButton->Start ?>"><?php echo $Language->Phrase("PagerNext") ?></a></li>
+	<?php if ($script_function_parameter_relation_edit->Pager->NextButton->Enabled) { ?>
+	<li><a href="<?php echo $script_function_parameter_relation_edit->PageUrl() ?>start=<?php echo $script_function_parameter_relation_edit->Pager->NextButton->Start ?>"><?php echo $Language->Phrase("PagerNext") ?></a></li>
 	<?php } ?>
-	<?php if ($stop_task_edit->Pager->LastButton->Enabled) { ?>
-	<li><a href="<?php echo $stop_task_edit->PageUrl() ?>start=<?php echo $stop_task_edit->Pager->LastButton->Start ?>"><?php echo $Language->Phrase("PagerLast") ?></a></li>
+	<?php if ($script_function_parameter_relation_edit->Pager->LastButton->Enabled) { ?>
+	<li><a href="<?php echo $script_function_parameter_relation_edit->PageUrl() ?>start=<?php echo $script_function_parameter_relation_edit->Pager->LastButton->Start ?>"><?php echo $Language->Phrase("PagerLast") ?></a></li>
 	<?php } ?>
 </ul></div>
 </td>
@@ -994,13 +1065,13 @@ $stop_task_edit->ShowMessage();
 <button class="btn btn-primary ewButton" name="btnAction" id="btnAction" type="submit"><?php echo $Language->Phrase("EditBtn") ?></button>
 </form>
 <script type="text/javascript">
-fstop_taskedit.Init();
+fscript_function_parameter_relationedit.Init();
 <?php if (EW_MOBILE_REFLOW && ew_IsMobile()) { ?>
 ew_Reflow();
 <?php } ?>
 </script>
 <?php
-$stop_task_edit->ShowPageFooter();
+$script_function_parameter_relation_edit->ShowPageFooter();
 if (EW_DEBUG_ENABLED)
 	echo ew_DebugMsg();
 ?>
@@ -1012,5 +1083,5 @@ if (EW_DEBUG_ENABLED)
 </script>
 <?php include_once "footer.php" ?>
 <?php
-$stop_task_edit->Page_Terminate();
+$script_function_parameter_relation_edit->Page_Terminate();
 ?>

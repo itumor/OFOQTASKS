@@ -582,12 +582,7 @@ class cstop_task_list extends cstop_task {
 		$sKeyword = ew_AdjustSql($Keyword);
 		$sWhere = "";
 		$this->BuildBasicSearchSQL($sWhere, $this->server_id_mysqladmin, $Keyword);
-		$this->BuildBasicSearchSQL($sWhere, $this->HOSTNAME, $Keyword);
-		$this->BuildBasicSearchSQL($sWhere, $this->USERNAME, $Keyword);
-		$this->BuildBasicSearchSQL($sWhere, $this->PASSWORD, $Keyword);
-		$this->BuildBasicSearchSQL($sWhere, $this->DATABASE, $Keyword);
-		$this->BuildBasicSearchSQL($sWhere, $this->FILEPATH, $Keyword);
-		$this->BuildBasicSearchSQL($sWhere, $this->FILENAME, $Keyword);
+		$this->BuildBasicSearchSQL($sWhere, $this->username, $Keyword);
 		return $sWhere;
 	}
 
@@ -681,12 +676,8 @@ class cstop_task_list extends cstop_task {
 			$this->CurrentOrderType = @$_GET["ordertype"];
 			$this->UpdateSort($this->id); // id
 			$this->UpdateSort($this->server_id_mysqladmin); // server_id_mysqladmin
-			$this->UpdateSort($this->HOSTNAME); // HOSTNAME
-			$this->UpdateSort($this->USERNAME); // USERNAME
-			$this->UpdateSort($this->PASSWORD); // PASSWORD
-			$this->UpdateSort($this->DATABASE); // DATABASE
-			$this->UpdateSort($this->FILEPATH); // FILEPATH
-			$this->UpdateSort($this->FILENAME); // FILENAME
+			$this->UpdateSort($this->datetime); // datetime
+			$this->UpdateSort($this->username); // username
 			$this->setStartRecordNumber(1); // Reset start position
 		}
 	}
@@ -721,12 +712,8 @@ class cstop_task_list extends cstop_task {
 				$this->setSessionOrderBy($sOrderBy);
 				$this->id->setSort("");
 				$this->server_id_mysqladmin->setSort("");
-				$this->HOSTNAME->setSort("");
-				$this->USERNAME->setSort("");
-				$this->PASSWORD->setSort("");
-				$this->DATABASE->setSort("");
-				$this->FILEPATH->setSort("");
-				$this->FILENAME->setSort("");
+				$this->datetime->setSort("");
+				$this->username->setSort("");
 			}
 
 			// Reset start position
@@ -1019,12 +1006,8 @@ class cstop_task_list extends cstop_task {
 		$this->Row_Selected($row);
 		$this->id->setDbValue($rs->fields('id'));
 		$this->server_id_mysqladmin->setDbValue($rs->fields('server_id_mysqladmin'));
-		$this->HOSTNAME->setDbValue($rs->fields('HOSTNAME'));
-		$this->USERNAME->setDbValue($rs->fields('USERNAME'));
-		$this->PASSWORD->setDbValue($rs->fields('PASSWORD'));
-		$this->DATABASE->setDbValue($rs->fields('DATABASE'));
-		$this->FILEPATH->setDbValue($rs->fields('FILEPATH'));
-		$this->FILENAME->setDbValue($rs->fields('FILENAME'));
+		$this->datetime->setDbValue($rs->fields('datetime'));
+		$this->username->setDbValue($rs->fields('username'));
 	}
 
 	// Load DbValue from recordset
@@ -1033,12 +1016,8 @@ class cstop_task_list extends cstop_task {
 		$row = is_array($rs) ? $rs : $rs->fields;
 		$this->id->DbValue = $row['id'];
 		$this->server_id_mysqladmin->DbValue = $row['server_id_mysqladmin'];
-		$this->HOSTNAME->DbValue = $row['HOSTNAME'];
-		$this->USERNAME->DbValue = $row['USERNAME'];
-		$this->PASSWORD->DbValue = $row['PASSWORD'];
-		$this->DATABASE->DbValue = $row['DATABASE'];
-		$this->FILEPATH->DbValue = $row['FILEPATH'];
-		$this->FILENAME->DbValue = $row['FILENAME'];
+		$this->datetime->DbValue = $row['datetime'];
+		$this->username->DbValue = $row['username'];
 	}
 
 	// Load old record
@@ -1082,12 +1061,8 @@ class cstop_task_list extends cstop_task {
 		// Common render codes for all row types
 		// id
 		// server_id_mysqladmin
-		// HOSTNAME
-		// USERNAME
-		// PASSWORD
-		// DATABASE
-		// FILEPATH
-		// FILENAME
+		// datetime
+		// username
 
 		if ($this->RowType == EW_ROWTYPE_VIEW) { // View row
 
@@ -1099,29 +1074,13 @@ class cstop_task_list extends cstop_task {
 			$this->server_id_mysqladmin->ViewValue = $this->server_id_mysqladmin->CurrentValue;
 			$this->server_id_mysqladmin->ViewCustomAttributes = "";
 
-			// HOSTNAME
-			$this->HOSTNAME->ViewValue = $this->HOSTNAME->CurrentValue;
-			$this->HOSTNAME->ViewCustomAttributes = "";
+			// datetime
+			$this->datetime->ViewValue = $this->datetime->CurrentValue;
+			$this->datetime->ViewCustomAttributes = "";
 
-			// USERNAME
-			$this->USERNAME->ViewValue = $this->USERNAME->CurrentValue;
-			$this->USERNAME->ViewCustomAttributes = "";
-
-			// PASSWORD
-			$this->PASSWORD->ViewValue = $this->PASSWORD->CurrentValue;
-			$this->PASSWORD->ViewCustomAttributes = "";
-
-			// DATABASE
-			$this->DATABASE->ViewValue = $this->DATABASE->CurrentValue;
-			$this->DATABASE->ViewCustomAttributes = "";
-
-			// FILEPATH
-			$this->FILEPATH->ViewValue = $this->FILEPATH->CurrentValue;
-			$this->FILEPATH->ViewCustomAttributes = "";
-
-			// FILENAME
-			$this->FILENAME->ViewValue = $this->FILENAME->CurrentValue;
-			$this->FILENAME->ViewCustomAttributes = "";
+			// username
+			$this->username->ViewValue = $this->username->CurrentValue;
+			$this->username->ViewCustomAttributes = "";
 
 			// id
 			$this->id->LinkCustomAttributes = "";
@@ -1133,35 +1092,15 @@ class cstop_task_list extends cstop_task {
 			$this->server_id_mysqladmin->HrefValue = "";
 			$this->server_id_mysqladmin->TooltipValue = "";
 
-			// HOSTNAME
-			$this->HOSTNAME->LinkCustomAttributes = "";
-			$this->HOSTNAME->HrefValue = "";
-			$this->HOSTNAME->TooltipValue = "";
+			// datetime
+			$this->datetime->LinkCustomAttributes = "";
+			$this->datetime->HrefValue = "";
+			$this->datetime->TooltipValue = "";
 
-			// USERNAME
-			$this->USERNAME->LinkCustomAttributes = "";
-			$this->USERNAME->HrefValue = "";
-			$this->USERNAME->TooltipValue = "";
-
-			// PASSWORD
-			$this->PASSWORD->LinkCustomAttributes = "";
-			$this->PASSWORD->HrefValue = "";
-			$this->PASSWORD->TooltipValue = "";
-
-			// DATABASE
-			$this->DATABASE->LinkCustomAttributes = "";
-			$this->DATABASE->HrefValue = "";
-			$this->DATABASE->TooltipValue = "";
-
-			// FILEPATH
-			$this->FILEPATH->LinkCustomAttributes = "";
-			$this->FILEPATH->HrefValue = "";
-			$this->FILEPATH->TooltipValue = "";
-
-			// FILENAME
-			$this->FILENAME->LinkCustomAttributes = "";
-			$this->FILENAME->HrefValue = "";
-			$this->FILENAME->TooltipValue = "";
+			// username
+			$this->username->LinkCustomAttributes = "";
+			$this->username->HrefValue = "";
+			$this->username->TooltipValue = "";
 		}
 
 		// Call Row Rendered event
@@ -1753,57 +1692,21 @@ $stop_task_list->ListOptions->Render("header", "left");
         </div></div></td>
 	<?php } ?>
 <?php } ?>		
-<?php if ($stop_task->HOSTNAME->Visible) { // HOSTNAME ?>
-	<?php if ($stop_task->SortUrl($stop_task->HOSTNAME) == "") { ?>
-		<td><div id="elh_stop_task_HOSTNAME" class="stop_task_HOSTNAME"><div class="ewTableHeaderCaption"><?php echo $stop_task->HOSTNAME->FldCaption() ?></div></div></td>
+<?php if ($stop_task->datetime->Visible) { // datetime ?>
+	<?php if ($stop_task->SortUrl($stop_task->datetime) == "") { ?>
+		<td><div id="elh_stop_task_datetime" class="stop_task_datetime"><div class="ewTableHeaderCaption"><?php echo $stop_task->datetime->FldCaption() ?></div></div></td>
 	<?php } else { ?>
-		<td><div class="ewPointer" onclick="ew_Sort(event,'<?php echo $stop_task->SortUrl($stop_task->HOSTNAME) ?>',1);"><div id="elh_stop_task_HOSTNAME" class="stop_task_HOSTNAME">
-			<div class="ewTableHeaderBtn"><span class="ewTableHeaderCaption"><?php echo $stop_task->HOSTNAME->FldCaption() ?><?php echo $Language->Phrase("SrchLegend") ?></span><span class="ewTableHeaderSort"><?php if ($stop_task->HOSTNAME->getSort() == "ASC") { ?><span class="caret ewSortUp"></span><?php } elseif ($stop_task->HOSTNAME->getSort() == "DESC") { ?><span class="caret"></span><?php } ?></span></div>
+		<td><div class="ewPointer" onclick="ew_Sort(event,'<?php echo $stop_task->SortUrl($stop_task->datetime) ?>',1);"><div id="elh_stop_task_datetime" class="stop_task_datetime">
+			<div class="ewTableHeaderBtn"><span class="ewTableHeaderCaption"><?php echo $stop_task->datetime->FldCaption() ?></span><span class="ewTableHeaderSort"><?php if ($stop_task->datetime->getSort() == "ASC") { ?><span class="caret ewSortUp"></span><?php } elseif ($stop_task->datetime->getSort() == "DESC") { ?><span class="caret"></span><?php } ?></span></div>
         </div></div></td>
 	<?php } ?>
 <?php } ?>		
-<?php if ($stop_task->USERNAME->Visible) { // USERNAME ?>
-	<?php if ($stop_task->SortUrl($stop_task->USERNAME) == "") { ?>
-		<td><div id="elh_stop_task_USERNAME" class="stop_task_USERNAME"><div class="ewTableHeaderCaption"><?php echo $stop_task->USERNAME->FldCaption() ?></div></div></td>
+<?php if ($stop_task->username->Visible) { // username ?>
+	<?php if ($stop_task->SortUrl($stop_task->username) == "") { ?>
+		<td><div id="elh_stop_task_username" class="stop_task_username"><div class="ewTableHeaderCaption"><?php echo $stop_task->username->FldCaption() ?></div></div></td>
 	<?php } else { ?>
-		<td><div class="ewPointer" onclick="ew_Sort(event,'<?php echo $stop_task->SortUrl($stop_task->USERNAME) ?>',1);"><div id="elh_stop_task_USERNAME" class="stop_task_USERNAME">
-			<div class="ewTableHeaderBtn"><span class="ewTableHeaderCaption"><?php echo $stop_task->USERNAME->FldCaption() ?><?php echo $Language->Phrase("SrchLegend") ?></span><span class="ewTableHeaderSort"><?php if ($stop_task->USERNAME->getSort() == "ASC") { ?><span class="caret ewSortUp"></span><?php } elseif ($stop_task->USERNAME->getSort() == "DESC") { ?><span class="caret"></span><?php } ?></span></div>
-        </div></div></td>
-	<?php } ?>
-<?php } ?>		
-<?php if ($stop_task->PASSWORD->Visible) { // PASSWORD ?>
-	<?php if ($stop_task->SortUrl($stop_task->PASSWORD) == "") { ?>
-		<td><div id="elh_stop_task_PASSWORD" class="stop_task_PASSWORD"><div class="ewTableHeaderCaption"><?php echo $stop_task->PASSWORD->FldCaption() ?></div></div></td>
-	<?php } else { ?>
-		<td><div class="ewPointer" onclick="ew_Sort(event,'<?php echo $stop_task->SortUrl($stop_task->PASSWORD) ?>',1);"><div id="elh_stop_task_PASSWORD" class="stop_task_PASSWORD">
-			<div class="ewTableHeaderBtn"><span class="ewTableHeaderCaption"><?php echo $stop_task->PASSWORD->FldCaption() ?><?php echo $Language->Phrase("SrchLegend") ?></span><span class="ewTableHeaderSort"><?php if ($stop_task->PASSWORD->getSort() == "ASC") { ?><span class="caret ewSortUp"></span><?php } elseif ($stop_task->PASSWORD->getSort() == "DESC") { ?><span class="caret"></span><?php } ?></span></div>
-        </div></div></td>
-	<?php } ?>
-<?php } ?>		
-<?php if ($stop_task->DATABASE->Visible) { // DATABASE ?>
-	<?php if ($stop_task->SortUrl($stop_task->DATABASE) == "") { ?>
-		<td><div id="elh_stop_task_DATABASE" class="stop_task_DATABASE"><div class="ewTableHeaderCaption"><?php echo $stop_task->DATABASE->FldCaption() ?></div></div></td>
-	<?php } else { ?>
-		<td><div class="ewPointer" onclick="ew_Sort(event,'<?php echo $stop_task->SortUrl($stop_task->DATABASE) ?>',1);"><div id="elh_stop_task_DATABASE" class="stop_task_DATABASE">
-			<div class="ewTableHeaderBtn"><span class="ewTableHeaderCaption"><?php echo $stop_task->DATABASE->FldCaption() ?><?php echo $Language->Phrase("SrchLegend") ?></span><span class="ewTableHeaderSort"><?php if ($stop_task->DATABASE->getSort() == "ASC") { ?><span class="caret ewSortUp"></span><?php } elseif ($stop_task->DATABASE->getSort() == "DESC") { ?><span class="caret"></span><?php } ?></span></div>
-        </div></div></td>
-	<?php } ?>
-<?php } ?>		
-<?php if ($stop_task->FILEPATH->Visible) { // FILEPATH ?>
-	<?php if ($stop_task->SortUrl($stop_task->FILEPATH) == "") { ?>
-		<td><div id="elh_stop_task_FILEPATH" class="stop_task_FILEPATH"><div class="ewTableHeaderCaption"><?php echo $stop_task->FILEPATH->FldCaption() ?></div></div></td>
-	<?php } else { ?>
-		<td><div class="ewPointer" onclick="ew_Sort(event,'<?php echo $stop_task->SortUrl($stop_task->FILEPATH) ?>',1);"><div id="elh_stop_task_FILEPATH" class="stop_task_FILEPATH">
-			<div class="ewTableHeaderBtn"><span class="ewTableHeaderCaption"><?php echo $stop_task->FILEPATH->FldCaption() ?><?php echo $Language->Phrase("SrchLegend") ?></span><span class="ewTableHeaderSort"><?php if ($stop_task->FILEPATH->getSort() == "ASC") { ?><span class="caret ewSortUp"></span><?php } elseif ($stop_task->FILEPATH->getSort() == "DESC") { ?><span class="caret"></span><?php } ?></span></div>
-        </div></div></td>
-	<?php } ?>
-<?php } ?>		
-<?php if ($stop_task->FILENAME->Visible) { // FILENAME ?>
-	<?php if ($stop_task->SortUrl($stop_task->FILENAME) == "") { ?>
-		<td><div id="elh_stop_task_FILENAME" class="stop_task_FILENAME"><div class="ewTableHeaderCaption"><?php echo $stop_task->FILENAME->FldCaption() ?></div></div></td>
-	<?php } else { ?>
-		<td><div class="ewPointer" onclick="ew_Sort(event,'<?php echo $stop_task->SortUrl($stop_task->FILENAME) ?>',1);"><div id="elh_stop_task_FILENAME" class="stop_task_FILENAME">
-			<div class="ewTableHeaderBtn"><span class="ewTableHeaderCaption"><?php echo $stop_task->FILENAME->FldCaption() ?><?php echo $Language->Phrase("SrchLegend") ?></span><span class="ewTableHeaderSort"><?php if ($stop_task->FILENAME->getSort() == "ASC") { ?><span class="caret ewSortUp"></span><?php } elseif ($stop_task->FILENAME->getSort() == "DESC") { ?><span class="caret"></span><?php } ?></span></div>
+		<td><div class="ewPointer" onclick="ew_Sort(event,'<?php echo $stop_task->SortUrl($stop_task->username) ?>',1);"><div id="elh_stop_task_username" class="stop_task_username">
+			<div class="ewTableHeaderBtn"><span class="ewTableHeaderCaption"><?php echo $stop_task->username->FldCaption() ?><?php echo $Language->Phrase("SrchLegend") ?></span><span class="ewTableHeaderSort"><?php if ($stop_task->username->getSort() == "ASC") { ?><span class="caret ewSortUp"></span><?php } elseif ($stop_task->username->getSort() == "DESC") { ?><span class="caret"></span><?php } ?></span></div>
         </div></div></td>
 	<?php } ?>
 <?php } ?>		
@@ -1883,40 +1786,16 @@ $stop_task_list->ListOptions->Render("body", "left", $stop_task_list->RowCnt);
 <?php echo $stop_task->server_id_mysqladmin->ListViewValue() ?></span>
 <a id="<?php echo $stop_task_list->PageObjName . "_row_" . $stop_task_list->RowCnt ?>"></a></td>
 	<?php } ?>
-	<?php if ($stop_task->HOSTNAME->Visible) { // HOSTNAME ?>
-		<td<?php echo $stop_task->HOSTNAME->CellAttributes() ?>>
-<span<?php echo $stop_task->HOSTNAME->ViewAttributes() ?>>
-<?php echo $stop_task->HOSTNAME->ListViewValue() ?></span>
+	<?php if ($stop_task->datetime->Visible) { // datetime ?>
+		<td<?php echo $stop_task->datetime->CellAttributes() ?>>
+<span<?php echo $stop_task->datetime->ViewAttributes() ?>>
+<?php echo $stop_task->datetime->ListViewValue() ?></span>
 <a id="<?php echo $stop_task_list->PageObjName . "_row_" . $stop_task_list->RowCnt ?>"></a></td>
 	<?php } ?>
-	<?php if ($stop_task->USERNAME->Visible) { // USERNAME ?>
-		<td<?php echo $stop_task->USERNAME->CellAttributes() ?>>
-<span<?php echo $stop_task->USERNAME->ViewAttributes() ?>>
-<?php echo $stop_task->USERNAME->ListViewValue() ?></span>
-<a id="<?php echo $stop_task_list->PageObjName . "_row_" . $stop_task_list->RowCnt ?>"></a></td>
-	<?php } ?>
-	<?php if ($stop_task->PASSWORD->Visible) { // PASSWORD ?>
-		<td<?php echo $stop_task->PASSWORD->CellAttributes() ?>>
-<span<?php echo $stop_task->PASSWORD->ViewAttributes() ?>>
-<?php echo $stop_task->PASSWORD->ListViewValue() ?></span>
-<a id="<?php echo $stop_task_list->PageObjName . "_row_" . $stop_task_list->RowCnt ?>"></a></td>
-	<?php } ?>
-	<?php if ($stop_task->DATABASE->Visible) { // DATABASE ?>
-		<td<?php echo $stop_task->DATABASE->CellAttributes() ?>>
-<span<?php echo $stop_task->DATABASE->ViewAttributes() ?>>
-<?php echo $stop_task->DATABASE->ListViewValue() ?></span>
-<a id="<?php echo $stop_task_list->PageObjName . "_row_" . $stop_task_list->RowCnt ?>"></a></td>
-	<?php } ?>
-	<?php if ($stop_task->FILEPATH->Visible) { // FILEPATH ?>
-		<td<?php echo $stop_task->FILEPATH->CellAttributes() ?>>
-<span<?php echo $stop_task->FILEPATH->ViewAttributes() ?>>
-<?php echo $stop_task->FILEPATH->ListViewValue() ?></span>
-<a id="<?php echo $stop_task_list->PageObjName . "_row_" . $stop_task_list->RowCnt ?>"></a></td>
-	<?php } ?>
-	<?php if ($stop_task->FILENAME->Visible) { // FILENAME ?>
-		<td<?php echo $stop_task->FILENAME->CellAttributes() ?>>
-<span<?php echo $stop_task->FILENAME->ViewAttributes() ?>>
-<?php echo $stop_task->FILENAME->ListViewValue() ?></span>
+	<?php if ($stop_task->username->Visible) { // username ?>
+		<td<?php echo $stop_task->username->CellAttributes() ?>>
+<span<?php echo $stop_task->username->ViewAttributes() ?>>
+<?php echo $stop_task->username->ListViewValue() ?></span>
 <a id="<?php echo $stop_task_list->PageObjName . "_row_" . $stop_task_list->RowCnt ?>"></a></td>
 	<?php } ?>
 <?php

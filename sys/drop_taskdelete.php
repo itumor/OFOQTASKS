@@ -354,11 +354,11 @@ class cdrop_task_delete extends cdrop_task {
 		$this->id->setDbValue($rs->fields('id'));
 		$this->server_id_mysqladmin->setDbValue($rs->fields('server_id_mysqladmin'));
 		$this->HOSTNAME->setDbValue($rs->fields('HOSTNAME'));
-		$this->USERNAME->setDbValue($rs->fields('USERNAME'));
 		$this->PASSWORD->setDbValue($rs->fields('PASSWORD'));
 		$this->DATABASE->setDbValue($rs->fields('DATABASE'));
-		$this->FILEPATH->setDbValue($rs->fields('FILEPATH'));
-		$this->FILENAME->setDbValue($rs->fields('FILENAME'));
+		$this->datetime->setDbValue($rs->fields('datetime'));
+		$this->DBUSERNAME->setDbValue($rs->fields('DBUSERNAME'));
+		$this->username->setDbValue($rs->fields('username'));
 	}
 
 	// Load DbValue from recordset
@@ -368,11 +368,11 @@ class cdrop_task_delete extends cdrop_task {
 		$this->id->DbValue = $row['id'];
 		$this->server_id_mysqladmin->DbValue = $row['server_id_mysqladmin'];
 		$this->HOSTNAME->DbValue = $row['HOSTNAME'];
-		$this->USERNAME->DbValue = $row['USERNAME'];
 		$this->PASSWORD->DbValue = $row['PASSWORD'];
 		$this->DATABASE->DbValue = $row['DATABASE'];
-		$this->FILEPATH->DbValue = $row['FILEPATH'];
-		$this->FILENAME->DbValue = $row['FILENAME'];
+		$this->datetime->DbValue = $row['datetime'];
+		$this->DBUSERNAME->DbValue = $row['DBUSERNAME'];
+		$this->username->DbValue = $row['username'];
 	}
 
 	// Render row values based on field settings
@@ -389,11 +389,11 @@ class cdrop_task_delete extends cdrop_task {
 		// id
 		// server_id_mysqladmin
 		// HOSTNAME
-		// USERNAME
 		// PASSWORD
 		// DATABASE
-		// FILEPATH
-		// FILENAME
+		// datetime
+		// DBUSERNAME
+		// username
 
 		if ($this->RowType == EW_ROWTYPE_VIEW) { // View row
 
@@ -409,10 +409,6 @@ class cdrop_task_delete extends cdrop_task {
 			$this->HOSTNAME->ViewValue = $this->HOSTNAME->CurrentValue;
 			$this->HOSTNAME->ViewCustomAttributes = "";
 
-			// USERNAME
-			$this->USERNAME->ViewValue = $this->USERNAME->CurrentValue;
-			$this->USERNAME->ViewCustomAttributes = "";
-
 			// PASSWORD
 			$this->PASSWORD->ViewValue = $this->PASSWORD->CurrentValue;
 			$this->PASSWORD->ViewCustomAttributes = "";
@@ -421,13 +417,17 @@ class cdrop_task_delete extends cdrop_task {
 			$this->DATABASE->ViewValue = $this->DATABASE->CurrentValue;
 			$this->DATABASE->ViewCustomAttributes = "";
 
-			// FILEPATH
-			$this->FILEPATH->ViewValue = $this->FILEPATH->CurrentValue;
-			$this->FILEPATH->ViewCustomAttributes = "";
+			// datetime
+			$this->datetime->ViewValue = $this->datetime->CurrentValue;
+			$this->datetime->ViewCustomAttributes = "";
 
-			// FILENAME
-			$this->FILENAME->ViewValue = $this->FILENAME->CurrentValue;
-			$this->FILENAME->ViewCustomAttributes = "";
+			// DBUSERNAME
+			$this->DBUSERNAME->ViewValue = $this->DBUSERNAME->CurrentValue;
+			$this->DBUSERNAME->ViewCustomAttributes = "";
+
+			// username
+			$this->username->ViewValue = $this->username->CurrentValue;
+			$this->username->ViewCustomAttributes = "";
 
 			// id
 			$this->id->LinkCustomAttributes = "";
@@ -444,11 +444,6 @@ class cdrop_task_delete extends cdrop_task {
 			$this->HOSTNAME->HrefValue = "";
 			$this->HOSTNAME->TooltipValue = "";
 
-			// USERNAME
-			$this->USERNAME->LinkCustomAttributes = "";
-			$this->USERNAME->HrefValue = "";
-			$this->USERNAME->TooltipValue = "";
-
 			// PASSWORD
 			$this->PASSWORD->LinkCustomAttributes = "";
 			$this->PASSWORD->HrefValue = "";
@@ -459,15 +454,20 @@ class cdrop_task_delete extends cdrop_task {
 			$this->DATABASE->HrefValue = "";
 			$this->DATABASE->TooltipValue = "";
 
-			// FILEPATH
-			$this->FILEPATH->LinkCustomAttributes = "";
-			$this->FILEPATH->HrefValue = "";
-			$this->FILEPATH->TooltipValue = "";
+			// datetime
+			$this->datetime->LinkCustomAttributes = "";
+			$this->datetime->HrefValue = "";
+			$this->datetime->TooltipValue = "";
 
-			// FILENAME
-			$this->FILENAME->LinkCustomAttributes = "";
-			$this->FILENAME->HrefValue = "";
-			$this->FILENAME->TooltipValue = "";
+			// DBUSERNAME
+			$this->DBUSERNAME->LinkCustomAttributes = "";
+			$this->DBUSERNAME->HrefValue = "";
+			$this->DBUSERNAME->TooltipValue = "";
+
+			// username
+			$this->username->LinkCustomAttributes = "";
+			$this->username->HrefValue = "";
+			$this->username->TooltipValue = "";
 		}
 
 		// Call Row Rendered event
@@ -718,20 +718,20 @@ $drop_task_delete->ShowMessage();
 <?php if ($drop_task->HOSTNAME->Visible) { // HOSTNAME ?>
 		<td><span id="elh_drop_task_HOSTNAME" class="drop_task_HOSTNAME"><?php echo $drop_task->HOSTNAME->FldCaption() ?></span></td>
 <?php } ?>
-<?php if ($drop_task->USERNAME->Visible) { // USERNAME ?>
-		<td><span id="elh_drop_task_USERNAME" class="drop_task_USERNAME"><?php echo $drop_task->USERNAME->FldCaption() ?></span></td>
-<?php } ?>
 <?php if ($drop_task->PASSWORD->Visible) { // PASSWORD ?>
 		<td><span id="elh_drop_task_PASSWORD" class="drop_task_PASSWORD"><?php echo $drop_task->PASSWORD->FldCaption() ?></span></td>
 <?php } ?>
 <?php if ($drop_task->DATABASE->Visible) { // DATABASE ?>
 		<td><span id="elh_drop_task_DATABASE" class="drop_task_DATABASE"><?php echo $drop_task->DATABASE->FldCaption() ?></span></td>
 <?php } ?>
-<?php if ($drop_task->FILEPATH->Visible) { // FILEPATH ?>
-		<td><span id="elh_drop_task_FILEPATH" class="drop_task_FILEPATH"><?php echo $drop_task->FILEPATH->FldCaption() ?></span></td>
+<?php if ($drop_task->datetime->Visible) { // datetime ?>
+		<td><span id="elh_drop_task_datetime" class="drop_task_datetime"><?php echo $drop_task->datetime->FldCaption() ?></span></td>
 <?php } ?>
-<?php if ($drop_task->FILENAME->Visible) { // FILENAME ?>
-		<td><span id="elh_drop_task_FILENAME" class="drop_task_FILENAME"><?php echo $drop_task->FILENAME->FldCaption() ?></span></td>
+<?php if ($drop_task->DBUSERNAME->Visible) { // DBUSERNAME ?>
+		<td><span id="elh_drop_task_DBUSERNAME" class="drop_task_DBUSERNAME"><?php echo $drop_task->DBUSERNAME->FldCaption() ?></span></td>
+<?php } ?>
+<?php if ($drop_task->username->Visible) { // username ?>
+		<td><span id="elh_drop_task_username" class="drop_task_username"><?php echo $drop_task->username->FldCaption() ?></span></td>
 <?php } ?>
 	</tr>
 	</thead>
@@ -778,14 +778,6 @@ while (!$drop_task_delete->Recordset->EOF) {
 </span>
 </td>
 <?php } ?>
-<?php if ($drop_task->USERNAME->Visible) { // USERNAME ?>
-		<td<?php echo $drop_task->USERNAME->CellAttributes() ?>>
-<span id="el<?php echo $drop_task_delete->RowCnt ?>_drop_task_USERNAME" class="control-group drop_task_USERNAME">
-<span<?php echo $drop_task->USERNAME->ViewAttributes() ?>>
-<?php echo $drop_task->USERNAME->ListViewValue() ?></span>
-</span>
-</td>
-<?php } ?>
 <?php if ($drop_task->PASSWORD->Visible) { // PASSWORD ?>
 		<td<?php echo $drop_task->PASSWORD->CellAttributes() ?>>
 <span id="el<?php echo $drop_task_delete->RowCnt ?>_drop_task_PASSWORD" class="control-group drop_task_PASSWORD">
@@ -802,19 +794,27 @@ while (!$drop_task_delete->Recordset->EOF) {
 </span>
 </td>
 <?php } ?>
-<?php if ($drop_task->FILEPATH->Visible) { // FILEPATH ?>
-		<td<?php echo $drop_task->FILEPATH->CellAttributes() ?>>
-<span id="el<?php echo $drop_task_delete->RowCnt ?>_drop_task_FILEPATH" class="control-group drop_task_FILEPATH">
-<span<?php echo $drop_task->FILEPATH->ViewAttributes() ?>>
-<?php echo $drop_task->FILEPATH->ListViewValue() ?></span>
+<?php if ($drop_task->datetime->Visible) { // datetime ?>
+		<td<?php echo $drop_task->datetime->CellAttributes() ?>>
+<span id="el<?php echo $drop_task_delete->RowCnt ?>_drop_task_datetime" class="control-group drop_task_datetime">
+<span<?php echo $drop_task->datetime->ViewAttributes() ?>>
+<?php echo $drop_task->datetime->ListViewValue() ?></span>
 </span>
 </td>
 <?php } ?>
-<?php if ($drop_task->FILENAME->Visible) { // FILENAME ?>
-		<td<?php echo $drop_task->FILENAME->CellAttributes() ?>>
-<span id="el<?php echo $drop_task_delete->RowCnt ?>_drop_task_FILENAME" class="control-group drop_task_FILENAME">
-<span<?php echo $drop_task->FILENAME->ViewAttributes() ?>>
-<?php echo $drop_task->FILENAME->ListViewValue() ?></span>
+<?php if ($drop_task->DBUSERNAME->Visible) { // DBUSERNAME ?>
+		<td<?php echo $drop_task->DBUSERNAME->CellAttributes() ?>>
+<span id="el<?php echo $drop_task_delete->RowCnt ?>_drop_task_DBUSERNAME" class="control-group drop_task_DBUSERNAME">
+<span<?php echo $drop_task->DBUSERNAME->ViewAttributes() ?>>
+<?php echo $drop_task->DBUSERNAME->ListViewValue() ?></span>
+</span>
+</td>
+<?php } ?>
+<?php if ($drop_task->username->Visible) { // username ?>
+		<td<?php echo $drop_task->username->CellAttributes() ?>>
+<span id="el<?php echo $drop_task_delete->RowCnt ?>_drop_task_username" class="control-group drop_task_username">
+<span<?php echo $drop_task->username->ViewAttributes() ?>>
+<?php echo $drop_task->username->ListViewValue() ?></span>
 </span>
 </td>
 <?php } ?>

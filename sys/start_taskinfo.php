@@ -8,13 +8,9 @@ $start_task = NULL;
 //
 class cstart_task extends cTable {
 	var $id;
+	var $datetime;
+	var $username;
 	var $server_id_mysqladmin;
-	var $HOSTNAME;
-	var $USERNAME;
-	var $PASSWORD;
-	var $DATABASE;
-	var $FILEPATH;
-	var $FILENAME;
 
 	//
 	// Table class constructor
@@ -45,33 +41,17 @@ class cstart_task extends cTable {
 		$this->id->FldDefaultErrMsg = $Language->Phrase("IncorrectInteger");
 		$this->fields['id'] = &$this->id;
 
+		// datetime
+		$this->datetime = new cField('start_task', 'start_task', 'x_datetime', 'datetime', '`datetime`', 'DATE_FORMAT(`datetime`, \'%d/%m/%Y %H:%i:%s\')', 135, -1, FALSE, '`datetime`', FALSE, FALSE, FALSE, 'FORMATTED TEXT');
+		$this->fields['datetime'] = &$this->datetime;
+
+		// username
+		$this->username = new cField('start_task', 'start_task', 'x_username', 'username', '`username`', '`username`', 200, -1, FALSE, '`username`', FALSE, FALSE, FALSE, 'FORMATTED TEXT');
+		$this->fields['username'] = &$this->username;
+
 		// server_id_mysqladmin
 		$this->server_id_mysqladmin = new cField('start_task', 'start_task', 'x_server_id_mysqladmin', 'server_id_mysqladmin', '`server_id_mysqladmin`', '`server_id_mysqladmin`', 200, -1, FALSE, '`server_id_mysqladmin`', FALSE, FALSE, FALSE, 'FORMATTED TEXT');
 		$this->fields['server_id_mysqladmin'] = &$this->server_id_mysqladmin;
-
-		// HOSTNAME
-		$this->HOSTNAME = new cField('start_task', 'start_task', 'x_HOSTNAME', 'HOSTNAME', '`HOSTNAME`', '`HOSTNAME`', 200, -1, FALSE, '`HOSTNAME`', FALSE, FALSE, FALSE, 'FORMATTED TEXT');
-		$this->fields['HOSTNAME'] = &$this->HOSTNAME;
-
-		// USERNAME
-		$this->USERNAME = new cField('start_task', 'start_task', 'x_USERNAME', 'USERNAME', '`USERNAME`', '`USERNAME`', 200, -1, FALSE, '`USERNAME`', FALSE, FALSE, FALSE, 'FORMATTED TEXT');
-		$this->fields['USERNAME'] = &$this->USERNAME;
-
-		// PASSWORD
-		$this->PASSWORD = new cField('start_task', 'start_task', 'x_PASSWORD', 'PASSWORD', '`PASSWORD`', '`PASSWORD`', 200, -1, FALSE, '`PASSWORD`', FALSE, FALSE, FALSE, 'FORMATTED TEXT');
-		$this->fields['PASSWORD'] = &$this->PASSWORD;
-
-		// DATABASE
-		$this->DATABASE = new cField('start_task', 'start_task', 'x_DATABASE', 'DATABASE', '`DATABASE`', '`DATABASE`', 200, -1, FALSE, '`DATABASE`', FALSE, FALSE, FALSE, 'FORMATTED TEXT');
-		$this->fields['DATABASE'] = &$this->DATABASE;
-
-		// FILEPATH
-		$this->FILEPATH = new cField('start_task', 'start_task', 'x_FILEPATH', 'FILEPATH', '`FILEPATH`', '`FILEPATH`', 200, -1, FALSE, '`FILEPATH`', FALSE, FALSE, FALSE, 'FORMATTED TEXT');
-		$this->fields['FILEPATH'] = &$this->FILEPATH;
-
-		// FILENAME
-		$this->FILENAME = new cField('start_task', 'start_task', 'x_FILENAME', 'FILENAME', '`FILENAME`', '`FILENAME`', 200, -1, FALSE, '`FILENAME`', FALSE, FALSE, FALSE, 'FORMATTED TEXT');
-		$this->fields['FILENAME'] = &$this->FILENAME;
 	}
 
 	// Single column sort
@@ -491,13 +471,9 @@ class cstart_task extends cTable {
 	// Load row values from recordset
 	function LoadListRowValues(&$rs) {
 		$this->id->setDbValue($rs->fields('id'));
+		$this->datetime->setDbValue($rs->fields('datetime'));
+		$this->username->setDbValue($rs->fields('username'));
 		$this->server_id_mysqladmin->setDbValue($rs->fields('server_id_mysqladmin'));
-		$this->HOSTNAME->setDbValue($rs->fields('HOSTNAME'));
-		$this->USERNAME->setDbValue($rs->fields('USERNAME'));
-		$this->PASSWORD->setDbValue($rs->fields('PASSWORD'));
-		$this->DATABASE->setDbValue($rs->fields('DATABASE'));
-		$this->FILEPATH->setDbValue($rs->fields('FILEPATH'));
-		$this->FILENAME->setDbValue($rs->fields('FILENAME'));
 	}
 
 	// Render list row values
@@ -509,17 +485,21 @@ class cstart_task extends cTable {
 
    // Common render codes
 		// id
+		// datetime
+		// username
 		// server_id_mysqladmin
-		// HOSTNAME
-		// USERNAME
-		// PASSWORD
-		// DATABASE
-		// FILEPATH
-		// FILENAME
 		// id
 
 		$this->id->ViewValue = $this->id->CurrentValue;
 		$this->id->ViewCustomAttributes = "";
+
+		// datetime
+		$this->datetime->ViewValue = $this->datetime->CurrentValue;
+		$this->datetime->ViewCustomAttributes = "";
+
+		// username
+		$this->username->ViewValue = $this->username->CurrentValue;
+		$this->username->ViewCustomAttributes = "";
 
 		// server_id_mysqladmin
 		if (strval($this->server_id_mysqladmin->CurrentValue) <> "") {
@@ -545,69 +525,25 @@ class cstart_task extends cTable {
 		}
 		$this->server_id_mysqladmin->ViewCustomAttributes = "";
 
-		// HOSTNAME
-		$this->HOSTNAME->ViewValue = $this->HOSTNAME->CurrentValue;
-		$this->HOSTNAME->ViewCustomAttributes = "";
-
-		// USERNAME
-		$this->USERNAME->ViewValue = $this->USERNAME->CurrentValue;
-		$this->USERNAME->ViewCustomAttributes = "";
-
-		// PASSWORD
-		$this->PASSWORD->ViewValue = $this->PASSWORD->CurrentValue;
-		$this->PASSWORD->ViewCustomAttributes = "";
-
-		// DATABASE
-		$this->DATABASE->ViewValue = $this->DATABASE->CurrentValue;
-		$this->DATABASE->ViewCustomAttributes = "";
-
-		// FILEPATH
-		$this->FILEPATH->ViewValue = $this->FILEPATH->CurrentValue;
-		$this->FILEPATH->ViewCustomAttributes = "";
-
-		// FILENAME
-		$this->FILENAME->ViewValue = $this->FILENAME->CurrentValue;
-		$this->FILENAME->ViewCustomAttributes = "";
-
 		// id
 		$this->id->LinkCustomAttributes = "";
 		$this->id->HrefValue = "";
 		$this->id->TooltipValue = "";
 
+		// datetime
+		$this->datetime->LinkCustomAttributes = "";
+		$this->datetime->HrefValue = "";
+		$this->datetime->TooltipValue = "";
+
+		// username
+		$this->username->LinkCustomAttributes = "";
+		$this->username->HrefValue = "";
+		$this->username->TooltipValue = "";
+
 		// server_id_mysqladmin
 		$this->server_id_mysqladmin->LinkCustomAttributes = "";
 		$this->server_id_mysqladmin->HrefValue = "";
 		$this->server_id_mysqladmin->TooltipValue = "";
-
-		// HOSTNAME
-		$this->HOSTNAME->LinkCustomAttributes = "";
-		$this->HOSTNAME->HrefValue = "";
-		$this->HOSTNAME->TooltipValue = "";
-
-		// USERNAME
-		$this->USERNAME->LinkCustomAttributes = "";
-		$this->USERNAME->HrefValue = "";
-		$this->USERNAME->TooltipValue = "";
-
-		// PASSWORD
-		$this->PASSWORD->LinkCustomAttributes = "";
-		$this->PASSWORD->HrefValue = "";
-		$this->PASSWORD->TooltipValue = "";
-
-		// DATABASE
-		$this->DATABASE->LinkCustomAttributes = "";
-		$this->DATABASE->HrefValue = "";
-		$this->DATABASE->TooltipValue = "";
-
-		// FILEPATH
-		$this->FILEPATH->LinkCustomAttributes = "";
-		$this->FILEPATH->HrefValue = "";
-		$this->FILEPATH->TooltipValue = "";
-
-		// FILENAME
-		$this->FILENAME->LinkCustomAttributes = "";
-		$this->FILENAME->HrefValue = "";
-		$this->FILENAME->TooltipValue = "";
 
 		// Call Row Rendered event
 		$this->Row_Rendered();
@@ -632,22 +568,14 @@ class cstart_task extends cTable {
 			$Doc->BeginExportRow();
 			if ($ExportPageType == "view") {
 				if ($this->id->Exportable) $Doc->ExportCaption($this->id);
+				if ($this->datetime->Exportable) $Doc->ExportCaption($this->datetime);
+				if ($this->username->Exportable) $Doc->ExportCaption($this->username);
 				if ($this->server_id_mysqladmin->Exportable) $Doc->ExportCaption($this->server_id_mysqladmin);
-				if ($this->HOSTNAME->Exportable) $Doc->ExportCaption($this->HOSTNAME);
-				if ($this->USERNAME->Exportable) $Doc->ExportCaption($this->USERNAME);
-				if ($this->PASSWORD->Exportable) $Doc->ExportCaption($this->PASSWORD);
-				if ($this->DATABASE->Exportable) $Doc->ExportCaption($this->DATABASE);
-				if ($this->FILEPATH->Exportable) $Doc->ExportCaption($this->FILEPATH);
-				if ($this->FILENAME->Exportable) $Doc->ExportCaption($this->FILENAME);
 			} else {
 				if ($this->id->Exportable) $Doc->ExportCaption($this->id);
+				if ($this->datetime->Exportable) $Doc->ExportCaption($this->datetime);
+				if ($this->username->Exportable) $Doc->ExportCaption($this->username);
 				if ($this->server_id_mysqladmin->Exportable) $Doc->ExportCaption($this->server_id_mysqladmin);
-				if ($this->HOSTNAME->Exportable) $Doc->ExportCaption($this->HOSTNAME);
-				if ($this->USERNAME->Exportable) $Doc->ExportCaption($this->USERNAME);
-				if ($this->PASSWORD->Exportable) $Doc->ExportCaption($this->PASSWORD);
-				if ($this->DATABASE->Exportable) $Doc->ExportCaption($this->DATABASE);
-				if ($this->FILEPATH->Exportable) $Doc->ExportCaption($this->FILEPATH);
-				if ($this->FILENAME->Exportable) $Doc->ExportCaption($this->FILENAME);
 			}
 			$Doc->EndExportRow();
 		}
@@ -678,22 +606,14 @@ class cstart_task extends cTable {
 				$Doc->BeginExportRow($RowCnt); // Allow CSS styles if enabled
 				if ($ExportPageType == "view") {
 					if ($this->id->Exportable) $Doc->ExportField($this->id);
+					if ($this->datetime->Exportable) $Doc->ExportField($this->datetime);
+					if ($this->username->Exportable) $Doc->ExportField($this->username);
 					if ($this->server_id_mysqladmin->Exportable) $Doc->ExportField($this->server_id_mysqladmin);
-					if ($this->HOSTNAME->Exportable) $Doc->ExportField($this->HOSTNAME);
-					if ($this->USERNAME->Exportable) $Doc->ExportField($this->USERNAME);
-					if ($this->PASSWORD->Exportable) $Doc->ExportField($this->PASSWORD);
-					if ($this->DATABASE->Exportable) $Doc->ExportField($this->DATABASE);
-					if ($this->FILEPATH->Exportable) $Doc->ExportField($this->FILEPATH);
-					if ($this->FILENAME->Exportable) $Doc->ExportField($this->FILENAME);
 				} else {
 					if ($this->id->Exportable) $Doc->ExportField($this->id);
+					if ($this->datetime->Exportable) $Doc->ExportField($this->datetime);
+					if ($this->username->Exportable) $Doc->ExportField($this->username);
 					if ($this->server_id_mysqladmin->Exportable) $Doc->ExportField($this->server_id_mysqladmin);
-					if ($this->HOSTNAME->Exportable) $Doc->ExportField($this->HOSTNAME);
-					if ($this->USERNAME->Exportable) $Doc->ExportField($this->USERNAME);
-					if ($this->PASSWORD->Exportable) $Doc->ExportField($this->PASSWORD);
-					if ($this->DATABASE->Exportable) $Doc->ExportField($this->DATABASE);
-					if ($this->FILEPATH->Exportable) $Doc->ExportField($this->FILEPATH);
-					if ($this->FILENAME->Exportable) $Doc->ExportField($this->FILENAME);
 				}
 				$Doc->EndExportRow();
 			}

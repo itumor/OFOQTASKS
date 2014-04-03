@@ -1,22 +1,15 @@
 <?php
 
 // Global variable for table object
-$restore_task = NULL;
+$script_function_parameter_relation = NULL;
 
 //
-// Table class for restore_task
+// Table class for script_function_parameter_relation
 //
-class crestore_task extends cTable {
-	var $id;
-	var $server_id_mysqladmin;
-	var $HOSTNAME;
-	var $PASSWORD;
-	var $DATABASE;
-	var $FILEPATH;
-	var $FILENAME;
-	var $datetime;
-	var $DBUSERNAME;
-	var $username;
+class cscript_function_parameter_relation extends cTable {
+	var $script_function_parameter_relation;
+	var $parameter_id;
+	var $script_function_id;
 
 	//
 	// Table class constructor
@@ -26,8 +19,8 @@ class crestore_task extends cTable {
 
 		// Language object
 		if (!isset($Language)) $Language = new cLanguage();
-		$this->TableVar = 'restore_task';
-		$this->TableName = 'restore_task';
+		$this->TableVar = 'script_function_parameter_relation';
+		$this->TableName = 'script_function_parameter_relation';
 		$this->TableType = 'TABLE';
 		$this->ExportAll = TRUE;
 		$this->ExportPageBreakCount = 0; // Page break per every n record (PDF only)
@@ -42,46 +35,20 @@ class crestore_task extends cTable {
 		$this->UserIDAllowSecurity = 0; // User ID Allow
 		$this->BasicSearch = new cBasicSearch($this->TableVar);
 
-		// id
-		$this->id = new cField('restore_task', 'restore_task', 'x_id', 'id', '`id`', '`id`', 19, -1, FALSE, '`id`', FALSE, FALSE, FALSE, 'FORMATTED TEXT');
-		$this->id->FldDefaultErrMsg = $Language->Phrase("IncorrectInteger");
-		$this->fields['id'] = &$this->id;
+		// script_function_parameter_relation
+		$this->script_function_parameter_relation = new cField('script_function_parameter_relation', 'script_function_parameter_relation', 'x_script_function_parameter_relation', 'script_function_parameter_relation', '`script_function_parameter_relation`', '`script_function_parameter_relation`', 3, -1, FALSE, '`script_function_parameter_relation`', FALSE, FALSE, FALSE, 'FORMATTED TEXT');
+		$this->script_function_parameter_relation->FldDefaultErrMsg = $Language->Phrase("IncorrectInteger");
+		$this->fields['script_function_parameter_relation'] = &$this->script_function_parameter_relation;
 
-		// server_id_mysqladmin
-		$this->server_id_mysqladmin = new cField('restore_task', 'restore_task', 'x_server_id_mysqladmin', 'server_id_mysqladmin', '`server_id_mysqladmin`', '`server_id_mysqladmin`', 200, -1, FALSE, '`server_id_mysqladmin`', FALSE, FALSE, FALSE, 'FORMATTED TEXT');
-		$this->fields['server_id_mysqladmin'] = &$this->server_id_mysqladmin;
+		// parameter_id
+		$this->parameter_id = new cField('script_function_parameter_relation', 'script_function_parameter_relation', 'x_parameter_id', 'parameter_id', '`parameter_id`', '`parameter_id`', 3, -1, FALSE, '`parameter_id`', FALSE, FALSE, FALSE, 'FORMATTED TEXT');
+		$this->parameter_id->FldDefaultErrMsg = $Language->Phrase("IncorrectInteger");
+		$this->fields['parameter_id'] = &$this->parameter_id;
 
-		// HOSTNAME
-		$this->HOSTNAME = new cField('restore_task', 'restore_task', 'x_HOSTNAME', 'HOSTNAME', '`HOSTNAME`', '`HOSTNAME`', 200, -1, FALSE, '`HOSTNAME`', FALSE, FALSE, FALSE, 'FORMATTED TEXT');
-		$this->fields['HOSTNAME'] = &$this->HOSTNAME;
-
-		// PASSWORD
-		$this->PASSWORD = new cField('restore_task', 'restore_task', 'x_PASSWORD', 'PASSWORD', '`PASSWORD`', '`PASSWORD`', 200, -1, FALSE, '`PASSWORD`', FALSE, FALSE, FALSE, 'FORMATTED TEXT');
-		$this->fields['PASSWORD'] = &$this->PASSWORD;
-
-		// DATABASE
-		$this->DATABASE = new cField('restore_task', 'restore_task', 'x_DATABASE', 'DATABASE', '`DATABASE`', '`DATABASE`', 200, -1, FALSE, '`DATABASE`', FALSE, FALSE, FALSE, 'FORMATTED TEXT');
-		$this->fields['DATABASE'] = &$this->DATABASE;
-
-		// FILEPATH
-		$this->FILEPATH = new cField('restore_task', 'restore_task', 'x_FILEPATH', 'FILEPATH', '`FILEPATH`', '`FILEPATH`', 200, -1, FALSE, '`FILEPATH`', FALSE, FALSE, FALSE, 'FORMATTED TEXT');
-		$this->fields['FILEPATH'] = &$this->FILEPATH;
-
-		// FILENAME
-		$this->FILENAME = new cField('restore_task', 'restore_task', 'x_FILENAME', 'FILENAME', '`FILENAME`', '`FILENAME`', 200, -1, FALSE, '`FILENAME`', FALSE, FALSE, FALSE, 'FORMATTED TEXT');
-		$this->fields['FILENAME'] = &$this->FILENAME;
-
-		// datetime
-		$this->datetime = new cField('restore_task', 'restore_task', 'x_datetime', 'datetime', '`datetime`', 'DATE_FORMAT(`datetime`, \'%d/%m/%Y %H:%i:%s\')', 135, -1, FALSE, '`datetime`', FALSE, FALSE, FALSE, 'FORMATTED TEXT');
-		$this->fields['datetime'] = &$this->datetime;
-
-		// DBUSERNAME
-		$this->DBUSERNAME = new cField('restore_task', 'restore_task', 'x_DBUSERNAME', 'DBUSERNAME', '`DBUSERNAME`', '`DBUSERNAME`', 200, -1, FALSE, '`DBUSERNAME`', FALSE, FALSE, FALSE, 'FORMATTED TEXT');
-		$this->fields['DBUSERNAME'] = &$this->DBUSERNAME;
-
-		// username
-		$this->username = new cField('restore_task', 'restore_task', 'x_username', 'username', '`username`', '`username`', 200, -1, FALSE, '`username`', FALSE, FALSE, FALSE, 'FORMATTED TEXT');
-		$this->fields['username'] = &$this->username;
+		// script_function_id
+		$this->script_function_id = new cField('script_function_parameter_relation', 'script_function_parameter_relation', 'x_script_function_id', 'script_function_id', '`script_function_id`', '`script_function_id`', 3, -1, FALSE, '`script_function_id`', FALSE, FALSE, FALSE, 'FORMATTED TEXT');
+		$this->script_function_id->FldDefaultErrMsg = $Language->Phrase("IncorrectInteger");
+		$this->fields['script_function_id'] = &$this->script_function_id;
 	}
 
 	// Single column sort
@@ -103,7 +70,7 @@ class crestore_task extends cTable {
 
 	// Table level SQL
 	function SqlFrom() { // From
-		return "`restore_task`";
+		return "`script_function_parameter_relation`";
 	}
 
 	function SqlSelect() { // Select
@@ -275,7 +242,7 @@ class crestore_task extends cTable {
 	}
 
 	// Update Table
-	var $UpdateTable = "`restore_task`";
+	var $UpdateTable = "`script_function_parameter_relation`";
 
 	// INSERT statement
 	function InsertSQL(&$rs) {
@@ -328,8 +295,8 @@ class crestore_task extends cTable {
 	function DeleteSQL(&$rs, $where = "") {
 		$sql = "DELETE FROM " . $this->UpdateTable . " WHERE ";
 		if ($rs) {
-			if (array_key_exists('id', $rs))
-				ew_AddFilter($where, ew_QuotedName('id') . '=' . ew_QuotedValue($rs['id'], $this->id->FldDataType));
+			if (array_key_exists('script_function_parameter_relation', $rs))
+				ew_AddFilter($where, ew_QuotedName('script_function_parameter_relation') . '=' . ew_QuotedValue($rs['script_function_parameter_relation'], $this->script_function_parameter_relation->FldDataType));
 		}
 		$filter = $this->CurrentFilter;
 		ew_AddFilter($filter, $where);
@@ -348,15 +315,15 @@ class crestore_task extends cTable {
 
 	// Key filter WHERE clause
 	function SqlKeyFilter() {
-		return "`id` = @id@";
+		return "`script_function_parameter_relation` = @script_function_parameter_relation@";
 	}
 
 	// Key filter
 	function KeyFilter() {
 		$sKeyFilter = $this->SqlKeyFilter();
-		if (!is_numeric($this->id->CurrentValue))
+		if (!is_numeric($this->script_function_parameter_relation->CurrentValue))
 			$sKeyFilter = "0=1"; // Invalid key
-		$sKeyFilter = str_replace("@id@", ew_AdjustSql($this->id->CurrentValue), $sKeyFilter); // Replace key value
+		$sKeyFilter = str_replace("@script_function_parameter_relation@", ew_AdjustSql($this->script_function_parameter_relation->CurrentValue), $sKeyFilter); // Replace key value
 		return $sKeyFilter;
 	}
 
@@ -370,7 +337,7 @@ class crestore_task extends cTable {
 		if (@$_SESSION[$name] <> "") {
 			return $_SESSION[$name];
 		} else {
-			return "restore_tasklist.php";
+			return "script_function_parameter_relationlist.php";
 		}
 	}
 
@@ -380,25 +347,25 @@ class crestore_task extends cTable {
 
 	// List URL
 	function GetListUrl() {
-		return "restore_tasklist.php";
+		return "script_function_parameter_relationlist.php";
 	}
 
 	// View URL
 	function GetViewUrl($parm = "") {
 		if ($parm <> "")
-			return $this->KeyUrl("restore_taskview.php", $this->UrlParm($parm));
+			return $this->KeyUrl("script_function_parameter_relationview.php", $this->UrlParm($parm));
 		else
-			return $this->KeyUrl("restore_taskview.php", $this->UrlParm(EW_TABLE_SHOW_DETAIL . "="));
+			return $this->KeyUrl("script_function_parameter_relationview.php", $this->UrlParm(EW_TABLE_SHOW_DETAIL . "="));
 	}
 
 	// Add URL
 	function GetAddUrl() {
-		return "restore_taskadd.php";
+		return "script_function_parameter_relationadd.php";
 	}
 
 	// Edit URL
 	function GetEditUrl($parm = "") {
-		return $this->KeyUrl("restore_taskedit.php", $this->UrlParm($parm));
+		return $this->KeyUrl("script_function_parameter_relationedit.php", $this->UrlParm($parm));
 	}
 
 	// Inline edit URL
@@ -408,7 +375,7 @@ class crestore_task extends cTable {
 
 	// Copy URL
 	function GetCopyUrl($parm = "") {
-		return $this->KeyUrl("restore_taskadd.php", $this->UrlParm($parm));
+		return $this->KeyUrl("script_function_parameter_relationadd.php", $this->UrlParm($parm));
 	}
 
 	// Inline copy URL
@@ -418,15 +385,15 @@ class crestore_task extends cTable {
 
 	// Delete URL
 	function GetDeleteUrl() {
-		return $this->KeyUrl("restore_taskdelete.php", $this->UrlParm());
+		return $this->KeyUrl("script_function_parameter_relationdelete.php", $this->UrlParm());
 	}
 
 	// Add key value to URL
 	function KeyUrl($url, $parm = "") {
 		$sUrl = $url . "?";
 		if ($parm <> "") $sUrl .= $parm . "&";
-		if (!is_null($this->id->CurrentValue)) {
-			$sUrl .= "id=" . urlencode($this->id->CurrentValue);
+		if (!is_null($this->script_function_parameter_relation->CurrentValue)) {
+			$sUrl .= "script_function_parameter_relation=" . urlencode($this->script_function_parameter_relation->CurrentValue);
 		} else {
 			return "javascript:alert(ewLanguage.Phrase('InvalidRecord'));";
 		}
@@ -458,7 +425,7 @@ class crestore_task extends cTable {
 			$arKeys = ew_StripSlashes($_GET["key_m"]);
 			$cnt = count($arKeys);
 		} elseif (isset($_GET)) {
-			$arKeys[] = @$_GET["id"]; // id
+			$arKeys[] = @$_GET["script_function_parameter_relation"]; // script_function_parameter_relation
 
 			//return $arKeys; // Do not return yet, so the values will also be checked by the following code
 		}
@@ -479,7 +446,7 @@ class crestore_task extends cTable {
 		$sKeyFilter = "";
 		foreach ($arKeys as $key) {
 			if ($sKeyFilter <> "") $sKeyFilter .= " OR ";
-			$this->id->CurrentValue = $key;
+			$this->script_function_parameter_relation->CurrentValue = $key;
 			$sKeyFilter .= "(" . $this->KeyFilter() . ")";
 		}
 		return $sKeyFilter;
@@ -500,16 +467,9 @@ class crestore_task extends cTable {
 
 	// Load row values from recordset
 	function LoadListRowValues(&$rs) {
-		$this->id->setDbValue($rs->fields('id'));
-		$this->server_id_mysqladmin->setDbValue($rs->fields('server_id_mysqladmin'));
-		$this->HOSTNAME->setDbValue($rs->fields('HOSTNAME'));
-		$this->PASSWORD->setDbValue($rs->fields('PASSWORD'));
-		$this->DATABASE->setDbValue($rs->fields('DATABASE'));
-		$this->FILEPATH->setDbValue($rs->fields('FILEPATH'));
-		$this->FILENAME->setDbValue($rs->fields('FILENAME'));
-		$this->datetime->setDbValue($rs->fields('datetime'));
-		$this->DBUSERNAME->setDbValue($rs->fields('DBUSERNAME'));
-		$this->username->setDbValue($rs->fields('username'));
+		$this->script_function_parameter_relation->setDbValue($rs->fields('script_function_parameter_relation'));
+		$this->parameter_id->setDbValue($rs->fields('parameter_id'));
+		$this->script_function_id->setDbValue($rs->fields('script_function_id'));
 	}
 
 	// Render list row values
@@ -520,106 +480,76 @@ class crestore_task extends cTable {
 		$this->Row_Rendering();
 
    // Common render codes
-		// id
-		// server_id_mysqladmin
-		// HOSTNAME
-		// PASSWORD
-		// DATABASE
-		// FILEPATH
-		// FILENAME
-		// datetime
-		// DBUSERNAME
-		// username
-		// id
+		// script_function_parameter_relation
+		// parameter_id
+		// script_function_id
+		// script_function_parameter_relation
 
-		$this->id->ViewValue = $this->id->CurrentValue;
-		$this->id->ViewCustomAttributes = "";
+		$this->script_function_parameter_relation->ViewValue = $this->script_function_parameter_relation->CurrentValue;
+		$this->script_function_parameter_relation->ViewCustomAttributes = "";
 
-		// server_id_mysqladmin
-		$this->server_id_mysqladmin->ViewValue = $this->server_id_mysqladmin->CurrentValue;
-		$this->server_id_mysqladmin->ViewCustomAttributes = "";
+		// parameter_id
+		if (strval($this->parameter_id->CurrentValue) <> "") {
+			$sFilterWrk = "`parameter_id`" . ew_SearchString("=", $this->parameter_id->CurrentValue, EW_DATATYPE_NUMBER);
+		$sSqlWrk = "SELECT `parameter_id`, `parameter_name` AS `DispFld`, '' AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld` FROM `parameter`";
+		$sWhereWrk = "";
+		if ($sFilterWrk <> "") {
+			ew_AddFilter($sWhereWrk, $sFilterWrk);
+		}
 
-		// HOSTNAME
-		$this->HOSTNAME->ViewValue = $this->HOSTNAME->CurrentValue;
-		$this->HOSTNAME->ViewCustomAttributes = "";
+		// Call Lookup selecting
+		$this->Lookup_Selecting($this->parameter_id, $sWhereWrk);
+		if ($sWhereWrk <> "") $sSqlWrk .= " WHERE " . $sWhereWrk;
+			$rswrk = $conn->Execute($sSqlWrk);
+			if ($rswrk && !$rswrk->EOF) { // Lookup values found
+				$this->parameter_id->ViewValue = $rswrk->fields('DispFld');
+				$rswrk->Close();
+			} else {
+				$this->parameter_id->ViewValue = $this->parameter_id->CurrentValue;
+			}
+		} else {
+			$this->parameter_id->ViewValue = NULL;
+		}
+		$this->parameter_id->ViewCustomAttributes = "";
 
-		// PASSWORD
-		$this->PASSWORD->ViewValue = $this->PASSWORD->CurrentValue;
-		$this->PASSWORD->ViewCustomAttributes = "";
+		// script_function_id
+		if (strval($this->script_function_id->CurrentValue) <> "") {
+			$sFilterWrk = "`script_function_id`" . ew_SearchString("=", $this->script_function_id->CurrentValue, EW_DATATYPE_NUMBER);
+		$sSqlWrk = "SELECT `script_function_id`, `script_function_name` AS `DispFld`, '' AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld` FROM `script_function`";
+		$sWhereWrk = "";
+		if ($sFilterWrk <> "") {
+			ew_AddFilter($sWhereWrk, $sFilterWrk);
+		}
 
-		// DATABASE
-		$this->DATABASE->ViewValue = $this->DATABASE->CurrentValue;
-		$this->DATABASE->ViewCustomAttributes = "";
+		// Call Lookup selecting
+		$this->Lookup_Selecting($this->script_function_id, $sWhereWrk);
+		if ($sWhereWrk <> "") $sSqlWrk .= " WHERE " . $sWhereWrk;
+			$rswrk = $conn->Execute($sSqlWrk);
+			if ($rswrk && !$rswrk->EOF) { // Lookup values found
+				$this->script_function_id->ViewValue = $rswrk->fields('DispFld');
+				$rswrk->Close();
+			} else {
+				$this->script_function_id->ViewValue = $this->script_function_id->CurrentValue;
+			}
+		} else {
+			$this->script_function_id->ViewValue = NULL;
+		}
+		$this->script_function_id->ViewCustomAttributes = "";
 
-		// FILEPATH
-		$this->FILEPATH->ViewValue = $this->FILEPATH->CurrentValue;
-		$this->FILEPATH->ViewCustomAttributes = "";
+		// script_function_parameter_relation
+		$this->script_function_parameter_relation->LinkCustomAttributes = "";
+		$this->script_function_parameter_relation->HrefValue = "";
+		$this->script_function_parameter_relation->TooltipValue = "";
 
-		// FILENAME
-		$this->FILENAME->ViewValue = $this->FILENAME->CurrentValue;
-		$this->FILENAME->ViewCustomAttributes = "";
+		// parameter_id
+		$this->parameter_id->LinkCustomAttributes = "";
+		$this->parameter_id->HrefValue = "";
+		$this->parameter_id->TooltipValue = "";
 
-		// datetime
-		$this->datetime->ViewValue = $this->datetime->CurrentValue;
-		$this->datetime->ViewCustomAttributes = "";
-
-		// DBUSERNAME
-		$this->DBUSERNAME->ViewValue = $this->DBUSERNAME->CurrentValue;
-		$this->DBUSERNAME->ViewCustomAttributes = "";
-
-		// username
-		$this->username->ViewValue = $this->username->CurrentValue;
-		$this->username->ViewCustomAttributes = "";
-
-		// id
-		$this->id->LinkCustomAttributes = "";
-		$this->id->HrefValue = "";
-		$this->id->TooltipValue = "";
-
-		// server_id_mysqladmin
-		$this->server_id_mysqladmin->LinkCustomAttributes = "";
-		$this->server_id_mysqladmin->HrefValue = "";
-		$this->server_id_mysqladmin->TooltipValue = "";
-
-		// HOSTNAME
-		$this->HOSTNAME->LinkCustomAttributes = "";
-		$this->HOSTNAME->HrefValue = "";
-		$this->HOSTNAME->TooltipValue = "";
-
-		// PASSWORD
-		$this->PASSWORD->LinkCustomAttributes = "";
-		$this->PASSWORD->HrefValue = "";
-		$this->PASSWORD->TooltipValue = "";
-
-		// DATABASE
-		$this->DATABASE->LinkCustomAttributes = "";
-		$this->DATABASE->HrefValue = "";
-		$this->DATABASE->TooltipValue = "";
-
-		// FILEPATH
-		$this->FILEPATH->LinkCustomAttributes = "";
-		$this->FILEPATH->HrefValue = "";
-		$this->FILEPATH->TooltipValue = "";
-
-		// FILENAME
-		$this->FILENAME->LinkCustomAttributes = "";
-		$this->FILENAME->HrefValue = "";
-		$this->FILENAME->TooltipValue = "";
-
-		// datetime
-		$this->datetime->LinkCustomAttributes = "";
-		$this->datetime->HrefValue = "";
-		$this->datetime->TooltipValue = "";
-
-		// DBUSERNAME
-		$this->DBUSERNAME->LinkCustomAttributes = "";
-		$this->DBUSERNAME->HrefValue = "";
-		$this->DBUSERNAME->TooltipValue = "";
-
-		// username
-		$this->username->LinkCustomAttributes = "";
-		$this->username->HrefValue = "";
-		$this->username->TooltipValue = "";
+		// script_function_id
+		$this->script_function_id->LinkCustomAttributes = "";
+		$this->script_function_id->HrefValue = "";
+		$this->script_function_id->TooltipValue = "";
 
 		// Call Row Rendered event
 		$this->Row_Rendered();
@@ -643,27 +573,13 @@ class crestore_task extends cTable {
 		if ($Doc->Horizontal) { // Horizontal format, write header
 			$Doc->BeginExportRow();
 			if ($ExportPageType == "view") {
-				if ($this->id->Exportable) $Doc->ExportCaption($this->id);
-				if ($this->server_id_mysqladmin->Exportable) $Doc->ExportCaption($this->server_id_mysqladmin);
-				if ($this->HOSTNAME->Exportable) $Doc->ExportCaption($this->HOSTNAME);
-				if ($this->PASSWORD->Exportable) $Doc->ExportCaption($this->PASSWORD);
-				if ($this->DATABASE->Exportable) $Doc->ExportCaption($this->DATABASE);
-				if ($this->FILEPATH->Exportable) $Doc->ExportCaption($this->FILEPATH);
-				if ($this->FILENAME->Exportable) $Doc->ExportCaption($this->FILENAME);
-				if ($this->datetime->Exportable) $Doc->ExportCaption($this->datetime);
-				if ($this->DBUSERNAME->Exportable) $Doc->ExportCaption($this->DBUSERNAME);
-				if ($this->username->Exportable) $Doc->ExportCaption($this->username);
+				if ($this->script_function_parameter_relation->Exportable) $Doc->ExportCaption($this->script_function_parameter_relation);
+				if ($this->parameter_id->Exportable) $Doc->ExportCaption($this->parameter_id);
+				if ($this->script_function_id->Exportable) $Doc->ExportCaption($this->script_function_id);
 			} else {
-				if ($this->id->Exportable) $Doc->ExportCaption($this->id);
-				if ($this->server_id_mysqladmin->Exportable) $Doc->ExportCaption($this->server_id_mysqladmin);
-				if ($this->HOSTNAME->Exportable) $Doc->ExportCaption($this->HOSTNAME);
-				if ($this->PASSWORD->Exportable) $Doc->ExportCaption($this->PASSWORD);
-				if ($this->DATABASE->Exportable) $Doc->ExportCaption($this->DATABASE);
-				if ($this->FILEPATH->Exportable) $Doc->ExportCaption($this->FILEPATH);
-				if ($this->FILENAME->Exportable) $Doc->ExportCaption($this->FILENAME);
-				if ($this->datetime->Exportable) $Doc->ExportCaption($this->datetime);
-				if ($this->DBUSERNAME->Exportable) $Doc->ExportCaption($this->DBUSERNAME);
-				if ($this->username->Exportable) $Doc->ExportCaption($this->username);
+				if ($this->script_function_parameter_relation->Exportable) $Doc->ExportCaption($this->script_function_parameter_relation);
+				if ($this->parameter_id->Exportable) $Doc->ExportCaption($this->parameter_id);
+				if ($this->script_function_id->Exportable) $Doc->ExportCaption($this->script_function_id);
 			}
 			$Doc->EndExportRow();
 		}
@@ -693,27 +609,13 @@ class crestore_task extends cTable {
 				$this->RenderListRow();
 				$Doc->BeginExportRow($RowCnt); // Allow CSS styles if enabled
 				if ($ExportPageType == "view") {
-					if ($this->id->Exportable) $Doc->ExportField($this->id);
-					if ($this->server_id_mysqladmin->Exportable) $Doc->ExportField($this->server_id_mysqladmin);
-					if ($this->HOSTNAME->Exportable) $Doc->ExportField($this->HOSTNAME);
-					if ($this->PASSWORD->Exportable) $Doc->ExportField($this->PASSWORD);
-					if ($this->DATABASE->Exportable) $Doc->ExportField($this->DATABASE);
-					if ($this->FILEPATH->Exportable) $Doc->ExportField($this->FILEPATH);
-					if ($this->FILENAME->Exportable) $Doc->ExportField($this->FILENAME);
-					if ($this->datetime->Exportable) $Doc->ExportField($this->datetime);
-					if ($this->DBUSERNAME->Exportable) $Doc->ExportField($this->DBUSERNAME);
-					if ($this->username->Exportable) $Doc->ExportField($this->username);
+					if ($this->script_function_parameter_relation->Exportable) $Doc->ExportField($this->script_function_parameter_relation);
+					if ($this->parameter_id->Exportable) $Doc->ExportField($this->parameter_id);
+					if ($this->script_function_id->Exportable) $Doc->ExportField($this->script_function_id);
 				} else {
-					if ($this->id->Exportable) $Doc->ExportField($this->id);
-					if ($this->server_id_mysqladmin->Exportable) $Doc->ExportField($this->server_id_mysqladmin);
-					if ($this->HOSTNAME->Exportable) $Doc->ExportField($this->HOSTNAME);
-					if ($this->PASSWORD->Exportable) $Doc->ExportField($this->PASSWORD);
-					if ($this->DATABASE->Exportable) $Doc->ExportField($this->DATABASE);
-					if ($this->FILEPATH->Exportable) $Doc->ExportField($this->FILEPATH);
-					if ($this->FILENAME->Exportable) $Doc->ExportField($this->FILENAME);
-					if ($this->datetime->Exportable) $Doc->ExportField($this->datetime);
-					if ($this->DBUSERNAME->Exportable) $Doc->ExportField($this->DBUSERNAME);
-					if ($this->username->Exportable) $Doc->ExportField($this->username);
+					if ($this->script_function_parameter_relation->Exportable) $Doc->ExportField($this->script_function_parameter_relation);
+					if ($this->parameter_id->Exportable) $Doc->ExportField($this->parameter_id);
+					if ($this->script_function_id->Exportable) $Doc->ExportField($this->script_function_id);
 				}
 				$Doc->EndExportRow();
 			}

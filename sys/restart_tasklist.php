@@ -582,6 +582,7 @@ class crestart_task_list extends crestart_task {
 		$sKeyword = ew_AdjustSql($Keyword);
 		$sWhere = "";
 		$this->BuildBasicSearchSQL($sWhere, $this->server_id_mysqladmin, $Keyword);
+		$this->BuildBasicSearchSQL($sWhere, $this->username, $Keyword);
 		return $sWhere;
 	}
 
@@ -675,6 +676,8 @@ class crestart_task_list extends crestart_task {
 			$this->CurrentOrderType = @$_GET["ordertype"];
 			$this->UpdateSort($this->id); // id
 			$this->UpdateSort($this->server_id_mysqladmin); // server_id_mysqladmin
+			$this->UpdateSort($this->username); // username
+			$this->UpdateSort($this->datetime); // datetime
 			$this->setStartRecordNumber(1); // Reset start position
 		}
 	}
@@ -709,6 +712,8 @@ class crestart_task_list extends crestart_task {
 				$this->setSessionOrderBy($sOrderBy);
 				$this->id->setSort("");
 				$this->server_id_mysqladmin->setSort("");
+				$this->username->setSort("");
+				$this->datetime->setSort("");
 			}
 
 			// Reset start position
@@ -1001,6 +1006,8 @@ class crestart_task_list extends crestart_task {
 		$this->Row_Selected($row);
 		$this->id->setDbValue($rs->fields('id'));
 		$this->server_id_mysqladmin->setDbValue($rs->fields('server_id_mysqladmin'));
+		$this->username->setDbValue($rs->fields('username'));
+		$this->datetime->setDbValue($rs->fields('datetime'));
 	}
 
 	// Load DbValue from recordset
@@ -1009,6 +1016,8 @@ class crestart_task_list extends crestart_task {
 		$row = is_array($rs) ? $rs : $rs->fields;
 		$this->id->DbValue = $row['id'];
 		$this->server_id_mysqladmin->DbValue = $row['server_id_mysqladmin'];
+		$this->username->DbValue = $row['username'];
+		$this->datetime->DbValue = $row['datetime'];
 	}
 
 	// Load old record
@@ -1052,6 +1061,8 @@ class crestart_task_list extends crestart_task {
 		// Common render codes for all row types
 		// id
 		// server_id_mysqladmin
+		// username
+		// datetime
 
 		if ($this->RowType == EW_ROWTYPE_VIEW) { // View row
 
@@ -1083,6 +1094,14 @@ class crestart_task_list extends crestart_task {
 			}
 			$this->server_id_mysqladmin->ViewCustomAttributes = "";
 
+			// username
+			$this->username->ViewValue = $this->username->CurrentValue;
+			$this->username->ViewCustomAttributes = "";
+
+			// datetime
+			$this->datetime->ViewValue = $this->datetime->CurrentValue;
+			$this->datetime->ViewCustomAttributes = "";
+
 			// id
 			$this->id->LinkCustomAttributes = "";
 			$this->id->HrefValue = "";
@@ -1092,6 +1111,16 @@ class crestart_task_list extends crestart_task {
 			$this->server_id_mysqladmin->LinkCustomAttributes = "";
 			$this->server_id_mysqladmin->HrefValue = "";
 			$this->server_id_mysqladmin->TooltipValue = "";
+
+			// username
+			$this->username->LinkCustomAttributes = "";
+			$this->username->HrefValue = "";
+			$this->username->TooltipValue = "";
+
+			// datetime
+			$this->datetime->LinkCustomAttributes = "";
+			$this->datetime->HrefValue = "";
+			$this->datetime->TooltipValue = "";
 		}
 
 		// Call Row Rendered event
@@ -1684,6 +1713,24 @@ $restart_task_list->ListOptions->Render("header", "left");
         </div></div></td>
 	<?php } ?>
 <?php } ?>		
+<?php if ($restart_task->username->Visible) { // username ?>
+	<?php if ($restart_task->SortUrl($restart_task->username) == "") { ?>
+		<td><div id="elh_restart_task_username" class="restart_task_username"><div class="ewTableHeaderCaption"><?php echo $restart_task->username->FldCaption() ?></div></div></td>
+	<?php } else { ?>
+		<td><div class="ewPointer" onclick="ew_Sort(event,'<?php echo $restart_task->SortUrl($restart_task->username) ?>',1);"><div id="elh_restart_task_username" class="restart_task_username">
+			<div class="ewTableHeaderBtn"><span class="ewTableHeaderCaption"><?php echo $restart_task->username->FldCaption() ?><?php echo $Language->Phrase("SrchLegend") ?></span><span class="ewTableHeaderSort"><?php if ($restart_task->username->getSort() == "ASC") { ?><span class="caret ewSortUp"></span><?php } elseif ($restart_task->username->getSort() == "DESC") { ?><span class="caret"></span><?php } ?></span></div>
+        </div></div></td>
+	<?php } ?>
+<?php } ?>		
+<?php if ($restart_task->datetime->Visible) { // datetime ?>
+	<?php if ($restart_task->SortUrl($restart_task->datetime) == "") { ?>
+		<td><div id="elh_restart_task_datetime" class="restart_task_datetime"><div class="ewTableHeaderCaption"><?php echo $restart_task->datetime->FldCaption() ?></div></div></td>
+	<?php } else { ?>
+		<td><div class="ewPointer" onclick="ew_Sort(event,'<?php echo $restart_task->SortUrl($restart_task->datetime) ?>',1);"><div id="elh_restart_task_datetime" class="restart_task_datetime">
+			<div class="ewTableHeaderBtn"><span class="ewTableHeaderCaption"><?php echo $restart_task->datetime->FldCaption() ?></span><span class="ewTableHeaderSort"><?php if ($restart_task->datetime->getSort() == "ASC") { ?><span class="caret ewSortUp"></span><?php } elseif ($restart_task->datetime->getSort() == "DESC") { ?><span class="caret"></span><?php } ?></span></div>
+        </div></div></td>
+	<?php } ?>
+<?php } ?>		
 <?php
 
 // Render list options (header, right)
@@ -1758,6 +1805,18 @@ $restart_task_list->ListOptions->Render("body", "left", $restart_task_list->RowC
 		<td<?php echo $restart_task->server_id_mysqladmin->CellAttributes() ?>>
 <span<?php echo $restart_task->server_id_mysqladmin->ViewAttributes() ?>>
 <?php echo $restart_task->server_id_mysqladmin->ListViewValue() ?></span>
+<a id="<?php echo $restart_task_list->PageObjName . "_row_" . $restart_task_list->RowCnt ?>"></a></td>
+	<?php } ?>
+	<?php if ($restart_task->username->Visible) { // username ?>
+		<td<?php echo $restart_task->username->CellAttributes() ?>>
+<span<?php echo $restart_task->username->ViewAttributes() ?>>
+<?php echo $restart_task->username->ListViewValue() ?></span>
+<a id="<?php echo $restart_task_list->PageObjName . "_row_" . $restart_task_list->RowCnt ?>"></a></td>
+	<?php } ?>
+	<?php if ($restart_task->datetime->Visible) { // datetime ?>
+		<td<?php echo $restart_task->datetime->CellAttributes() ?>>
+<span<?php echo $restart_task->datetime->ViewAttributes() ?>>
+<?php echo $restart_task->datetime->ListViewValue() ?></span>
 <a id="<?php echo $restart_task_list->PageObjName . "_row_" . $restart_task_list->RowCnt ?>"></a></td>
 	<?php } ?>
 <?php

@@ -5,7 +5,7 @@ ob_start(); // Turn on output buffering
 <?php include_once "ewcfg10.php" ?>
 <?php include_once "ewmysql10.php" ?>
 <?php include_once "phpfn10.php" ?>
-<?php include_once "restart_taskinfo.php" ?>
+<?php include_once "script_function_parameter_relationinfo.php" ?>
 <?php include_once "_logininfo.php" ?>
 <?php include_once "userfn10.php" ?>
 <?php
@@ -14,9 +14,9 @@ ob_start(); // Turn on output buffering
 // Page class
 //
 
-$restart_task_delete = NULL; // Initialize page object first
+$script_function_parameter_relation_delete = NULL; // Initialize page object first
 
-class crestart_task_delete extends crestart_task {
+class cscript_function_parameter_relation_delete extends cscript_function_parameter_relation {
 
 	// Page ID
 	var $PageID = 'delete';
@@ -25,10 +25,10 @@ class crestart_task_delete extends crestart_task {
 	var $ProjectID = "{3246B9FA-4C51-4733-8040-34B188FCD87E}";
 
 	// Table name
-	var $TableName = 'restart_task';
+	var $TableName = 'script_function_parameter_relation';
 
 	// Page object name
-	var $PageObjName = 'restart_task_delete';
+	var $PageObjName = 'script_function_parameter_relation_delete';
 
 	// Page name
 	function PageName() {
@@ -171,10 +171,10 @@ class crestart_task_delete extends crestart_task {
 		// Parent constuctor
 		parent::__construct();
 
-		// Table object (restart_task)
-		if (!isset($GLOBALS["restart_task"])) {
-			$GLOBALS["restart_task"] = &$this;
-			$GLOBALS["Table"] = &$GLOBALS["restart_task"];
+		// Table object (script_function_parameter_relation)
+		if (!isset($GLOBALS["script_function_parameter_relation"])) {
+			$GLOBALS["script_function_parameter_relation"] = &$this;
+			$GLOBALS["Table"] = &$GLOBALS["script_function_parameter_relation"];
 		}
 
 		// Table object (_login)
@@ -186,7 +186,7 @@ class crestart_task_delete extends crestart_task {
 
 		// Table name (for backward compatibility)
 		if (!defined("EW_TABLE_NAME"))
-			define("EW_TABLE_NAME", 'restart_task', TRUE);
+			define("EW_TABLE_NAME", 'script_function_parameter_relation', TRUE);
 
 		// Start timer
 		if (!isset($GLOBALS["gTimer"])) $GLOBALS["gTimer"] = new cTimer();
@@ -218,13 +218,13 @@ class crestart_task_delete extends crestart_task {
 		if (!$Security->CanDelete()) {
 			$Security->SaveLastUrl();
 			$this->setFailureMessage($Language->Phrase("NoPermission")); // Set no permission
-			$this->Page_Terminate("restart_tasklist.php");
+			$this->Page_Terminate("script_function_parameter_relationlist.php");
 		}
 		$Security->UserID_Loading();
 		if ($Security->IsLoggedIn()) $Security->LoadUserID();
 		$Security->UserID_Loaded();
 		$this->CurrentAction = (@$_GET["a"] <> "") ? $_GET["a"] : @$_POST["a_list"]; // Set up curent action
-		$this->id->Visible = !$this->IsAdd() && !$this->IsCopy() && !$this->IsGridAdd();
+		$this->script_function_parameter_relation->Visible = !$this->IsAdd() && !$this->IsCopy() && !$this->IsGridAdd();
 
 		// Global Page Loading event (in userfn*.php)
 		Page_Loading();
@@ -277,10 +277,10 @@ class crestart_task_delete extends crestart_task {
 		$this->RecKeys = $this->GetRecordKeys(); // Load record keys
 		$sFilter = $this->GetKeyFilter();
 		if ($sFilter == "")
-			$this->Page_Terminate("restart_tasklist.php"); // Prevent SQL injection, return to list
+			$this->Page_Terminate("script_function_parameter_relationlist.php"); // Prevent SQL injection, return to list
 
 		// Set up filter (SQL WHHERE clause) and get return SQL
-		// SQL constructor in restart_task class, restart_taskinfo.php
+		// SQL constructor in script_function_parameter_relation class, script_function_parameter_relationinfo.php
 
 		$this->CurrentFilter = $sFilter;
 
@@ -351,20 +351,18 @@ class crestart_task_delete extends crestart_task {
 		// Call Row Selected event
 		$row = &$rs->fields;
 		$this->Row_Selected($row);
-		$this->id->setDbValue($rs->fields('id'));
-		$this->server_id_mysqladmin->setDbValue($rs->fields('server_id_mysqladmin'));
-		$this->username->setDbValue($rs->fields('username'));
-		$this->datetime->setDbValue($rs->fields('datetime'));
+		$this->script_function_parameter_relation->setDbValue($rs->fields('script_function_parameter_relation'));
+		$this->parameter_id->setDbValue($rs->fields('parameter_id'));
+		$this->script_function_id->setDbValue($rs->fields('script_function_id'));
 	}
 
 	// Load DbValue from recordset
 	function LoadDbValues(&$rs) {
 		if (!$rs || !is_array($rs) && $rs->EOF) return;
 		$row = is_array($rs) ? $rs : $rs->fields;
-		$this->id->DbValue = $row['id'];
-		$this->server_id_mysqladmin->DbValue = $row['server_id_mysqladmin'];
-		$this->username->DbValue = $row['username'];
-		$this->datetime->DbValue = $row['datetime'];
+		$this->script_function_parameter_relation->DbValue = $row['script_function_parameter_relation'];
+		$this->parameter_id->DbValue = $row['parameter_id'];
+		$this->script_function_id->DbValue = $row['script_function_id'];
 	}
 
 	// Render row values based on field settings
@@ -378,68 +376,78 @@ class crestart_task_delete extends crestart_task {
 		$this->Row_Rendering();
 
 		// Common render codes for all row types
-		// id
-		// server_id_mysqladmin
-		// username
-		// datetime
+		// script_function_parameter_relation
+		// parameter_id
+		// script_function_id
 
 		if ($this->RowType == EW_ROWTYPE_VIEW) { // View row
 
-			// id
-			$this->id->ViewValue = $this->id->CurrentValue;
-			$this->id->ViewCustomAttributes = "";
+			// script_function_parameter_relation
+			$this->script_function_parameter_relation->ViewValue = $this->script_function_parameter_relation->CurrentValue;
+			$this->script_function_parameter_relation->ViewCustomAttributes = "";
 
-			// server_id_mysqladmin
-			if (strval($this->server_id_mysqladmin->CurrentValue) <> "") {
-				$sFilterWrk = "`server_id`" . ew_SearchString("=", $this->server_id_mysqladmin->CurrentValue, EW_DATATYPE_NUMBER);
-			$sSqlWrk = "SELECT `server_id`, `server_name` AS `DispFld`, '' AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld` FROM `server`";
+			// parameter_id
+			if (strval($this->parameter_id->CurrentValue) <> "") {
+				$sFilterWrk = "`parameter_id`" . ew_SearchString("=", $this->parameter_id->CurrentValue, EW_DATATYPE_NUMBER);
+			$sSqlWrk = "SELECT `parameter_id`, `parameter_name` AS `DispFld`, '' AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld` FROM `parameter`";
 			$sWhereWrk = "";
 			if ($sFilterWrk <> "") {
 				ew_AddFilter($sWhereWrk, $sFilterWrk);
 			}
 
 			// Call Lookup selecting
-			$this->Lookup_Selecting($this->server_id_mysqladmin, $sWhereWrk);
+			$this->Lookup_Selecting($this->parameter_id, $sWhereWrk);
 			if ($sWhereWrk <> "") $sSqlWrk .= " WHERE " . $sWhereWrk;
 				$rswrk = $conn->Execute($sSqlWrk);
 				if ($rswrk && !$rswrk->EOF) { // Lookup values found
-					$this->server_id_mysqladmin->ViewValue = $rswrk->fields('DispFld');
+					$this->parameter_id->ViewValue = $rswrk->fields('DispFld');
 					$rswrk->Close();
 				} else {
-					$this->server_id_mysqladmin->ViewValue = $this->server_id_mysqladmin->CurrentValue;
+					$this->parameter_id->ViewValue = $this->parameter_id->CurrentValue;
 				}
 			} else {
-				$this->server_id_mysqladmin->ViewValue = NULL;
+				$this->parameter_id->ViewValue = NULL;
 			}
-			$this->server_id_mysqladmin->ViewCustomAttributes = "";
+			$this->parameter_id->ViewCustomAttributes = "";
 
-			// username
-			$this->username->ViewValue = $this->username->CurrentValue;
-			$this->username->ViewCustomAttributes = "";
+			// script_function_id
+			if (strval($this->script_function_id->CurrentValue) <> "") {
+				$sFilterWrk = "`script_function_id`" . ew_SearchString("=", $this->script_function_id->CurrentValue, EW_DATATYPE_NUMBER);
+			$sSqlWrk = "SELECT `script_function_id`, `script_function_name` AS `DispFld`, '' AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld` FROM `script_function`";
+			$sWhereWrk = "";
+			if ($sFilterWrk <> "") {
+				ew_AddFilter($sWhereWrk, $sFilterWrk);
+			}
 
-			// datetime
-			$this->datetime->ViewValue = $this->datetime->CurrentValue;
-			$this->datetime->ViewCustomAttributes = "";
+			// Call Lookup selecting
+			$this->Lookup_Selecting($this->script_function_id, $sWhereWrk);
+			if ($sWhereWrk <> "") $sSqlWrk .= " WHERE " . $sWhereWrk;
+				$rswrk = $conn->Execute($sSqlWrk);
+				if ($rswrk && !$rswrk->EOF) { // Lookup values found
+					$this->script_function_id->ViewValue = $rswrk->fields('DispFld');
+					$rswrk->Close();
+				} else {
+					$this->script_function_id->ViewValue = $this->script_function_id->CurrentValue;
+				}
+			} else {
+				$this->script_function_id->ViewValue = NULL;
+			}
+			$this->script_function_id->ViewCustomAttributes = "";
 
-			// id
-			$this->id->LinkCustomAttributes = "";
-			$this->id->HrefValue = "";
-			$this->id->TooltipValue = "";
+			// script_function_parameter_relation
+			$this->script_function_parameter_relation->LinkCustomAttributes = "";
+			$this->script_function_parameter_relation->HrefValue = "";
+			$this->script_function_parameter_relation->TooltipValue = "";
 
-			// server_id_mysqladmin
-			$this->server_id_mysqladmin->LinkCustomAttributes = "";
-			$this->server_id_mysqladmin->HrefValue = "";
-			$this->server_id_mysqladmin->TooltipValue = "";
+			// parameter_id
+			$this->parameter_id->LinkCustomAttributes = "";
+			$this->parameter_id->HrefValue = "";
+			$this->parameter_id->TooltipValue = "";
 
-			// username
-			$this->username->LinkCustomAttributes = "";
-			$this->username->HrefValue = "";
-			$this->username->TooltipValue = "";
-
-			// datetime
-			$this->datetime->LinkCustomAttributes = "";
-			$this->datetime->HrefValue = "";
-			$this->datetime->TooltipValue = "";
+			// script_function_id
+			$this->script_function_id->LinkCustomAttributes = "";
+			$this->script_function_id->HrefValue = "";
+			$this->script_function_id->TooltipValue = "";
 		}
 
 		// Call Row Rendered event
@@ -491,7 +499,7 @@ class crestart_task_delete extends crestart_task {
 			foreach ($rsold as $row) {
 				$sThisKey = "";
 				if ($sThisKey <> "") $sThisKey .= $GLOBALS["EW_COMPOSITE_KEY_SEPARATOR"];
-				$sThisKey .= $row['id'];
+				$sThisKey .= $row['script_function_parameter_relation'];
 				$this->LoadDbValues($row);
 				$conn->raiseErrorFn = 'ew_ErrorFn';
 				$DeleteRows = $this->Delete($row); // Delete
@@ -534,7 +542,7 @@ class crestart_task_delete extends crestart_task {
 		global $Breadcrumb, $Language;
 		$Breadcrumb = new cBreadcrumb();
 		$PageCaption = $this->TableCaption();
-		$Breadcrumb->Add("list", "<span id=\"ewPageCaption\">" . $PageCaption . "</span>", "restart_tasklist.php", $this->TableVar);
+		$Breadcrumb->Add("list", "<span id=\"ewPageCaption\">" . $PageCaption . "</span>", "script_function_parameter_relationlist.php", $this->TableVar);
 		$PageCaption = $Language->Phrase("delete");
 		$Breadcrumb->Add("delete", "<span id=\"ewPageCaption\">" . $PageCaption . "</span>", ew_CurrentUrl(), $this->TableVar);
 	}
@@ -604,33 +612,33 @@ class crestart_task_delete extends crestart_task {
 <?php
 
 // Create page object
-if (!isset($restart_task_delete)) $restart_task_delete = new crestart_task_delete();
+if (!isset($script_function_parameter_relation_delete)) $script_function_parameter_relation_delete = new cscript_function_parameter_relation_delete();
 
 // Page init
-$restart_task_delete->Page_Init();
+$script_function_parameter_relation_delete->Page_Init();
 
 // Page main
-$restart_task_delete->Page_Main();
+$script_function_parameter_relation_delete->Page_Main();
 
 // Global Page Rendering event (in userfn*.php)
 Page_Rendering();
 
 // Page Rendering event
-$restart_task_delete->Page_Render();
+$script_function_parameter_relation_delete->Page_Render();
 ?>
 <?php include_once "header.php" ?>
 <script type="text/javascript">
 
 // Page object
-var restart_task_delete = new ew_Page("restart_task_delete");
-restart_task_delete.PageID = "delete"; // Page ID
-var EW_PAGE_ID = restart_task_delete.PageID; // For backward compatibility
+var script_function_parameter_relation_delete = new ew_Page("script_function_parameter_relation_delete");
+script_function_parameter_relation_delete.PageID = "delete"; // Page ID
+var EW_PAGE_ID = script_function_parameter_relation_delete.PageID; // For backward compatibility
 
 // Form object
-var frestart_taskdelete = new ew_Form("frestart_taskdelete");
+var fscript_function_parameter_relationdelete = new ew_Form("fscript_function_parameter_relationdelete");
 
 // Form_CustomValidate event
-frestart_taskdelete.Form_CustomValidate = 
+fscript_function_parameter_relationdelete.Form_CustomValidate = 
  function(fobj) { // DO NOT CHANGE THIS LINE!
 
  	// Your custom validation code here, return false if invalid. 
@@ -639,13 +647,14 @@ frestart_taskdelete.Form_CustomValidate =
 
 // Use JavaScript validation or not
 <?php if (EW_CLIENT_VALIDATE) { ?>
-frestart_taskdelete.ValidateRequired = true;
+fscript_function_parameter_relationdelete.ValidateRequired = true;
 <?php } else { ?>
-frestart_taskdelete.ValidateRequired = false; 
+fscript_function_parameter_relationdelete.ValidateRequired = false; 
 <?php } ?>
 
 // Dynamic selection lists
-frestart_taskdelete.Lists["x_server_id_mysqladmin"] = {"LinkField":"x_server_id","Ajax":true,"AutoFill":false,"DisplayFields":["x_server_name","","",""],"ParentFields":[],"FilterFields":[],"Options":[]};
+fscript_function_parameter_relationdelete.Lists["x_parameter_id"] = {"LinkField":"x_parameter_id","Ajax":true,"AutoFill":false,"DisplayFields":["x_parameter_name","","",""],"ParentFields":[],"FilterFields":[],"Options":[]};
+fscript_function_parameter_relationdelete.Lists["x_script_function_id"] = {"LinkField":"x_script_function_id","Ajax":true,"AutoFill":false,"DisplayFields":["x_script_function_name","","",""],"ParentFields":[],"FilterFields":[],"Options":[]};
 
 // Form object for search
 </script>
@@ -656,102 +665,91 @@ frestart_taskdelete.Lists["x_server_id_mysqladmin"] = {"LinkField":"x_server_id"
 <?php
 
 // Load records for display
-if ($restart_task_delete->Recordset = $restart_task_delete->LoadRecordset())
-	$restart_task_deleteTotalRecs = $restart_task_delete->Recordset->RecordCount(); // Get record count
-if ($restart_task_deleteTotalRecs <= 0) { // No record found, exit
-	if ($restart_task_delete->Recordset)
-		$restart_task_delete->Recordset->Close();
-	$restart_task_delete->Page_Terminate("restart_tasklist.php"); // Return to list
+if ($script_function_parameter_relation_delete->Recordset = $script_function_parameter_relation_delete->LoadRecordset())
+	$script_function_parameter_relation_deleteTotalRecs = $script_function_parameter_relation_delete->Recordset->RecordCount(); // Get record count
+if ($script_function_parameter_relation_deleteTotalRecs <= 0) { // No record found, exit
+	if ($script_function_parameter_relation_delete->Recordset)
+		$script_function_parameter_relation_delete->Recordset->Close();
+	$script_function_parameter_relation_delete->Page_Terminate("script_function_parameter_relationlist.php"); // Return to list
 }
 ?>
 <?php $Breadcrumb->Render(); ?>
-<?php $restart_task_delete->ShowPageHeader(); ?>
+<?php $script_function_parameter_relation_delete->ShowPageHeader(); ?>
 <?php
-$restart_task_delete->ShowMessage();
+$script_function_parameter_relation_delete->ShowMessage();
 ?>
-<form name="frestart_taskdelete" id="frestart_taskdelete" class="ewForm form-horizontal" action="<?php echo ew_CurrentPage() ?>" method="post">
-<input type="hidden" name="t" value="restart_task">
+<form name="fscript_function_parameter_relationdelete" id="fscript_function_parameter_relationdelete" class="ewForm form-horizontal" action="<?php echo ew_CurrentPage() ?>" method="post">
+<input type="hidden" name="t" value="script_function_parameter_relation">
 <input type="hidden" name="a_delete" id="a_delete" value="D">
-<?php foreach ($restart_task_delete->RecKeys as $key) { ?>
+<?php foreach ($script_function_parameter_relation_delete->RecKeys as $key) { ?>
 <?php $keyvalue = is_array($key) ? implode($EW_COMPOSITE_KEY_SEPARATOR, $key) : $key; ?>
 <input type="hidden" name="key_m[]" value="<?php echo ew_HtmlEncode($keyvalue) ?>">
 <?php } ?>
 <table cellspacing="0" class="ewGrid"><tr><td class="ewGridContent">
 <div class="ewGridMiddlePanel">
-<table id="tbl_restart_taskdelete" class="ewTable ewTableSeparate">
-<?php echo $restart_task->TableCustomInnerHtml ?>
+<table id="tbl_script_function_parameter_relationdelete" class="ewTable ewTableSeparate">
+<?php echo $script_function_parameter_relation->TableCustomInnerHtml ?>
 	<thead>
 	<tr class="ewTableHeader">
-<?php if ($restart_task->id->Visible) { // id ?>
-		<td><span id="elh_restart_task_id" class="restart_task_id"><?php echo $restart_task->id->FldCaption() ?></span></td>
+<?php if ($script_function_parameter_relation->script_function_parameter_relation->Visible) { // script_function_parameter_relation ?>
+		<td><span id="elh_script_function_parameter_relation_script_function_parameter_relation" class="script_function_parameter_relation_script_function_parameter_relation"><?php echo $script_function_parameter_relation->script_function_parameter_relation->FldCaption() ?></span></td>
 <?php } ?>
-<?php if ($restart_task->server_id_mysqladmin->Visible) { // server_id_mysqladmin ?>
-		<td><span id="elh_restart_task_server_id_mysqladmin" class="restart_task_server_id_mysqladmin"><?php echo $restart_task->server_id_mysqladmin->FldCaption() ?></span></td>
+<?php if ($script_function_parameter_relation->parameter_id->Visible) { // parameter_id ?>
+		<td><span id="elh_script_function_parameter_relation_parameter_id" class="script_function_parameter_relation_parameter_id"><?php echo $script_function_parameter_relation->parameter_id->FldCaption() ?></span></td>
 <?php } ?>
-<?php if ($restart_task->username->Visible) { // username ?>
-		<td><span id="elh_restart_task_username" class="restart_task_username"><?php echo $restart_task->username->FldCaption() ?></span></td>
-<?php } ?>
-<?php if ($restart_task->datetime->Visible) { // datetime ?>
-		<td><span id="elh_restart_task_datetime" class="restart_task_datetime"><?php echo $restart_task->datetime->FldCaption() ?></span></td>
+<?php if ($script_function_parameter_relation->script_function_id->Visible) { // script_function_id ?>
+		<td><span id="elh_script_function_parameter_relation_script_function_id" class="script_function_parameter_relation_script_function_id"><?php echo $script_function_parameter_relation->script_function_id->FldCaption() ?></span></td>
 <?php } ?>
 	</tr>
 	</thead>
 	<tbody>
 <?php
-$restart_task_delete->RecCnt = 0;
+$script_function_parameter_relation_delete->RecCnt = 0;
 $i = 0;
-while (!$restart_task_delete->Recordset->EOF) {
-	$restart_task_delete->RecCnt++;
-	$restart_task_delete->RowCnt++;
+while (!$script_function_parameter_relation_delete->Recordset->EOF) {
+	$script_function_parameter_relation_delete->RecCnt++;
+	$script_function_parameter_relation_delete->RowCnt++;
 
 	// Set row properties
-	$restart_task->ResetAttrs();
-	$restart_task->RowType = EW_ROWTYPE_VIEW; // View
+	$script_function_parameter_relation->ResetAttrs();
+	$script_function_parameter_relation->RowType = EW_ROWTYPE_VIEW; // View
 
 	// Get the field contents
-	$restart_task_delete->LoadRowValues($restart_task_delete->Recordset);
+	$script_function_parameter_relation_delete->LoadRowValues($script_function_parameter_relation_delete->Recordset);
 
 	// Render row
-	$restart_task_delete->RenderRow();
+	$script_function_parameter_relation_delete->RenderRow();
 ?>
-	<tr<?php echo $restart_task->RowAttributes() ?>>
-<?php if ($restart_task->id->Visible) { // id ?>
-		<td<?php echo $restart_task->id->CellAttributes() ?>>
-<span id="el<?php echo $restart_task_delete->RowCnt ?>_restart_task_id" class="control-group restart_task_id">
-<span<?php echo $restart_task->id->ViewAttributes() ?>>
-<?php echo $restart_task->id->ListViewValue() ?></span>
+	<tr<?php echo $script_function_parameter_relation->RowAttributes() ?>>
+<?php if ($script_function_parameter_relation->script_function_parameter_relation->Visible) { // script_function_parameter_relation ?>
+		<td<?php echo $script_function_parameter_relation->script_function_parameter_relation->CellAttributes() ?>>
+<span id="el<?php echo $script_function_parameter_relation_delete->RowCnt ?>_script_function_parameter_relation_script_function_parameter_relation" class="control-group script_function_parameter_relation_script_function_parameter_relation">
+<span<?php echo $script_function_parameter_relation->script_function_parameter_relation->ViewAttributes() ?>>
+<?php echo $script_function_parameter_relation->script_function_parameter_relation->ListViewValue() ?></span>
 </span>
 </td>
 <?php } ?>
-<?php if ($restart_task->server_id_mysqladmin->Visible) { // server_id_mysqladmin ?>
-		<td<?php echo $restart_task->server_id_mysqladmin->CellAttributes() ?>>
-<span id="el<?php echo $restart_task_delete->RowCnt ?>_restart_task_server_id_mysqladmin" class="control-group restart_task_server_id_mysqladmin">
-<span<?php echo $restart_task->server_id_mysqladmin->ViewAttributes() ?>>
-<?php echo $restart_task->server_id_mysqladmin->ListViewValue() ?></span>
+<?php if ($script_function_parameter_relation->parameter_id->Visible) { // parameter_id ?>
+		<td<?php echo $script_function_parameter_relation->parameter_id->CellAttributes() ?>>
+<span id="el<?php echo $script_function_parameter_relation_delete->RowCnt ?>_script_function_parameter_relation_parameter_id" class="control-group script_function_parameter_relation_parameter_id">
+<span<?php echo $script_function_parameter_relation->parameter_id->ViewAttributes() ?>>
+<?php echo $script_function_parameter_relation->parameter_id->ListViewValue() ?></span>
 </span>
 </td>
 <?php } ?>
-<?php if ($restart_task->username->Visible) { // username ?>
-		<td<?php echo $restart_task->username->CellAttributes() ?>>
-<span id="el<?php echo $restart_task_delete->RowCnt ?>_restart_task_username" class="control-group restart_task_username">
-<span<?php echo $restart_task->username->ViewAttributes() ?>>
-<?php echo $restart_task->username->ListViewValue() ?></span>
-</span>
-</td>
-<?php } ?>
-<?php if ($restart_task->datetime->Visible) { // datetime ?>
-		<td<?php echo $restart_task->datetime->CellAttributes() ?>>
-<span id="el<?php echo $restart_task_delete->RowCnt ?>_restart_task_datetime" class="control-group restart_task_datetime">
-<span<?php echo $restart_task->datetime->ViewAttributes() ?>>
-<?php echo $restart_task->datetime->ListViewValue() ?></span>
+<?php if ($script_function_parameter_relation->script_function_id->Visible) { // script_function_id ?>
+		<td<?php echo $script_function_parameter_relation->script_function_id->CellAttributes() ?>>
+<span id="el<?php echo $script_function_parameter_relation_delete->RowCnt ?>_script_function_parameter_relation_script_function_id" class="control-group script_function_parameter_relation_script_function_id">
+<span<?php echo $script_function_parameter_relation->script_function_id->ViewAttributes() ?>>
+<?php echo $script_function_parameter_relation->script_function_id->ListViewValue() ?></span>
 </span>
 </td>
 <?php } ?>
 	</tr>
 <?php
-	$restart_task_delete->Recordset->MoveNext();
+	$script_function_parameter_relation_delete->Recordset->MoveNext();
 }
-$restart_task_delete->Recordset->Close();
+$script_function_parameter_relation_delete->Recordset->Close();
 ?>
 </tbody>
 </table>
@@ -762,10 +760,10 @@ $restart_task_delete->Recordset->Close();
 </div>
 </form>
 <script type="text/javascript">
-frestart_taskdelete.Init();
+fscript_function_parameter_relationdelete.Init();
 </script>
 <?php
-$restart_task_delete->ShowPageFooter();
+$script_function_parameter_relation_delete->ShowPageFooter();
 if (EW_DEBUG_ENABLED)
 	echo ew_DebugMsg();
 ?>
@@ -777,5 +775,5 @@ if (EW_DEBUG_ENABLED)
 </script>
 <?php include_once "footer.php" ?>
 <?php
-$restart_task_delete->Page_Terminate();
+$script_function_parameter_relation_delete->Page_Terminate();
 ?>

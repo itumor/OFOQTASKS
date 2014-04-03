@@ -5,7 +5,7 @@ ob_start(); // Turn on output buffering
 <?php include_once "ewcfg10.php" ?>
 <?php include_once "ewmysql10.php" ?>
 <?php include_once "phpfn10.php" ?>
-<?php include_once "create_taskinfo.php" ?>
+<?php include_once "script_function_parameter_relationinfo.php" ?>
 <?php include_once "_logininfo.php" ?>
 <?php include_once "userfn10.php" ?>
 <?php
@@ -14,9 +14,9 @@ ob_start(); // Turn on output buffering
 // Page class
 //
 
-$create_task_view = NULL; // Initialize page object first
+$script_function_parameter_relation_view = NULL; // Initialize page object first
 
-class ccreate_task_view extends ccreate_task {
+class cscript_function_parameter_relation_view extends cscript_function_parameter_relation {
 
 	// Page ID
 	var $PageID = 'view';
@@ -25,10 +25,10 @@ class ccreate_task_view extends ccreate_task {
 	var $ProjectID = "{3246B9FA-4C51-4733-8040-34B188FCD87E}";
 
 	// Table name
-	var $TableName = 'create_task';
+	var $TableName = 'script_function_parameter_relation';
 
 	// Page object name
-	var $PageObjName = 'create_task_view';
+	var $PageObjName = 'script_function_parameter_relation_view';
 
 	// Page name
 	function PageName() {
@@ -197,15 +197,15 @@ class ccreate_task_view extends ccreate_task {
 		// Parent constuctor
 		parent::__construct();
 
-		// Table object (create_task)
-		if (!isset($GLOBALS["create_task"])) {
-			$GLOBALS["create_task"] = &$this;
-			$GLOBALS["Table"] = &$GLOBALS["create_task"];
+		// Table object (script_function_parameter_relation)
+		if (!isset($GLOBALS["script_function_parameter_relation"])) {
+			$GLOBALS["script_function_parameter_relation"] = &$this;
+			$GLOBALS["Table"] = &$GLOBALS["script_function_parameter_relation"];
 		}
 		$KeyUrl = "";
-		if (@$_GET["id"] <> "") {
-			$this->RecKey["id"] = $_GET["id"];
-			$KeyUrl .= "&id=" . urlencode($this->RecKey["id"]);
+		if (@$_GET["script_function_parameter_relation"] <> "") {
+			$this->RecKey["script_function_parameter_relation"] = $_GET["script_function_parameter_relation"];
+			$KeyUrl .= "&script_function_parameter_relation=" . urlencode($this->RecKey["script_function_parameter_relation"]);
 		}
 		$this->ExportPrintUrl = $this->PageUrl() . "export=print" . $KeyUrl;
 		$this->ExportHtmlUrl = $this->PageUrl() . "export=html" . $KeyUrl;
@@ -224,7 +224,7 @@ class ccreate_task_view extends ccreate_task {
 
 		// Table name (for backward compatibility)
 		if (!defined("EW_TABLE_NAME"))
-			define("EW_TABLE_NAME", 'create_task', TRUE);
+			define("EW_TABLE_NAME", 'script_function_parameter_relation', TRUE);
 
 		// Start timer
 		if (!isset($GLOBALS["gTimer"])) $GLOBALS["gTimer"] = new cTimer();
@@ -269,7 +269,7 @@ class ccreate_task_view extends ccreate_task {
 		if (!$Security->CanView()) {
 			$Security->SaveLastUrl();
 			$this->setFailureMessage($Language->Phrase("NoPermission")); // Set no permission
-			$this->Page_Terminate("create_tasklist.php");
+			$this->Page_Terminate("script_function_parameter_relationlist.php");
 		}
 		$Security->UserID_Loading();
 		if ($Security->IsLoggedIn()) $Security->LoadUserID();
@@ -286,15 +286,15 @@ class ccreate_task_view extends ccreate_task {
 		}
 		$gsExport = $this->Export; // Get export parameter, used in header
 		$gsExportFile = $this->TableVar; // Get export file, used in header
-		if (@$_GET["id"] <> "") {
+		if (@$_GET["script_function_parameter_relation"] <> "") {
 			if ($gsExportFile <> "") $gsExportFile .= "_";
-			$gsExportFile .= ew_StripSlashes($_GET["id"]);
+			$gsExportFile .= ew_StripSlashes($_GET["script_function_parameter_relation"]);
 		}
 		$this->CurrentAction = (@$_GET["a"] <> "") ? $_GET["a"] : @$_POST["a_list"]; // Set up curent action
 
 		// Setup export options
 		$this->SetupExportOptions();
-		$this->id->Visible = !$this->IsAdd() && !$this->IsCopy() && !$this->IsGridAdd();
+		$this->script_function_parameter_relation->Visible = !$this->IsAdd() && !$this->IsCopy() && !$this->IsGridAdd();
 
 		// Global Page Loading event (in userfn*.php)
 		Page_Loading();
@@ -363,9 +363,9 @@ class ccreate_task_view extends ccreate_task {
 		// Set up Breadcrumb
 		$this->SetupBreadcrumb();
 		if ($this->IsPageRequest()) { // Validate request
-			if (@$_GET["id"] <> "") {
-				$this->id->setQueryStringValue($_GET["id"]);
-				$this->RecKey["id"] = $this->id->QueryStringValue;
+			if (@$_GET["script_function_parameter_relation"] <> "") {
+				$this->script_function_parameter_relation->setQueryStringValue($_GET["script_function_parameter_relation"]);
+				$this->RecKey["script_function_parameter_relation"] = $this->script_function_parameter_relation->QueryStringValue;
 			} else {
 				$bLoadCurrentRecord = TRUE;
 			}
@@ -380,7 +380,7 @@ class ccreate_task_view extends ccreate_task {
 					if ($this->TotalRecs <= 0) { // No record found
 						if ($this->getSuccessMessage() == "" && $this->getFailureMessage() == "")
 							$this->setFailureMessage($Language->Phrase("NoRecord")); // Set no record message
-						$this->Page_Terminate("create_tasklist.php"); // Return to list page
+						$this->Page_Terminate("script_function_parameter_relationlist.php"); // Return to list page
 					} elseif ($bLoadCurrentRecord) { // Load current record position
 						$this->SetUpStartRec(); // Set up start record position
 
@@ -391,7 +391,7 @@ class ccreate_task_view extends ccreate_task {
 						}
 					} else { // Match key values
 						while (!$this->Recordset->EOF) {
-							if (strval($this->id->CurrentValue) == strval($this->Recordset->fields('id'))) {
+							if (strval($this->script_function_parameter_relation->CurrentValue) == strval($this->Recordset->fields('script_function_parameter_relation'))) {
 								$this->setStartRecordNumber($this->StartRec); // Save record position
 								$bMatchRecord = TRUE;
 								break;
@@ -404,7 +404,7 @@ class ccreate_task_view extends ccreate_task {
 					if (!$bMatchRecord) {
 						if ($this->getSuccessMessage() == "" && $this->getFailureMessage() == "")
 							$this->setFailureMessage($Language->Phrase("NoRecord")); // Set no record message
-						$sReturnUrl = "create_tasklist.php"; // No matching record, return to list
+						$sReturnUrl = "script_function_parameter_relationlist.php"; // No matching record, return to list
 					} else {
 						$this->LoadRowValues($this->Recordset); // Load row values
 					}
@@ -417,7 +417,7 @@ class ccreate_task_view extends ccreate_task {
 				exit();
 			}
 		} else {
-			$sReturnUrl = "create_tasklist.php"; // Not page request, return to list
+			$sReturnUrl = "script_function_parameter_relationlist.php"; // Not page request, return to list
 		}
 		if ($sReturnUrl <> "")
 			$this->Page_Terminate($sReturnUrl);
@@ -551,28 +551,18 @@ class ccreate_task_view extends ccreate_task {
 		// Call Row Selected event
 		$row = &$rs->fields;
 		$this->Row_Selected($row);
-		$this->id->setDbValue($rs->fields('id'));
-		$this->server_id_mysqladmin->setDbValue($rs->fields('server_id_mysqladmin'));
-		$this->HOSTNAME->setDbValue($rs->fields('HOSTNAME'));
-		$this->PASSWORD->setDbValue($rs->fields('PASSWORD'));
-		$this->DATABASE->setDbValue($rs->fields('DATABASE'));
-		$this->datetime->setDbValue($rs->fields('datetime'));
-		$this->DBUSERNAME->setDbValue($rs->fields('DBUSERNAME'));
-		$this->username->setDbValue($rs->fields('username'));
+		$this->script_function_parameter_relation->setDbValue($rs->fields('script_function_parameter_relation'));
+		$this->parameter_id->setDbValue($rs->fields('parameter_id'));
+		$this->script_function_id->setDbValue($rs->fields('script_function_id'));
 	}
 
 	// Load DbValue from recordset
 	function LoadDbValues(&$rs) {
 		if (!$rs || !is_array($rs) && $rs->EOF) return;
 		$row = is_array($rs) ? $rs : $rs->fields;
-		$this->id->DbValue = $row['id'];
-		$this->server_id_mysqladmin->DbValue = $row['server_id_mysqladmin'];
-		$this->HOSTNAME->DbValue = $row['HOSTNAME'];
-		$this->PASSWORD->DbValue = $row['PASSWORD'];
-		$this->DATABASE->DbValue = $row['DATABASE'];
-		$this->datetime->DbValue = $row['datetime'];
-		$this->DBUSERNAME->DbValue = $row['DBUSERNAME'];
-		$this->username->DbValue = $row['username'];
+		$this->script_function_parameter_relation->DbValue = $row['script_function_parameter_relation'];
+		$this->parameter_id->DbValue = $row['parameter_id'];
+		$this->script_function_id->DbValue = $row['script_function_id'];
 	}
 
 	// Render row values based on field settings
@@ -592,88 +582,78 @@ class ccreate_task_view extends ccreate_task {
 		$this->Row_Rendering();
 
 		// Common render codes for all row types
-		// id
-		// server_id_mysqladmin
-		// HOSTNAME
-		// PASSWORD
-		// DATABASE
-		// datetime
-		// DBUSERNAME
-		// username
+		// script_function_parameter_relation
+		// parameter_id
+		// script_function_id
 
 		if ($this->RowType == EW_ROWTYPE_VIEW) { // View row
 
-			// id
-			$this->id->ViewValue = $this->id->CurrentValue;
-			$this->id->ViewCustomAttributes = "";
+			// script_function_parameter_relation
+			$this->script_function_parameter_relation->ViewValue = $this->script_function_parameter_relation->CurrentValue;
+			$this->script_function_parameter_relation->ViewCustomAttributes = "";
 
-			// server_id_mysqladmin
-			$this->server_id_mysqladmin->ViewValue = $this->server_id_mysqladmin->CurrentValue;
-			$this->server_id_mysqladmin->ViewCustomAttributes = "";
+			// parameter_id
+			if (strval($this->parameter_id->CurrentValue) <> "") {
+				$sFilterWrk = "`parameter_id`" . ew_SearchString("=", $this->parameter_id->CurrentValue, EW_DATATYPE_NUMBER);
+			$sSqlWrk = "SELECT `parameter_id`, `parameter_name` AS `DispFld`, '' AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld` FROM `parameter`";
+			$sWhereWrk = "";
+			if ($sFilterWrk <> "") {
+				ew_AddFilter($sWhereWrk, $sFilterWrk);
+			}
 
-			// HOSTNAME
-			$this->HOSTNAME->ViewValue = $this->HOSTNAME->CurrentValue;
-			$this->HOSTNAME->ViewCustomAttributes = "";
+			// Call Lookup selecting
+			$this->Lookup_Selecting($this->parameter_id, $sWhereWrk);
+			if ($sWhereWrk <> "") $sSqlWrk .= " WHERE " . $sWhereWrk;
+				$rswrk = $conn->Execute($sSqlWrk);
+				if ($rswrk && !$rswrk->EOF) { // Lookup values found
+					$this->parameter_id->ViewValue = $rswrk->fields('DispFld');
+					$rswrk->Close();
+				} else {
+					$this->parameter_id->ViewValue = $this->parameter_id->CurrentValue;
+				}
+			} else {
+				$this->parameter_id->ViewValue = NULL;
+			}
+			$this->parameter_id->ViewCustomAttributes = "";
 
-			// PASSWORD
-			$this->PASSWORD->ViewValue = $this->PASSWORD->CurrentValue;
-			$this->PASSWORD->ViewCustomAttributes = "";
+			// script_function_id
+			if (strval($this->script_function_id->CurrentValue) <> "") {
+				$sFilterWrk = "`script_function_id`" . ew_SearchString("=", $this->script_function_id->CurrentValue, EW_DATATYPE_NUMBER);
+			$sSqlWrk = "SELECT `script_function_id`, `script_function_name` AS `DispFld`, '' AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld` FROM `script_function`";
+			$sWhereWrk = "";
+			if ($sFilterWrk <> "") {
+				ew_AddFilter($sWhereWrk, $sFilterWrk);
+			}
 
-			// DATABASE
-			$this->DATABASE->ViewValue = $this->DATABASE->CurrentValue;
-			$this->DATABASE->ViewCustomAttributes = "";
+			// Call Lookup selecting
+			$this->Lookup_Selecting($this->script_function_id, $sWhereWrk);
+			if ($sWhereWrk <> "") $sSqlWrk .= " WHERE " . $sWhereWrk;
+				$rswrk = $conn->Execute($sSqlWrk);
+				if ($rswrk && !$rswrk->EOF) { // Lookup values found
+					$this->script_function_id->ViewValue = $rswrk->fields('DispFld');
+					$rswrk->Close();
+				} else {
+					$this->script_function_id->ViewValue = $this->script_function_id->CurrentValue;
+				}
+			} else {
+				$this->script_function_id->ViewValue = NULL;
+			}
+			$this->script_function_id->ViewCustomAttributes = "";
 
-			// datetime
-			$this->datetime->ViewValue = $this->datetime->CurrentValue;
-			$this->datetime->ViewCustomAttributes = "";
+			// script_function_parameter_relation
+			$this->script_function_parameter_relation->LinkCustomAttributes = "";
+			$this->script_function_parameter_relation->HrefValue = "";
+			$this->script_function_parameter_relation->TooltipValue = "";
 
-			// DBUSERNAME
-			$this->DBUSERNAME->ViewValue = $this->DBUSERNAME->CurrentValue;
-			$this->DBUSERNAME->ViewCustomAttributes = "";
+			// parameter_id
+			$this->parameter_id->LinkCustomAttributes = "";
+			$this->parameter_id->HrefValue = "";
+			$this->parameter_id->TooltipValue = "";
 
-			// username
-			$this->username->ViewValue = $this->username->CurrentValue;
-			$this->username->ViewCustomAttributes = "";
-
-			// id
-			$this->id->LinkCustomAttributes = "";
-			$this->id->HrefValue = "";
-			$this->id->TooltipValue = "";
-
-			// server_id_mysqladmin
-			$this->server_id_mysqladmin->LinkCustomAttributes = "";
-			$this->server_id_mysqladmin->HrefValue = "";
-			$this->server_id_mysqladmin->TooltipValue = "";
-
-			// HOSTNAME
-			$this->HOSTNAME->LinkCustomAttributes = "";
-			$this->HOSTNAME->HrefValue = "";
-			$this->HOSTNAME->TooltipValue = "";
-
-			// PASSWORD
-			$this->PASSWORD->LinkCustomAttributes = "";
-			$this->PASSWORD->HrefValue = "";
-			$this->PASSWORD->TooltipValue = "";
-
-			// DATABASE
-			$this->DATABASE->LinkCustomAttributes = "";
-			$this->DATABASE->HrefValue = "";
-			$this->DATABASE->TooltipValue = "";
-
-			// datetime
-			$this->datetime->LinkCustomAttributes = "";
-			$this->datetime->HrefValue = "";
-			$this->datetime->TooltipValue = "";
-
-			// DBUSERNAME
-			$this->DBUSERNAME->LinkCustomAttributes = "";
-			$this->DBUSERNAME->HrefValue = "";
-			$this->DBUSERNAME->TooltipValue = "";
-
-			// username
-			$this->username->LinkCustomAttributes = "";
-			$this->username->HrefValue = "";
-			$this->username->TooltipValue = "";
+			// script_function_id
+			$this->script_function_id->LinkCustomAttributes = "";
+			$this->script_function_id->HrefValue = "";
+			$this->script_function_id->TooltipValue = "";
 		}
 
 		// Call Row Rendered event
@@ -722,7 +702,7 @@ class ccreate_task_view extends ccreate_task {
 
 		// Export to Email
 		$item = &$this->ExportOptions->Add("email");
-		$item->Body = "<a id=\"emf_create_task\" href=\"javascript:void(0);\" class=\"ewExportLink ewEmail\" data-caption=\"" . $Language->Phrase("ExportToEmailText") . "\" onclick=\"ew_EmailDialogShow({lnk:'emf_create_task',hdr:ewLanguage.Phrase('ExportToEmail'),f:document.fcreate_taskview,key:" . ew_ArrayToJsonAttr($this->RecKey) . ",sel:false});\">" . $Language->Phrase("ExportToEmail") . "</a>";
+		$item->Body = "<a id=\"emf_script_function_parameter_relation\" href=\"javascript:void(0);\" class=\"ewExportLink ewEmail\" data-caption=\"" . $Language->Phrase("ExportToEmailText") . "\" onclick=\"ew_EmailDialogShow({lnk:'emf_script_function_parameter_relation',hdr:ewLanguage.Phrase('ExportToEmail'),f:document.fscript_function_parameter_relationview,key:" . ew_ArrayToJsonAttr($this->RecKey) . ",sel:false});\">" . $Language->Phrase("ExportToEmail") . "</a>";
 		$item->Visible = TRUE;
 
 		// Drop down button for export
@@ -910,7 +890,7 @@ class ccreate_task_view extends ccreate_task {
 		global $Breadcrumb, $Language;
 		$Breadcrumb = new cBreadcrumb();
 		$PageCaption = $this->TableCaption();
-		$Breadcrumb->Add("list", "<span id=\"ewPageCaption\">" . $PageCaption . "</span>", "create_tasklist.php", $this->TableVar);
+		$Breadcrumb->Add("list", "<span id=\"ewPageCaption\">" . $PageCaption . "</span>", "script_function_parameter_relationlist.php", $this->TableVar);
 		$PageCaption = $Language->Phrase("view");
 		$Breadcrumb->Add("view", "<span id=\"ewPageCaption\">" . $PageCaption . "</span>", ew_CurrentUrl(), $this->TableVar);
 	}
@@ -980,34 +960,34 @@ class ccreate_task_view extends ccreate_task {
 <?php
 
 // Create page object
-if (!isset($create_task_view)) $create_task_view = new ccreate_task_view();
+if (!isset($script_function_parameter_relation_view)) $script_function_parameter_relation_view = new cscript_function_parameter_relation_view();
 
 // Page init
-$create_task_view->Page_Init();
+$script_function_parameter_relation_view->Page_Init();
 
 // Page main
-$create_task_view->Page_Main();
+$script_function_parameter_relation_view->Page_Main();
 
 // Global Page Rendering event (in userfn*.php)
 Page_Rendering();
 
 // Page Rendering event
-$create_task_view->Page_Render();
+$script_function_parameter_relation_view->Page_Render();
 ?>
 <?php include_once "header.php" ?>
-<?php if ($create_task->Export == "") { ?>
+<?php if ($script_function_parameter_relation->Export == "") { ?>
 <script type="text/javascript">
 
 // Page object
-var create_task_view = new ew_Page("create_task_view");
-create_task_view.PageID = "view"; // Page ID
-var EW_PAGE_ID = create_task_view.PageID; // For backward compatibility
+var script_function_parameter_relation_view = new ew_Page("script_function_parameter_relation_view");
+script_function_parameter_relation_view.PageID = "view"; // Page ID
+var EW_PAGE_ID = script_function_parameter_relation_view.PageID; // For backward compatibility
 
 // Form object
-var fcreate_taskview = new ew_Form("fcreate_taskview");
+var fscript_function_parameter_relationview = new ew_Form("fscript_function_parameter_relationview");
 
 // Form_CustomValidate event
-fcreate_taskview.Form_CustomValidate = 
+fscript_function_parameter_relationview.Form_CustomValidate = 
  function(fobj) { // DO NOT CHANGE THIS LINE!
 
  	// Your custom validation code here, return false if invalid. 
@@ -1016,62 +996,64 @@ fcreate_taskview.Form_CustomValidate =
 
 // Use JavaScript validation or not
 <?php if (EW_CLIENT_VALIDATE) { ?>
-fcreate_taskview.ValidateRequired = true;
+fscript_function_parameter_relationview.ValidateRequired = true;
 <?php } else { ?>
-fcreate_taskview.ValidateRequired = false; 
+fscript_function_parameter_relationview.ValidateRequired = false; 
 <?php } ?>
 
 // Dynamic selection lists
-// Form object for search
+fscript_function_parameter_relationview.Lists["x_parameter_id"] = {"LinkField":"x_parameter_id","Ajax":true,"AutoFill":false,"DisplayFields":["x_parameter_name","","",""],"ParentFields":[],"FilterFields":[],"Options":[]};
+fscript_function_parameter_relationview.Lists["x_script_function_id"] = {"LinkField":"x_script_function_id","Ajax":true,"AutoFill":false,"DisplayFields":["x_script_function_name","","",""],"ParentFields":[],"FilterFields":[],"Options":[]};
 
+// Form object for search
 </script>
 <script type="text/javascript">
 
 // Write your client script here, no need to add script tags.
 </script>
 <?php } ?>
-<?php if ($create_task->Export == "") { ?>
+<?php if ($script_function_parameter_relation->Export == "") { ?>
 <?php $Breadcrumb->Render(); ?>
 <?php } ?>
-<?php if ($create_task->Export == "") { ?>
+<?php if ($script_function_parameter_relation->Export == "") { ?>
 <div class="ewViewExportOptions">
-<?php $create_task_view->ExportOptions->Render("body") ?>
-<?php if (!$create_task_view->ExportOptions->UseDropDownButton) { ?>
+<?php $script_function_parameter_relation_view->ExportOptions->Render("body") ?>
+<?php if (!$script_function_parameter_relation_view->ExportOptions->UseDropDownButton) { ?>
 </div>
 <div class="ewViewOtherOptions">
 <?php } ?>
 <?php
-	foreach ($create_task_view->OtherOptions as &$option)
+	foreach ($script_function_parameter_relation_view->OtherOptions as &$option)
 		$option->Render("body");
 ?>
 </div>
 <?php } ?>
-<?php $create_task_view->ShowPageHeader(); ?>
+<?php $script_function_parameter_relation_view->ShowPageHeader(); ?>
 <?php
-$create_task_view->ShowMessage();
+$script_function_parameter_relation_view->ShowMessage();
 ?>
-<?php if ($create_task->Export == "") { ?>
+<?php if ($script_function_parameter_relation->Export == "") { ?>
 <form name="ewPagerForm" class="ewForm form-horizontal" action="<?php echo ew_CurrentPage() ?>">
 <table class="ewPager">
 <tr><td>
-<?php if (!isset($create_task_view->Pager)) $create_task_view->Pager = new cNumericPager($create_task_view->StartRec, $create_task_view->DisplayRecs, $create_task_view->TotalRecs, $create_task_view->RecRange) ?>
-<?php if ($create_task_view->Pager->RecordCount > 0) { ?>
+<?php if (!isset($script_function_parameter_relation_view->Pager)) $script_function_parameter_relation_view->Pager = new cNumericPager($script_function_parameter_relation_view->StartRec, $script_function_parameter_relation_view->DisplayRecs, $script_function_parameter_relation_view->TotalRecs, $script_function_parameter_relation_view->RecRange) ?>
+<?php if ($script_function_parameter_relation_view->Pager->RecordCount > 0) { ?>
 <table cellspacing="0" class="ewStdTable"><tbody><tr><td>
 <div class="pagination"><ul>
-	<?php if ($create_task_view->Pager->FirstButton->Enabled) { ?>
-	<li><a href="<?php echo $create_task_view->PageUrl() ?>start=<?php echo $create_task_view->Pager->FirstButton->Start ?>"><?php echo $Language->Phrase("PagerFirst") ?></a></li>
+	<?php if ($script_function_parameter_relation_view->Pager->FirstButton->Enabled) { ?>
+	<li><a href="<?php echo $script_function_parameter_relation_view->PageUrl() ?>start=<?php echo $script_function_parameter_relation_view->Pager->FirstButton->Start ?>"><?php echo $Language->Phrase("PagerFirst") ?></a></li>
 	<?php } ?>
-	<?php if ($create_task_view->Pager->PrevButton->Enabled) { ?>
-	<li><a href="<?php echo $create_task_view->PageUrl() ?>start=<?php echo $create_task_view->Pager->PrevButton->Start ?>"><?php echo $Language->Phrase("PagerPrevious") ?></a></li>
+	<?php if ($script_function_parameter_relation_view->Pager->PrevButton->Enabled) { ?>
+	<li><a href="<?php echo $script_function_parameter_relation_view->PageUrl() ?>start=<?php echo $script_function_parameter_relation_view->Pager->PrevButton->Start ?>"><?php echo $Language->Phrase("PagerPrevious") ?></a></li>
 	<?php } ?>
-	<?php foreach ($create_task_view->Pager->Items as $PagerItem) { ?>
-		<li<?php if (!$PagerItem->Enabled) { echo " class=\" active\""; } ?>><a href="<?php if ($PagerItem->Enabled) { echo $create_task_view->PageUrl() . "start=" . $PagerItem->Start; } else { echo "#"; } ?>"><?php echo $PagerItem->Text ?></a></li>
+	<?php foreach ($script_function_parameter_relation_view->Pager->Items as $PagerItem) { ?>
+		<li<?php if (!$PagerItem->Enabled) { echo " class=\" active\""; } ?>><a href="<?php if ($PagerItem->Enabled) { echo $script_function_parameter_relation_view->PageUrl() . "start=" . $PagerItem->Start; } else { echo "#"; } ?>"><?php echo $PagerItem->Text ?></a></li>
 	<?php } ?>
-	<?php if ($create_task_view->Pager->NextButton->Enabled) { ?>
-	<li><a href="<?php echo $create_task_view->PageUrl() ?>start=<?php echo $create_task_view->Pager->NextButton->Start ?>"><?php echo $Language->Phrase("PagerNext") ?></a></li>
+	<?php if ($script_function_parameter_relation_view->Pager->NextButton->Enabled) { ?>
+	<li><a href="<?php echo $script_function_parameter_relation_view->PageUrl() ?>start=<?php echo $script_function_parameter_relation_view->Pager->NextButton->Start ?>"><?php echo $Language->Phrase("PagerNext") ?></a></li>
 	<?php } ?>
-	<?php if ($create_task_view->Pager->LastButton->Enabled) { ?>
-	<li><a href="<?php echo $create_task_view->PageUrl() ?>start=<?php echo $create_task_view->Pager->LastButton->Start ?>"><?php echo $Language->Phrase("PagerLast") ?></a></li>
+	<?php if ($script_function_parameter_relation_view->Pager->LastButton->Enabled) { ?>
+	<li><a href="<?php echo $script_function_parameter_relation_view->PageUrl() ?>start=<?php echo $script_function_parameter_relation_view->Pager->LastButton->Start ?>"><?php echo $Language->Phrase("PagerLast") ?></a></li>
 	<?php } ?>
 </ul></div>
 </td>
@@ -1083,121 +1065,66 @@ $create_task_view->ShowMessage();
 </tr></table>
 </form>
 <?php } ?>
-<form name="fcreate_taskview" id="fcreate_taskview" class="ewForm form-horizontal" action="<?php echo ew_CurrentPage() ?>" method="post">
-<input type="hidden" name="t" value="create_task">
+<form name="fscript_function_parameter_relationview" id="fscript_function_parameter_relationview" class="ewForm form-horizontal" action="<?php echo ew_CurrentPage() ?>" method="post">
+<input type="hidden" name="t" value="script_function_parameter_relation">
 <table cellspacing="0" class="ewGrid"><tr><td>
-<table id="tbl_create_taskview" class="table table-bordered table-striped">
-<?php if ($create_task->id->Visible) { // id ?>
-	<tr id="r_id">
-		<td><span id="elh_create_task_id"><?php echo $create_task->id->FldCaption() ?></span></td>
-		<td<?php echo $create_task->id->CellAttributes() ?>>
-<span id="el_create_task_id" class="control-group">
-<span<?php echo $create_task->id->ViewAttributes() ?>>
-<?php echo $create_task->id->ViewValue ?></span>
+<table id="tbl_script_function_parameter_relationview" class="table table-bordered table-striped">
+<?php if ($script_function_parameter_relation->script_function_parameter_relation->Visible) { // script_function_parameter_relation ?>
+	<tr id="r_script_function_parameter_relation">
+		<td><span id="elh_script_function_parameter_relation_script_function_parameter_relation"><?php echo $script_function_parameter_relation->script_function_parameter_relation->FldCaption() ?></span></td>
+		<td<?php echo $script_function_parameter_relation->script_function_parameter_relation->CellAttributes() ?>>
+<span id="el_script_function_parameter_relation_script_function_parameter_relation" class="control-group">
+<span<?php echo $script_function_parameter_relation->script_function_parameter_relation->ViewAttributes() ?>>
+<?php echo $script_function_parameter_relation->script_function_parameter_relation->ViewValue ?></span>
 </span>
 </td>
 	</tr>
 <?php } ?>
-<?php if ($create_task->server_id_mysqladmin->Visible) { // server_id_mysqladmin ?>
-	<tr id="r_server_id_mysqladmin">
-		<td><span id="elh_create_task_server_id_mysqladmin"><?php echo $create_task->server_id_mysqladmin->FldCaption() ?></span></td>
-		<td<?php echo $create_task->server_id_mysqladmin->CellAttributes() ?>>
-<span id="el_create_task_server_id_mysqladmin" class="control-group">
-<span<?php echo $create_task->server_id_mysqladmin->ViewAttributes() ?>>
-<?php echo $create_task->server_id_mysqladmin->ViewValue ?></span>
+<?php if ($script_function_parameter_relation->parameter_id->Visible) { // parameter_id ?>
+	<tr id="r_parameter_id">
+		<td><span id="elh_script_function_parameter_relation_parameter_id"><?php echo $script_function_parameter_relation->parameter_id->FldCaption() ?></span></td>
+		<td<?php echo $script_function_parameter_relation->parameter_id->CellAttributes() ?>>
+<span id="el_script_function_parameter_relation_parameter_id" class="control-group">
+<span<?php echo $script_function_parameter_relation->parameter_id->ViewAttributes() ?>>
+<?php echo $script_function_parameter_relation->parameter_id->ViewValue ?></span>
 </span>
 </td>
 	</tr>
 <?php } ?>
-<?php if ($create_task->HOSTNAME->Visible) { // HOSTNAME ?>
-	<tr id="r_HOSTNAME">
-		<td><span id="elh_create_task_HOSTNAME"><?php echo $create_task->HOSTNAME->FldCaption() ?></span></td>
-		<td<?php echo $create_task->HOSTNAME->CellAttributes() ?>>
-<span id="el_create_task_HOSTNAME" class="control-group">
-<span<?php echo $create_task->HOSTNAME->ViewAttributes() ?>>
-<?php echo $create_task->HOSTNAME->ViewValue ?></span>
-</span>
-</td>
-	</tr>
-<?php } ?>
-<?php if ($create_task->PASSWORD->Visible) { // PASSWORD ?>
-	<tr id="r_PASSWORD">
-		<td><span id="elh_create_task_PASSWORD"><?php echo $create_task->PASSWORD->FldCaption() ?></span></td>
-		<td<?php echo $create_task->PASSWORD->CellAttributes() ?>>
-<span id="el_create_task_PASSWORD" class="control-group">
-<span<?php echo $create_task->PASSWORD->ViewAttributes() ?>>
-<?php echo $create_task->PASSWORD->ViewValue ?></span>
-</span>
-</td>
-	</tr>
-<?php } ?>
-<?php if ($create_task->DATABASE->Visible) { // DATABASE ?>
-	<tr id="r_DATABASE">
-		<td><span id="elh_create_task_DATABASE"><?php echo $create_task->DATABASE->FldCaption() ?></span></td>
-		<td<?php echo $create_task->DATABASE->CellAttributes() ?>>
-<span id="el_create_task_DATABASE" class="control-group">
-<span<?php echo $create_task->DATABASE->ViewAttributes() ?>>
-<?php echo $create_task->DATABASE->ViewValue ?></span>
-</span>
-</td>
-	</tr>
-<?php } ?>
-<?php if ($create_task->datetime->Visible) { // datetime ?>
-	<tr id="r_datetime">
-		<td><span id="elh_create_task_datetime"><?php echo $create_task->datetime->FldCaption() ?></span></td>
-		<td<?php echo $create_task->datetime->CellAttributes() ?>>
-<span id="el_create_task_datetime" class="control-group">
-<span<?php echo $create_task->datetime->ViewAttributes() ?>>
-<?php echo $create_task->datetime->ViewValue ?></span>
-</span>
-</td>
-	</tr>
-<?php } ?>
-<?php if ($create_task->DBUSERNAME->Visible) { // DBUSERNAME ?>
-	<tr id="r_DBUSERNAME">
-		<td><span id="elh_create_task_DBUSERNAME"><?php echo $create_task->DBUSERNAME->FldCaption() ?></span></td>
-		<td<?php echo $create_task->DBUSERNAME->CellAttributes() ?>>
-<span id="el_create_task_DBUSERNAME" class="control-group">
-<span<?php echo $create_task->DBUSERNAME->ViewAttributes() ?>>
-<?php echo $create_task->DBUSERNAME->ViewValue ?></span>
-</span>
-</td>
-	</tr>
-<?php } ?>
-<?php if ($create_task->username->Visible) { // username ?>
-	<tr id="r_username">
-		<td><span id="elh_create_task_username"><?php echo $create_task->username->FldCaption() ?></span></td>
-		<td<?php echo $create_task->username->CellAttributes() ?>>
-<span id="el_create_task_username" class="control-group">
-<span<?php echo $create_task->username->ViewAttributes() ?>>
-<?php echo $create_task->username->ViewValue ?></span>
+<?php if ($script_function_parameter_relation->script_function_id->Visible) { // script_function_id ?>
+	<tr id="r_script_function_id">
+		<td><span id="elh_script_function_parameter_relation_script_function_id"><?php echo $script_function_parameter_relation->script_function_id->FldCaption() ?></span></td>
+		<td<?php echo $script_function_parameter_relation->script_function_id->CellAttributes() ?>>
+<span id="el_script_function_parameter_relation_script_function_id" class="control-group">
+<span<?php echo $script_function_parameter_relation->script_function_id->ViewAttributes() ?>>
+<?php echo $script_function_parameter_relation->script_function_id->ViewValue ?></span>
 </span>
 </td>
 	</tr>
 <?php } ?>
 </table>
 </td></tr></table>
-<?php if ($create_task->Export == "") { ?>
+<?php if ($script_function_parameter_relation->Export == "") { ?>
 <table class="ewPager">
 <tr><td>
-<?php if (!isset($create_task_view->Pager)) $create_task_view->Pager = new cNumericPager($create_task_view->StartRec, $create_task_view->DisplayRecs, $create_task_view->TotalRecs, $create_task_view->RecRange) ?>
-<?php if ($create_task_view->Pager->RecordCount > 0) { ?>
+<?php if (!isset($script_function_parameter_relation_view->Pager)) $script_function_parameter_relation_view->Pager = new cNumericPager($script_function_parameter_relation_view->StartRec, $script_function_parameter_relation_view->DisplayRecs, $script_function_parameter_relation_view->TotalRecs, $script_function_parameter_relation_view->RecRange) ?>
+<?php if ($script_function_parameter_relation_view->Pager->RecordCount > 0) { ?>
 <table cellspacing="0" class="ewStdTable"><tbody><tr><td>
 <div class="pagination"><ul>
-	<?php if ($create_task_view->Pager->FirstButton->Enabled) { ?>
-	<li><a href="<?php echo $create_task_view->PageUrl() ?>start=<?php echo $create_task_view->Pager->FirstButton->Start ?>"><?php echo $Language->Phrase("PagerFirst") ?></a></li>
+	<?php if ($script_function_parameter_relation_view->Pager->FirstButton->Enabled) { ?>
+	<li><a href="<?php echo $script_function_parameter_relation_view->PageUrl() ?>start=<?php echo $script_function_parameter_relation_view->Pager->FirstButton->Start ?>"><?php echo $Language->Phrase("PagerFirst") ?></a></li>
 	<?php } ?>
-	<?php if ($create_task_view->Pager->PrevButton->Enabled) { ?>
-	<li><a href="<?php echo $create_task_view->PageUrl() ?>start=<?php echo $create_task_view->Pager->PrevButton->Start ?>"><?php echo $Language->Phrase("PagerPrevious") ?></a></li>
+	<?php if ($script_function_parameter_relation_view->Pager->PrevButton->Enabled) { ?>
+	<li><a href="<?php echo $script_function_parameter_relation_view->PageUrl() ?>start=<?php echo $script_function_parameter_relation_view->Pager->PrevButton->Start ?>"><?php echo $Language->Phrase("PagerPrevious") ?></a></li>
 	<?php } ?>
-	<?php foreach ($create_task_view->Pager->Items as $PagerItem) { ?>
-		<li<?php if (!$PagerItem->Enabled) { echo " class=\" active\""; } ?>><a href="<?php if ($PagerItem->Enabled) { echo $create_task_view->PageUrl() . "start=" . $PagerItem->Start; } else { echo "#"; } ?>"><?php echo $PagerItem->Text ?></a></li>
+	<?php foreach ($script_function_parameter_relation_view->Pager->Items as $PagerItem) { ?>
+		<li<?php if (!$PagerItem->Enabled) { echo " class=\" active\""; } ?>><a href="<?php if ($PagerItem->Enabled) { echo $script_function_parameter_relation_view->PageUrl() . "start=" . $PagerItem->Start; } else { echo "#"; } ?>"><?php echo $PagerItem->Text ?></a></li>
 	<?php } ?>
-	<?php if ($create_task_view->Pager->NextButton->Enabled) { ?>
-	<li><a href="<?php echo $create_task_view->PageUrl() ?>start=<?php echo $create_task_view->Pager->NextButton->Start ?>"><?php echo $Language->Phrase("PagerNext") ?></a></li>
+	<?php if ($script_function_parameter_relation_view->Pager->NextButton->Enabled) { ?>
+	<li><a href="<?php echo $script_function_parameter_relation_view->PageUrl() ?>start=<?php echo $script_function_parameter_relation_view->Pager->NextButton->Start ?>"><?php echo $Language->Phrase("PagerNext") ?></a></li>
 	<?php } ?>
-	<?php if ($create_task_view->Pager->LastButton->Enabled) { ?>
-	<li><a href="<?php echo $create_task_view->PageUrl() ?>start=<?php echo $create_task_view->Pager->LastButton->Start ?>"><?php echo $Language->Phrase("PagerLast") ?></a></li>
+	<?php if ($script_function_parameter_relation_view->Pager->LastButton->Enabled) { ?>
+	<li><a href="<?php echo $script_function_parameter_relation_view->PageUrl() ?>start=<?php echo $script_function_parameter_relation_view->Pager->LastButton->Start ?>"><?php echo $Language->Phrase("PagerLast") ?></a></li>
 	<?php } ?>
 </ul></div>
 </td>
@@ -1210,14 +1137,14 @@ $create_task_view->ShowMessage();
 <?php } ?>
 </form>
 <script type="text/javascript">
-fcreate_taskview.Init();
+fscript_function_parameter_relationview.Init();
 </script>
 <?php
-$create_task_view->ShowPageFooter();
+$script_function_parameter_relation_view->ShowPageFooter();
 if (EW_DEBUG_ENABLED)
 	echo ew_DebugMsg();
 ?>
-<?php if ($create_task->Export == "") { ?>
+<?php if ($script_function_parameter_relation->Export == "") { ?>
 <script type="text/javascript">
 
 // Write your table-specific startup script here
@@ -1227,5 +1154,5 @@ if (EW_DEBUG_ENABLED)
 <?php } ?>
 <?php include_once "footer.php" ?>
 <?php
-$create_task_view->Page_Terminate();
+$script_function_parameter_relation_view->Page_Terminate();
 ?>

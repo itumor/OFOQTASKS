@@ -241,6 +241,8 @@ class cdefault {
 			$this->Page_Terminate("stop_tasklist.php");
 		if ($Security->AllowList(CurrentProjectID() . 'update_task'))
 			$this->Page_Terminate("update_tasklist.php");
+		if ($Security->AllowList(CurrentProjectID() . 'script_function_parameter_relation'))
+			$this->Page_Terminate("script_function_parameter_relationlist.php");
 		if ($Security->IsLoggedIn()) {
 			$this->setFailureMessage($Language->Phrase("NoPermission") . "<br><br><a href=\"logout.php\">" . $Language->Phrase("BackToLogin") . "</a>");
 		} else {

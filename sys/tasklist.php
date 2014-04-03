@@ -75,6 +75,9 @@ class ctask_list extends ctask {
 	var $GridEditUrl;
 	var $MultiDeleteUrl;
 	var $MultiUpdateUrl;
+	var $AuditTrailOnAdd = TRUE;
+	var $AuditTrailOnEdit = TRUE;
+	var $AuditTrailOnDelete = TRUE;
 
 	// Message
 	function getMessage() {
@@ -293,6 +296,9 @@ class ctask_list extends ctask {
 		if ($Security->IsLoggedIn()) $Security->LoadUserID();
 		$Security->UserID_Loaded();
 
+		// Create form object
+		$objForm = new cFormObj();
+
 		// Get export parameters
 		if (@$_GET["export"] <> "") {
 			$this->Export = $_GET["export"];
@@ -425,6 +431,42 @@ class ctask_list extends ctask {
 			// Set up Breadcrumb
 			$this->SetupBreadcrumb();
 
+			// Check QueryString parameters
+			if (@$_GET["a"] <> "") {
+				$this->CurrentAction = $_GET["a"];
+
+				// Clear inline mode
+				if ($this->CurrentAction == "cancel")
+					$this->ClearInlineMode();
+
+				// Switch to grid edit mode
+				if ($this->CurrentAction == "gridedit")
+					$this->GridEditMode();
+
+				// Switch to inline edit mode
+				if ($this->CurrentAction == "edit")
+					$this->InlineEditMode();
+			} else {
+				if (@$_POST["a_list"] <> "") {
+					$this->CurrentAction = $_POST["a_list"]; // Get action
+
+					// Grid Update
+					if (($this->CurrentAction == "gridupdate" || $this->CurrentAction == "gridoverwrite") && @$_SESSION[EW_SESSION_INLINE_MODE] == "gridedit") {
+						if ($this->ValidateGridForm()) {
+							$this->GridUpdate();
+						} else {
+							$this->setFailureMessage($gsFormError);
+							$this->EventCancelled = TRUE;
+							$this->CurrentAction = "gridedit"; // Stay in Grid Edit mode
+						}
+					}
+
+					// Inline Update
+					if (($this->CurrentAction == "update" || $this->CurrentAction == "overwrite") && @$_SESSION[EW_SESSION_INLINE_MODE] == "edit")
+						$this->InlineUpdate();
+				}
+			}
+
 			// Hide list options
 			if ($this->Export <> "") {
 				$this->ListOptions->HideAllOptions(array("sequence"));
@@ -444,6 +486,14 @@ class ctask_list extends ctask {
 			if ($this->Export <> "") {
 				foreach ($this->OtherOptions as &$option)
 					$option->HideAllOptions();
+			}
+
+			// Show grid delete link for grid add / grid edit
+			if ($this->AllowAddDeleteRow) {
+				if ($this->CurrentAction == "gridadd" || $this->CurrentAction == "gridedit") {
+					$item = $this->ListOptions->GetItem("griddelete");
+					if ($item) $item->Visible = TRUE;
+				}
 			}
 
 			// Get basic search values
@@ -553,6 +603,176 @@ class ctask_list extends ctask {
 		}
 	}
 
+	//  Exit inline mode
+	function ClearInlineMode() {
+		$this->setKey("task_id", ""); // Clear inline edit key
+		$this->LastAction = $this->CurrentAction; // Save last action
+		$this->CurrentAction = ""; // Clear action
+		$_SESSION[EW_SESSION_INLINE_MODE] = ""; // Clear inline mode
+	}
+
+	// Switch to Grid Edit mode
+	function GridEditMode() {
+		$_SESSION[EW_SESSION_INLINE_MODE] = "gridedit"; // Enable grid edit
+	}
+
+	// Switch to Inline Edit mode
+	function InlineEditMode() {
+		global $Security, $Language;
+		if (!$Security->CanEdit())
+			$this->Page_Terminate("login.php"); // Go to login page
+		$bInlineEdit = TRUE;
+		if (@$_GET["task_id"] <> "") {
+			$this->task_id->setQueryStringValue($_GET["task_id"]);
+		} else {
+			$bInlineEdit = FALSE;
+		}
+		if ($bInlineEdit) {
+			if ($this->LoadRow()) {
+				$this->setKey("task_id", $this->task_id->CurrentValue); // Set up inline edit key
+				$_SESSION[EW_SESSION_INLINE_MODE] = "edit"; // Enable inline edit
+			}
+		}
+	}
+
+	// Perform update to Inline Edit record
+	function InlineUpdate() {
+		global $Language, $objForm, $gsFormError;
+		$objForm->Index = 1; 
+		$this->LoadFormValues(); // Get form values
+
+		// Validate form
+		$bInlineUpdate = TRUE;
+		if (!$this->ValidateForm()) {	
+			$bInlineUpdate = FALSE; // Form error, reset action
+			$this->setFailureMessage($gsFormError);
+		} else {
+			$bInlineUpdate = FALSE;
+			$rowkey = strval($objForm->GetValue("k_key"));
+			if ($this->SetupKeyValues($rowkey)) { // Set up key values
+				if ($this->CheckInlineEditKey()) { // Check key
+					$this->SendEmail = TRUE; // Send email on update success
+					$bInlineUpdate = $this->EditRow(); // Update record
+				} else {
+					$bInlineUpdate = FALSE;
+				}
+			}
+		}
+		if ($bInlineUpdate) { // Update success
+			if ($this->getSuccessMessage() == "")
+				$this->setSuccessMessage($Language->Phrase("UpdateSuccess")); // Set up success message
+			$this->ClearInlineMode(); // Clear inline edit mode
+		} else {
+			if ($this->getFailureMessage() == "")
+				$this->setFailureMessage($Language->Phrase("UpdateFailed")); // Set update failed message
+			$this->EventCancelled = TRUE; // Cancel event
+			$this->CurrentAction = "edit"; // Stay in edit mode
+		}
+	}
+
+	// Check Inline Edit key
+	function CheckInlineEditKey() {
+
+		//CheckInlineEditKey = True
+		if (strval($this->getKey("task_id")) <> strval($this->task_id->CurrentValue))
+			return FALSE;
+		return TRUE;
+	}
+
+	// Perform update to grid
+	function GridUpdate() {
+		global $conn, $Language, $objForm, $gsFormError;
+		$bGridUpdate = TRUE;
+
+		// Begin transaction
+		$conn->BeginTrans();
+		if ($this->AuditTrailOnEdit) $this->WriteAuditTrailDummy($Language->Phrase("BatchUpdateBegin")); // Batch update begin
+
+		// Get old recordset
+		$this->CurrentFilter = $this->BuildKeyFilter();
+		$sSql = $this->SQL();
+		if ($rs = $conn->Execute($sSql)) {
+			$rsold = $rs->GetRows();
+			$rs->Close();
+		}
+		$sKey = "";
+
+		// Update row index and get row key
+		$objForm->Index = -1;
+		$rowcnt = strval($objForm->GetValue($this->FormKeyCountName));
+		if ($rowcnt == "" || !is_numeric($rowcnt))
+			$rowcnt = 0;
+
+		// Update all rows based on key
+		for ($rowindex = 1; $rowindex <= $rowcnt; $rowindex++) {
+			$objForm->Index = $rowindex;
+			$rowkey = strval($objForm->GetValue($this->FormKeyName));
+			$rowaction = strval($objForm->GetValue($this->FormActionName));
+
+			// Load all values and keys
+			if ($rowaction <> "insertdelete") { // Skip insert then deleted rows
+				$this->LoadFormValues(); // Get form values
+				if ($rowaction == "" || $rowaction == "edit" || $rowaction == "delete") {
+					$bGridUpdate = $this->SetupKeyValues($rowkey); // Set up key values
+				} else {
+					$bGridUpdate = TRUE;
+				}
+
+				// Skip empty row
+				if ($rowaction == "insert" && $this->EmptyRow()) {
+
+					// No action required
+				// Validate form and insert/update/delete record
+
+				} elseif ($bGridUpdate) {
+					if ($rowaction == "delete") {
+						$this->CurrentFilter = $this->KeyFilter();
+						$bGridUpdate = $this->DeleteRows(); // Delete this row
+					} else if (!$this->ValidateForm()) {
+						$bGridUpdate = FALSE; // Form error, reset action
+						$this->setFailureMessage($gsFormError);
+					} else {
+						if ($rowaction == "insert") {
+							$bGridUpdate = $this->AddRow(); // Insert this row
+						} else {
+							if ($rowkey <> "") {
+								$this->SendEmail = FALSE; // Do not send email on update success
+								$bGridUpdate = $this->EditRow(); // Update this row
+							}
+						} // End update
+					}
+				}
+				if ($bGridUpdate) {
+					if ($sKey <> "") $sKey .= ", ";
+					$sKey .= $rowkey;
+				} else {
+					break;
+				}
+			}
+		}
+		if ($bGridUpdate) {
+			$conn->CommitTrans(); // Commit transaction
+
+			// Get new recordset
+			if ($rs = $conn->Execute($sSql)) {
+				$rsnew = $rs->GetRows();
+				$rs->Close();
+			}
+			if ($this->AuditTrailOnEdit) $this->WriteAuditTrailDummy($Language->Phrase("BatchUpdateSuccess")); // Batch update success
+			if ($this->getSuccessMessage() == "")
+				$this->setSuccessMessage($Language->Phrase("UpdateSuccess")); // Set up update success message
+			$this->ClearInlineMode(); // Clear inline edit mode
+		} else {
+			$conn->RollbackTrans(); // Rollback transaction
+			if ($this->AuditTrailOnEdit) $this->WriteAuditTrailDummy($Language->Phrase("BatchUpdateRollback")); // Batch update rollback
+			if ($this->getFailureMessage() == "")
+				$this->setFailureMessage($Language->Phrase("UpdateFailed")); // Set update failed message
+			$this->EventCancelled = TRUE; // Set event cancelled
+			$this->CurrentAction = "gridedit"; // Stay in Grid Edit mode
+		}
+		return $bGridUpdate;
+	}
+
 	// Build filter for all keys
 	function BuildKeyFilter() {
 		global $objForm;
@@ -589,6 +809,56 @@ class ctask_list extends ctask {
 				return FALSE;
 		}
 		return TRUE;
+	}
+
+	// Check if empty row
+	function EmptyRow() {
+		global $objForm;
+		if ($objForm->HasValue("x_task_name") && $objForm->HasValue("o_task_name") && $this->task_name->CurrentValue <> $this->task_name->OldValue)
+			return FALSE;
+		if ($objForm->HasValue("x_sqlscript") && $objForm->HasValue("o_sqlscript") && $this->sqlscript->CurrentValue <> $this->sqlscript->OldValue)
+			return FALSE;
+		if ($objForm->HasValue("x_phpscript") && $objForm->HasValue("o_phpscript") && $this->phpscript->CurrentValue <> $this->phpscript->OldValue)
+			return FALSE;
+		return TRUE;
+	}
+
+	// Validate grid form
+	function ValidateGridForm() {
+		global $objForm;
+
+		// Get row count
+		$objForm->Index = -1;
+		$rowcnt = strval($objForm->GetValue($this->FormKeyCountName));
+		if ($rowcnt == "" || !is_numeric($rowcnt))
+			$rowcnt = 0;
+
+		// Validate all records
+		for ($rowindex = 1; $rowindex <= $rowcnt; $rowindex++) {
+
+			// Load current row values
+			$objForm->Index = $rowindex;
+			$rowaction = strval($objForm->GetValue($this->FormActionName));
+			if ($rowaction <> "delete" && $rowaction <> "insertdelete") {
+				$this->LoadFormValues(); // Get form values
+				if ($rowaction == "insert" && $this->EmptyRow()) {
+
+					// Ignore
+				} else if (!$this->ValidateForm()) {
+					return FALSE;
+				}
+			}
+		}
+		return TRUE;
+	}
+
+	// Restore form values for current row
+	function RestoreCurrentRowFormValues($idx) {
+		global $objForm;
+
+		// Get row based on current index
+		$objForm->Index = $idx;
+		$this->LoadFormValues(); // Load form values
 	}
 
 	// Advanced search WHERE clause based on QueryString
@@ -838,6 +1108,14 @@ class ctask_list extends ctask {
 	function SetupListOptions() {
 		global $Security, $Language;
 
+		// "griddelete"
+		if ($this->AllowAddDeleteRow) {
+			$item = &$this->ListOptions->Add("griddelete");
+			$item->CssStyle = "white-space: nowrap;";
+			$item->OnLeft = TRUE;
+			$item->Visible = FALSE; // Default hidden
+		}
+
 		// Add group option item
 		$item = &$this->ListOptions->Add($this->ListOptions->GroupOptionName);
 		$item->Body = "";
@@ -888,6 +1166,50 @@ class ctask_list extends ctask {
 		global $Security, $Language, $objForm;
 		$this->ListOptions->LoadDefault();
 
+		// Set up row action and key
+		if (is_numeric($this->RowIndex) && $this->CurrentMode <> "view") {
+			$objForm->Index = $this->RowIndex;
+			$ActionName = str_replace("k_", "k" . $this->RowIndex . "_", $this->FormActionName);
+			$OldKeyName = str_replace("k_", "k" . $this->RowIndex . "_", $this->FormOldKeyName);
+			$KeyName = str_replace("k_", "k" . $this->RowIndex . "_", $this->FormKeyName);
+			$BlankRowName = str_replace("k_", "k" . $this->RowIndex . "_", $this->FormBlankRowName);
+			if ($this->RowAction <> "")
+				$this->MultiSelectKey .= "<input type=\"hidden\" name=\"" . $ActionName . "\" id=\"" . $ActionName . "\" value=\"" . $this->RowAction . "\">";
+			if ($this->RowAction == "delete") {
+				$rowkey = $objForm->GetValue($this->FormKeyName);
+				$this->SetupKeyValues($rowkey);
+			}
+			if ($this->RowAction == "insert" && $this->CurrentAction == "F" && $this->EmptyRow())
+				$this->MultiSelectKey .= "<input type=\"hidden\" name=\"" . $BlankRowName . "\" id=\"" . $BlankRowName . "\" value=\"1\">";
+		}
+
+		// "delete"
+		if ($this->AllowAddDeleteRow) {
+			if ($this->CurrentAction == "gridadd" || $this->CurrentAction == "gridedit") {
+				$option = &$this->ListOptions;
+				$option->UseButtonGroup = TRUE; // Use button group for grid delete button
+				$option->UseImageAndText = TRUE; // Use image and text for grid delete button
+				$oListOpt = &$option->Items["griddelete"];
+				if (!$Security->CanDelete() && is_numeric($this->RowIndex) && ($this->RowAction == "" || $this->RowAction == "edit")) { // Do not allow delete existing record
+					$oListOpt->Body = "&nbsp;";
+				} else {
+					$oListOpt->Body = "<a class=\"ewGridLink ewGridDelete\" data-caption=\"" . ew_HtmlTitle($Language->Phrase("DeleteLink")) . "\" href=\"javascript:void(0);\" onclick=\"ew_DeleteGridRow(this, " . $this->RowIndex . ");\">" . $Language->Phrase("DeleteLink") . "</a>";
+				}
+			}
+		}
+
+		// "edit"
+		$oListOpt = &$this->ListOptions->Items["edit"];
+		if ($this->CurrentAction == "edit" && $this->RowType == EW_ROWTYPE_EDIT) { // Inline-Edit
+			$this->ListOptions->CustomItem = "edit"; // Show edit column only
+				$oListOpt->Body = "<div" . (($oListOpt->OnLeft) ? " style=\"text-align: right\"" : "") . ">" .
+					"<a class=\"ewGridLink ewInlineUpdate\" data-caption=\"" . ew_HtmlTitle($Language->Phrase("UpdateLink")) . "\" href=\"\" onclick=\"return ewForms(this).Submit('" . ew_GetHashUrl($this->PageName(), $this->PageObjName . "_row_" . $this->RowCnt) . "');\">" . $Language->Phrase("UpdateLink") . "</a>&nbsp;" .
+					"<a class=\"ewGridLink ewInlineCancel\" data-caption=\"" . ew_HtmlTitle($Language->Phrase("CancelLink")) . "\" href=\"" . $this->PageUrl() . "a=cancel\">" . $Language->Phrase("CancelLink") . "</a>" .
+					"<input type=\"hidden\" name=\"a_list\" id=\"a_list\" value=\"update\"></div>";
+			$oListOpt->Body .= "<input type=\"hidden\" name=\"k" . $this->RowIndex . "_key\" id=\"k" . $this->RowIndex . "_key\" value=\"" . ew_HtmlEncode($this->task_id->CurrentValue) . "\">";
+			return;
+		}
+
 		// "view"
 		$oListOpt = &$this->ListOptions->Items["view"];
 		if ($Security->CanView())
@@ -899,6 +1221,8 @@ class ctask_list extends ctask {
 		$oListOpt = &$this->ListOptions->Items["edit"];
 		if ($Security->CanEdit()) {
 			$oListOpt->Body = "<a class=\"ewRowLink ewEdit\" data-caption=\"" . ew_HtmlTitle($Language->Phrase("EditLink")) . "\" href=\"" . ew_HtmlEncode($this->EditUrl) . "\">" . $Language->Phrase("EditLink") . "</a>";
+			$oListOpt->Body .= "<span class=\"ewSeparator\">&nbsp;|&nbsp;</span>";
+			$oListOpt->Body .= "<a class=\"ewRowLink ewInlineEdit\" data-caption=\"" . ew_HtmlTitle($Language->Phrase("InlineEditLink")) . "\" href=\"" . ew_HtmlEncode(ew_GetHashUrl($this->InlineEditUrl, $this->PageObjName . "_row_" . $this->RowCnt)) . "\">" . $Language->Phrase("InlineEditLink") . "</a>";
 		} else {
 			$oListOpt->Body = "";
 		}
@@ -914,6 +1238,9 @@ class ctask_list extends ctask {
 		// "checkbox"
 		$oListOpt = &$this->ListOptions->Items["checkbox"];
 		$oListOpt->Body = "<label class=\"checkbox\"><input type=\"checkbox\" name=\"key_m[]\" value=\"" . ew_HtmlEncode($this->task_id->CurrentValue) . "\" onclick='ew_ClickMultiCheckbox(event, this);'></label>";
+		if ($this->CurrentAction == "gridedit" && is_numeric($this->RowIndex)) {
+			$this->MultiSelectKey .= "<input type=\"hidden\" name=\"" . $KeyName . "\" id=\"" . $KeyName . "\" value=\"" . $this->task_id->CurrentValue . "\">";
+		}
 		$this->RenderListOptionsExt();
 
 		// Call ListOptions_Rendered event
@@ -930,6 +1257,12 @@ class ctask_list extends ctask {
 		$item = &$option->Add("add");
 		$item->Body = "<a class=\"ewAddEdit ewAdd\" href=\"" . ew_HtmlEncode($this->AddUrl) . "\">" . $Language->Phrase("AddLink") . "</a>";
 		$item->Visible = ($this->AddUrl <> "" && $Security->CanAdd());
+
+		// Add grid edit
+		$option = $options["addedit"];
+		$item = &$option->Add("gridedit");
+		$item->Body = "<a class=\"ewAddEdit ewGridEdit\" href=\"" . ew_HtmlEncode($this->GridEditUrl) . "\">" . $Language->Phrase("GridEditLink") . "</a>";
+		$item->Visible = ($this->GridEditUrl <> "" && $Security->CanEdit());
 		$option = $options["action"];
 
 		// Add multi delete
@@ -955,6 +1288,7 @@ class ctask_list extends ctask {
 	function RenderOtherOptions() {
 		global $Language, $Security;
 		$options = &$this->OtherOptions;
+		if ($this->CurrentAction <> "gridadd" && $this->CurrentAction <> "gridedit") { // Not grid add/edit mode
 			$option = &$options["action"];
 			foreach ($this->CustomActions as $action => $name) {
 
@@ -974,6 +1308,31 @@ class ctask_list extends ctask {
 				$item = &$option->GetItem("multiupdate");
 				if ($item) $item->Visible = FALSE;
 			}
+		} else { // Grid add/edit mode
+
+			// Hide all options first
+			foreach ($options as &$option)
+				$option->HideAllOptions();
+			if ($this->CurrentAction == "gridedit") {
+				if ($this->AllowAddDeleteRow) {
+
+					// Add add blank row
+					$option = &$options["addedit"];
+					$option->UseDropDownButton = FALSE;
+					$option->UseImageAndText = TRUE;
+					$item = &$option->Add("addblankrow");
+					$item->Body = "<a class=\"ewAddEdit ewAddBlankRow\" data-caption=\"" . ew_HtmlTitle($Language->Phrase("AddBlankRow")) . "\" href=\"javascript:void(0);\" onclick=\"ew_AddGridRow(this);\">" . $Language->Phrase("AddBlankRow") . "</a>";
+					$item->Visible = $Security->CanAdd();
+				}
+				$option = &$options["action"];
+				$option->UseDropDownButton = FALSE;
+				$option->UseImageAndText = TRUE;
+					$item = &$option->Add("gridsave");
+					$item->Body = "<a class=\"ewAction ewGridSave\" data-caption=\"" . ew_HtmlTitle($Language->Phrase("GridSaveLink")) . "\" href=\"\" onclick=\"return ewForms(this).Submit();\">" . $Language->Phrase("GridSaveLink") . "</a>";
+					$item = &$option->Add("gridcancel");
+					$item->Body = "<a class=\"ewAction ewGridCancel\" data-caption=\"" . ew_HtmlTitle($Language->Phrase("GridCancelLink")) . "\" href=\"" . $this->PageUrl() . "a=cancel\">" . $Language->Phrase("GridCancelLink") . "</a>";
+			}
+		}
 	}
 
 	// Process custom action
@@ -1060,6 +1419,18 @@ class ctask_list extends ctask {
 		}
 	}
 
+	// Load default values
+	function LoadDefaultValues() {
+		$this->task_id->CurrentValue = NULL;
+		$this->task_id->OldValue = $this->task_id->CurrentValue;
+		$this->task_name->CurrentValue = NULL;
+		$this->task_name->OldValue = $this->task_name->CurrentValue;
+		$this->sqlscript->CurrentValue = NULL;
+		$this->sqlscript->OldValue = $this->sqlscript->CurrentValue;
+		$this->phpscript->CurrentValue = NULL;
+		$this->phpscript->OldValue = $this->phpscript->CurrentValue;
+	}
+
 	// Load basic search values
 	function LoadBasicSearchValues() {
 		$this->BasicSearch->Keyword = @$_GET[EW_TABLE_BASIC_SEARCH];
@@ -1092,6 +1463,34 @@ class ctask_list extends ctask {
 		$this->phpscript->AdvancedSearch->SearchValue = ew_StripSlashes(@$_GET["x_phpscript"]);
 		if ($this->phpscript->AdvancedSearch->SearchValue <> "") $this->Command = "search";
 		$this->phpscript->AdvancedSearch->SearchOperator = @$_GET["z_phpscript"];
+	}
+
+	// Load form values
+	function LoadFormValues() {
+
+		// Load from form
+		global $objForm;
+		if (!$this->task_id->FldIsDetailKey && $this->CurrentAction <> "gridadd" && $this->CurrentAction <> "add")
+			$this->task_id->setFormValue($objForm->GetValue("x_task_id"));
+		if (!$this->task_name->FldIsDetailKey) {
+			$this->task_name->setFormValue($objForm->GetValue("x_task_name"));
+		}
+		if (!$this->sqlscript->FldIsDetailKey) {
+			$this->sqlscript->setFormValue($objForm->GetValue("x_sqlscript"));
+		}
+		if (!$this->phpscript->FldIsDetailKey) {
+			$this->phpscript->setFormValue($objForm->GetValue("x_phpscript"));
+		}
+	}
+
+	// Restore form values
+	function RestoreFormValues() {
+		global $objForm;
+		if ($this->CurrentAction <> "gridadd" && $this->CurrentAction <> "add")
+			$this->task_id->CurrentValue = $this->task_id->FormValue;
+		$this->task_name->CurrentValue = $this->task_name->FormValue;
+		$this->sqlscript->CurrentValue = $this->sqlscript->FormValue;
+		$this->phpscript->CurrentValue = $this->phpscript->FormValue;
 	}
 
 	// Load recordset
@@ -1246,6 +1645,78 @@ class ctask_list extends ctask {
 			$this->phpscript->TooltipValue = "";
 			if ($this->Export == "")
 				$this->phpscript->ViewValue = ew_Highlight($this->HighlightName(), $this->phpscript->ViewValue, $this->BasicSearch->getKeyword(), $this->BasicSearch->getType(), $this->phpscript->AdvancedSearch->getValue("x"), "");
+		} elseif ($this->RowType == EW_ROWTYPE_ADD) { // Add row
+
+			// task_id
+			// task_name
+
+			$this->task_name->EditCustomAttributes = "";
+			$this->task_name->EditValue = ew_HtmlEncode($this->task_name->CurrentValue);
+			$this->task_name->PlaceHolder = ew_HtmlEncode(ew_RemoveHtml($this->task_name->FldCaption()));
+
+			// sqlscript
+			$this->sqlscript->EditCustomAttributes = "";
+			$this->sqlscript->EditValue = $this->sqlscript->CurrentValue;
+			$this->sqlscript->PlaceHolder = ew_HtmlEncode(ew_RemoveHtml($this->sqlscript->FldCaption()));
+
+			// phpscript
+			$this->phpscript->EditCustomAttributes = "";
+			$this->phpscript->EditValue = $this->phpscript->CurrentValue;
+			$this->phpscript->PlaceHolder = ew_HtmlEncode(ew_RemoveHtml($this->phpscript->FldCaption()));
+
+			// Edit refer script
+			// task_id
+
+			$this->task_id->HrefValue = "";
+
+			// task_name
+			$this->task_name->HrefValue = "";
+
+			// sqlscript
+			$this->sqlscript->HrefValue = "";
+
+			// phpscript
+			$this->phpscript->HrefValue = "";
+		} elseif ($this->RowType == EW_ROWTYPE_EDIT) { // Edit row
+
+			// task_id
+			$this->task_id->EditCustomAttributes = "";
+			$this->task_id->EditValue = $this->task_id->CurrentValue;
+			$this->task_id->ViewCustomAttributes = "";
+
+			// task_name
+			$this->task_name->EditCustomAttributes = "";
+			$this->task_name->EditValue = ew_HtmlEncode($this->task_name->CurrentValue);
+			$this->task_name->PlaceHolder = ew_HtmlEncode(ew_RemoveHtml($this->task_name->FldCaption()));
+
+			// sqlscript
+			$this->sqlscript->EditCustomAttributes = "";
+			$this->sqlscript->EditValue = $this->sqlscript->CurrentValue;
+			$this->sqlscript->PlaceHolder = ew_HtmlEncode(ew_RemoveHtml($this->sqlscript->FldCaption()));
+
+			// phpscript
+			$this->phpscript->EditCustomAttributes = "";
+			$this->phpscript->EditValue = $this->phpscript->CurrentValue;
+			$this->phpscript->PlaceHolder = ew_HtmlEncode(ew_RemoveHtml($this->phpscript->FldCaption()));
+
+			// Edit refer script
+			// task_id
+
+			$this->task_id->HrefValue = "";
+
+			// task_name
+			$this->task_name->HrefValue = "";
+
+			// sqlscript
+			$this->sqlscript->HrefValue = "";
+
+			// phpscript
+			$this->phpscript->HrefValue = "";
+		}
+		if ($this->RowType == EW_ROWTYPE_ADD ||
+			$this->RowType == EW_ROWTYPE_EDIT ||
+			$this->RowType == EW_ROWTYPE_SEARCH) { // Add / Edit / Search row
+			$this->SetupFieldTitles();
 		}
 
 		// Call Row Rendered event
@@ -1274,6 +1745,242 @@ class ctask_list extends ctask {
 			ew_AddMessage($gsSearchError, $sFormCustomError);
 		}
 		return $ValidateSearch;
+	}
+
+	// Validate form
+	function ValidateForm() {
+		global $Language, $gsFormError;
+
+		// Initialize form error message
+		$gsFormError = "";
+
+		// Check if validation required
+		if (!EW_SERVER_VALIDATE)
+			return ($gsFormError == "");
+		if (!$this->task_name->FldIsDetailKey && !is_null($this->task_name->FormValue) && $this->task_name->FormValue == "") {
+			ew_AddMessage($gsFormError, $Language->Phrase("EnterRequiredField") . " - " . $this->task_name->FldCaption());
+		}
+		if (!$this->sqlscript->FldIsDetailKey && !is_null($this->sqlscript->FormValue) && $this->sqlscript->FormValue == "") {
+			ew_AddMessage($gsFormError, $Language->Phrase("EnterRequiredField") . " - " . $this->sqlscript->FldCaption());
+		}
+		if (!$this->phpscript->FldIsDetailKey && !is_null($this->phpscript->FormValue) && $this->phpscript->FormValue == "") {
+			ew_AddMessage($gsFormError, $Language->Phrase("EnterRequiredField") . " - " . $this->phpscript->FldCaption());
+		}
+
+		// Return validate result
+		$ValidateForm = ($gsFormError == "");
+
+		// Call Form_CustomValidate event
+		$sFormCustomError = "";
+		$ValidateForm = $ValidateForm && $this->Form_CustomValidate($sFormCustomError);
+		if ($sFormCustomError <> "") {
+			ew_AddMessage($gsFormError, $sFormCustomError);
+		}
+		return $ValidateForm;
+	}
+
+	//
+	// Delete records based on current filter
+	//
+	function DeleteRows() {
+		global $conn, $Language, $Security;
+		if (!$Security->CanDelete()) {
+			$this->setFailureMessage($Language->Phrase("NoDeletePermission")); // No delete permission
+			return FALSE;
+		}
+		$DeleteRows = TRUE;
+		$sSql = $this->SQL();
+		$conn->raiseErrorFn = 'ew_ErrorFn';
+		$rs = $conn->Execute($sSql);
+		$conn->raiseErrorFn = '';
+		if ($rs === FALSE) {
+			return FALSE;
+		} elseif ($rs->EOF) {
+			$this->setFailureMessage($Language->Phrase("NoRecord")); // No record found
+			$rs->Close();
+			return FALSE;
+
+		//} else {
+		//	$this->LoadRowValues($rs); // Load row values
+
+		}
+		if ($this->AuditTrailOnDelete) $this->WriteAuditTrailDummy($Language->Phrase("BatchDeleteBegin")); // Batch delete begin
+
+		// Clone old rows
+		$rsold = ($rs) ? $rs->GetRows() : array();
+		if ($rs)
+			$rs->Close();
+
+		// Call row deleting event
+		if ($DeleteRows) {
+			foreach ($rsold as $row) {
+				$DeleteRows = $this->Row_Deleting($row);
+				if (!$DeleteRows) break;
+			}
+		}
+		if ($DeleteRows) {
+			$sKey = "";
+			foreach ($rsold as $row) {
+				$sThisKey = "";
+				if ($sThisKey <> "") $sThisKey .= $GLOBALS["EW_COMPOSITE_KEY_SEPARATOR"];
+				$sThisKey .= $row['task_id'];
+				$this->LoadDbValues($row);
+				$conn->raiseErrorFn = 'ew_ErrorFn';
+				$DeleteRows = $this->Delete($row); // Delete
+				$conn->raiseErrorFn = '';
+				if ($DeleteRows === FALSE)
+					break;
+				if ($sKey <> "") $sKey .= ", ";
+				$sKey .= $sThisKey;
+			}
+		} else {
+
+			// Set up error message
+			if ($this->getSuccessMessage() <> "" || $this->getFailureMessage() <> "") {
+
+				// Use the message, do nothing
+			} elseif ($this->CancelMessage <> "") {
+				$this->setFailureMessage($this->CancelMessage);
+				$this->CancelMessage = "";
+			} else {
+				$this->setFailureMessage($Language->Phrase("DeleteCancelled"));
+			}
+		}
+		if ($DeleteRows) {
+			if ($DeleteRows) {
+				foreach ($rsold as $row)
+					$this->WriteAuditTrailOnDelete($row);
+			}
+		} else {
+		}
+
+		// Call Row Deleted event
+		if ($DeleteRows) {
+			foreach ($rsold as $row) {
+				$this->Row_Deleted($row);
+			}
+		}
+		return $DeleteRows;
+	}
+
+	// Update record based on key values
+	function EditRow() {
+		global $conn, $Security, $Language;
+		$sFilter = $this->KeyFilter();
+		$this->CurrentFilter = $sFilter;
+		$sSql = $this->SQL();
+		$conn->raiseErrorFn = 'ew_ErrorFn';
+		$rs = $conn->Execute($sSql);
+		$conn->raiseErrorFn = '';
+		if ($rs === FALSE)
+			return FALSE;
+		if ($rs->EOF) {
+			$EditRow = FALSE; // Update Failed
+		} else {
+
+			// Save old values
+			$rsold = &$rs->fields;
+			$this->LoadDbValues($rsold);
+			$rsnew = array();
+
+			// task_name
+			$this->task_name->SetDbValueDef($rsnew, $this->task_name->CurrentValue, "", $this->task_name->ReadOnly);
+
+			// sqlscript
+			$this->sqlscript->SetDbValueDef($rsnew, $this->sqlscript->CurrentValue, "", $this->sqlscript->ReadOnly);
+
+			// phpscript
+			$this->phpscript->SetDbValueDef($rsnew, $this->phpscript->CurrentValue, "", $this->phpscript->ReadOnly);
+
+			// Call Row Updating event
+			$bUpdateRow = $this->Row_Updating($rsold, $rsnew);
+			if ($bUpdateRow) {
+				$conn->raiseErrorFn = 'ew_ErrorFn';
+				if (count($rsnew) > 0)
+					$EditRow = $this->Update($rsnew, "", $rsold);
+				else
+					$EditRow = TRUE; // No field to update
+				$conn->raiseErrorFn = '';
+				if ($EditRow) {
+				}
+			} else {
+				if ($this->getSuccessMessage() <> "" || $this->getFailureMessage() <> "") {
+
+					// Use the message, do nothing
+				} elseif ($this->CancelMessage <> "") {
+					$this->setFailureMessage($this->CancelMessage);
+					$this->CancelMessage = "";
+				} else {
+					$this->setFailureMessage($Language->Phrase("UpdateCancelled"));
+				}
+				$EditRow = FALSE;
+			}
+		}
+
+		// Call Row_Updated event
+		if ($EditRow)
+			$this->Row_Updated($rsold, $rsnew);
+		if ($EditRow) {
+			$this->WriteAuditTrailOnEdit($rsold, $rsnew);
+		}
+		$rs->Close();
+		return $EditRow;
+	}
+
+	// Add record
+	function AddRow($rsold = NULL) {
+		global $conn, $Language, $Security;
+
+		// Load db values from rsold
+		if ($rsold) {
+			$this->LoadDbValues($rsold);
+		}
+		$rsnew = array();
+
+		// task_name
+		$this->task_name->SetDbValueDef($rsnew, $this->task_name->CurrentValue, "", FALSE);
+
+		// sqlscript
+		$this->sqlscript->SetDbValueDef($rsnew, $this->sqlscript->CurrentValue, "", FALSE);
+
+		// phpscript
+		$this->phpscript->SetDbValueDef($rsnew, $this->phpscript->CurrentValue, "", FALSE);
+
+		// Call Row Inserting event
+		$rs = ($rsold == NULL) ? NULL : $rsold->fields;
+		$bInsertRow = $this->Row_Inserting($rs, $rsnew);
+		if ($bInsertRow) {
+			$conn->raiseErrorFn = 'ew_ErrorFn';
+			$AddRow = $this->Insert($rsnew);
+			$conn->raiseErrorFn = '';
+			if ($AddRow) {
+			}
+		} else {
+			if ($this->getSuccessMessage() <> "" || $this->getFailureMessage() <> "") {
+
+				// Use the message, do nothing
+			} elseif ($this->CancelMessage <> "") {
+				$this->setFailureMessage($this->CancelMessage);
+				$this->CancelMessage = "";
+			} else {
+				$this->setFailureMessage($Language->Phrase("InsertCancelled"));
+			}
+			$AddRow = FALSE;
+		}
+
+		// Get insert id if necessary
+		if ($AddRow) {
+			$this->task_id->setDbValue($conn->Insert_ID());
+			$rsnew['task_id'] = $this->task_id->DbValue;
+		}
+		if ($AddRow) {
+
+			// Call Row Inserted event
+			$rs = ($rsold == NULL) ? NULL : $rsold->fields;
+			$this->Row_Inserted($rs, $rsnew);
+			$this->WriteAuditTrailOnAdd($rsnew);
+		}
+		return $AddRow;
 	}
 
 	// Load advanced search
@@ -1556,6 +2263,112 @@ class ctask_list extends ctask {
 		ew_WriteAuditTrail("log", ew_StdCurrentDateTime(), ew_ScriptName(), $usr, $typ, $table, "", "", "", "");
 	}
 
+	// Write Audit Trail (add page)
+	function WriteAuditTrailOnAdd(&$rs) {
+		if (!$this->AuditTrailOnAdd) return;
+		$table = 'task';
+
+		// Get key value
+		$key = "";
+		if ($key <> "") $key .= $GLOBALS["EW_COMPOSITE_KEY_SEPARATOR"];
+		$key .= $rs['task_id'];
+
+		// Write Audit Trail
+		$dt = ew_StdCurrentDateTime();
+		$id = ew_ScriptName();
+	  $usr = CurrentUserID();
+		foreach (array_keys($rs) as $fldname) {
+			if ($this->fields[$fldname]->FldDataType <> EW_DATATYPE_BLOB) { // Ignore BLOB fields
+				if ($this->fields[$fldname]->FldDataType == EW_DATATYPE_MEMO) {
+					if (EW_AUDIT_TRAIL_TO_DATABASE)
+						$newvalue = $rs[$fldname];
+					else
+						$newvalue = "[MEMO]"; // Memo Field
+				} elseif ($this->fields[$fldname]->FldDataType == EW_DATATYPE_XML) {
+					$newvalue = "[XML]"; // XML Field
+				} else {
+					$newvalue = $rs[$fldname];
+				}
+				ew_WriteAuditTrail("log", $dt, $id, $usr, "A", $table, $fldname, $key, "", $newvalue);
+			}
+		}
+	}
+
+	// Write Audit Trail (edit page)
+	function WriteAuditTrailOnEdit(&$rsold, &$rsnew) {
+		if (!$this->AuditTrailOnEdit) return;
+		$table = 'task';
+
+		// Get key value
+		$key = "";
+		if ($key <> "") $key .= $GLOBALS["EW_COMPOSITE_KEY_SEPARATOR"];
+		$key .= $rsold['task_id'];
+
+		// Write Audit Trail
+		$dt = ew_StdCurrentDateTime();
+		$id = ew_ScriptName();
+	  $usr = CurrentUserID();
+		foreach (array_keys($rsnew) as $fldname) {
+			if ($this->fields[$fldname]->FldDataType <> EW_DATATYPE_BLOB) { // Ignore BLOB fields
+				if ($this->fields[$fldname]->FldDataType == EW_DATATYPE_DATE) { // DateTime field
+					$modified = (ew_FormatDateTime($rsold[$fldname], 0) <> ew_FormatDateTime($rsnew[$fldname], 0));
+				} else {
+					$modified = !ew_CompareValue($rsold[$fldname], $rsnew[$fldname]);
+				}
+				if ($modified) {
+					if ($this->fields[$fldname]->FldDataType == EW_DATATYPE_MEMO) { // Memo field
+						if (EW_AUDIT_TRAIL_TO_DATABASE) {
+							$oldvalue = $rsold[$fldname];
+							$newvalue = $rsnew[$fldname];
+						} else {
+							$oldvalue = "[MEMO]";
+							$newvalue = "[MEMO]";
+						}
+					} elseif ($this->fields[$fldname]->FldDataType == EW_DATATYPE_XML) { // XML field
+						$oldvalue = "[XML]";
+						$newvalue = "[XML]";
+					} else {
+						$oldvalue = $rsold[$fldname];
+						$newvalue = $rsnew[$fldname];
+					}
+					ew_WriteAuditTrail("log", $dt, $id, $usr, "U", $table, $fldname, $key, $oldvalue, $newvalue);
+				}
+			}
+		}
+	}
+
+	// Write Audit Trail (delete page)
+	function WriteAuditTrailOnDelete(&$rs) {
+		if (!$this->AuditTrailOnDelete) return;
+		$table = 'task';
+
+		// Get key value
+		$key = "";
+		if ($key <> "")
+			$key .= $GLOBALS["EW_COMPOSITE_KEY_SEPARATOR"];
+		$key .= $rs['task_id'];
+
+		// Write Audit Trail
+		$dt = ew_StdCurrentDateTime();
+		$id = ew_ScriptName();
+	  $curUser = CurrentUserID();
+		foreach (array_keys($rs) as $fldname) {
+			if (array_key_exists($fldname, $this->fields) && $this->fields[$fldname]->FldDataType <> EW_DATATYPE_BLOB) { // Ignore BLOB fields
+				if ($this->fields[$fldname]->FldDataType == EW_DATATYPE_MEMO) {
+					if (EW_AUDIT_TRAIL_TO_DATABASE)
+						$oldvalue = $rs[$fldname];
+					else
+						$oldvalue = "[MEMO]"; // Memo field
+				} elseif ($this->fields[$fldname]->FldDataType == EW_DATATYPE_XML) {
+					$oldvalue = "[XML]"; // XML field
+				} else {
+					$oldvalue = $rs[$fldname];
+				}
+				ew_WriteAuditTrail("log", $dt, $id, $curUser, "D", $table, $fldname, $key, $oldvalue, "");
+			}
+		}
+	}
+
 	// Page Load event
 	function Page_Load() {
 
@@ -1680,6 +2493,42 @@ var EW_PAGE_ID = task_list.PageID; // For backward compatibility
 // Form object
 var ftasklist = new ew_Form("ftasklist");
 ftasklist.FormKeyCountName = '<?php echo $task_list->FormKeyCountName ?>';
+
+// Validate form
+ftasklist.Validate = function() {
+	if (!this.ValidateRequired)
+		return true; // Ignore validation
+	var $ = jQuery, fobj = this.GetForm(), $fobj = $(fobj);
+	this.PostAutoSuggest();
+	if ($fobj.find("#a_confirm").val() == "F")
+		return true;
+	var elm, felm, uelm, addcnt = 0;
+	var $k = $fobj.find("#" + this.FormKeyCountName); // Get key_count
+	var rowcnt = ($k[0]) ? parseInt($k.val(), 10) : 1;
+	var startcnt = (rowcnt == 0) ? 0 : 1; // Check rowcnt == 0 => Inline-Add
+	var gridinsert = $fobj.find("#a_list").val() == "gridinsert";
+	for (var i = startcnt; i <= rowcnt; i++) {
+		var infix = ($k[0]) ? String(i) : "";
+		$fobj.data("rowindex", infix);
+			elm = this.GetElements("x" + infix + "_task_name");
+			if (elm && !ew_HasValue(elm))
+				return this.OnError(elm, ewLanguage.Phrase("EnterRequiredField") + " - <?php echo ew_JsEncode2($task->task_name->FldCaption()) ?>");
+			elm = this.GetElements("x" + infix + "_sqlscript");
+			if (elm && !ew_HasValue(elm))
+				return this.OnError(elm, ewLanguage.Phrase("EnterRequiredField") + " - <?php echo ew_JsEncode2($task->sqlscript->FldCaption()) ?>");
+			elm = this.GetElements("x" + infix + "_phpscript");
+			if (elm && !ew_HasValue(elm))
+				return this.OnError(elm, ewLanguage.Phrase("EnterRequiredField") + " - <?php echo ew_JsEncode2($task->phpscript->FldCaption()) ?>");
+
+			// Set up row object
+			ew_ElementsToRow(fobj);
+
+			// Fire Form_CustomValidate event
+			if (!this.Form_CustomValidate(fobj))
+				return false;
+	}
+	return true;
+}
 
 // Form_CustomValidate event
 ftasklist.Form_CustomValidate = 
@@ -1921,6 +2770,15 @@ if ($task->ExportAll && $task->Export <> "") {
 	else
 		$task_list->StopRec = $task_list->TotalRecs;
 }
+
+// Restore number of post back records
+if ($objForm) {
+	$objForm->Index = -1;
+	if ($objForm->HasValue($task_list->FormKeyCountName) && ($task->CurrentAction == "gridadd" || $task->CurrentAction == "gridedit" || $task->CurrentAction == "F")) {
+		$task_list->KeyCount = $objForm->GetValue($task_list->FormKeyCountName);
+		$task_list->StopRec = $task_list->StartRec + $task_list->KeyCount - 1;
+	}
+}
 $task_list->RecCnt = $task_list->StartRec - 1;
 if ($task_list->Recordset && !$task_list->Recordset->EOF) {
 	$task_list->Recordset->MoveFirst();
@@ -1934,10 +2792,25 @@ if ($task_list->Recordset && !$task_list->Recordset->EOF) {
 $task->RowType = EW_ROWTYPE_AGGREGATEINIT;
 $task->ResetAttrs();
 $task_list->RenderRow();
+$task_list->EditRowCnt = 0;
+if ($task->CurrentAction == "edit")
+	$task_list->RowIndex = 1;
+if ($task->CurrentAction == "gridedit")
+	$task_list->RowIndex = 0;
 while ($task_list->RecCnt < $task_list->StopRec) {
 	$task_list->RecCnt++;
 	if (intval($task_list->RecCnt) >= intval($task_list->StartRec)) {
 		$task_list->RowCnt++;
+		if ($task->CurrentAction == "gridadd" || $task->CurrentAction == "gridedit" || $task->CurrentAction == "F") {
+			$task_list->RowIndex++;
+			$objForm->Index = $task_list->RowIndex;
+			if ($objForm->HasValue($task_list->FormActionName))
+				$task_list->RowAction = strval($objForm->GetValue($task_list->FormActionName));
+			elseif ($task->CurrentAction == "gridadd")
+				$task_list->RowAction = "insert";
+			else
+				$task_list->RowAction = "";
+		}
 
 		// Set up key count
 		$task_list->KeyCount = $task_list->RowIndex;
@@ -1946,10 +2819,33 @@ while ($task_list->RecCnt < $task_list->StopRec) {
 		$task->ResetAttrs();
 		$task->CssClass = "";
 		if ($task->CurrentAction == "gridadd") {
+			$task_list->LoadDefaultValues(); // Load default values
 		} else {
 			$task_list->LoadRowValues($task_list->Recordset); // Load row values
 		}
 		$task->RowType = EW_ROWTYPE_VIEW; // Render view
+		if ($task->CurrentAction == "edit") {
+			if ($task_list->CheckInlineEditKey() && $task_list->EditRowCnt == 0) { // Inline edit
+				$task->RowType = EW_ROWTYPE_EDIT; // Render edit
+			}
+		}
+		if ($task->CurrentAction == "gridedit") { // Grid edit
+			if ($task->EventCancelled) {
+				$task_list->RestoreCurrentRowFormValues($task_list->RowIndex); // Restore form values
+			}
+			if ($task_list->RowAction == "insert")
+				$task->RowType = EW_ROWTYPE_ADD; // Render add
+			else
+				$task->RowType = EW_ROWTYPE_EDIT; // Render edit
+		}
+		if ($task->CurrentAction == "edit" && $task->RowType == EW_ROWTYPE_EDIT && $task->EventCancelled) { // Update failed
+			$objForm->Index = 1;
+			$task_list->RestoreFormValues(); // Restore form values
+		}
+		if ($task->CurrentAction == "gridedit" && ($task->RowType == EW_ROWTYPE_EDIT || $task->RowType == EW_ROWTYPE_ADD) && $task->EventCancelled) // Update failed
+			$task_list->RestoreCurrentRowFormValues($task_list->RowIndex); // Restore form values
+		if ($task->RowType == EW_ROWTYPE_EDIT) // Edit row
+			$task_list->EditRowCnt++;
 
 		// Set up row id / data-rowindex
 		$task->RowAttrs = array_merge($task->RowAttrs, array('data-rowindex'=>$task_list->RowCnt, 'id'=>'r' . $task_list->RowCnt . '_task', 'data-rowtype'=>$task->RowType));
@@ -1959,6 +2855,9 @@ while ($task_list->RecCnt < $task_list->StopRec) {
 
 		// Render list options
 		$task_list->RenderListOptions();
+
+		// Skip delete row / empty row for confirm page
+		if ($task_list->RowAction <> "delete" && $task_list->RowAction <> "insertdelete" && !($task_list->RowAction == "insert" && $task->CurrentAction == "F" && $task_list->EmptyRow())) {
 ?>
 	<tr<?php echo $task->RowAttributes() ?>>
 <?php
@@ -1968,26 +2867,77 @@ $task_list->ListOptions->Render("body", "left", $task_list->RowCnt);
 ?>
 	<?php if ($task->task_id->Visible) { // task_id ?>
 		<td<?php echo $task->task_id->CellAttributes() ?>>
+<?php if ($task->RowType == EW_ROWTYPE_ADD) { // Add record ?>
+<input type="hidden" data-field="x_task_id" name="o<?php echo $task_list->RowIndex ?>_task_id" id="o<?php echo $task_list->RowIndex ?>_task_id" value="<?php echo ew_HtmlEncode($task->task_id->OldValue) ?>">
+<?php } ?>
+<?php if ($task->RowType == EW_ROWTYPE_EDIT) { // Edit record ?>
+<span id="el<?php echo $task_list->RowCnt ?>_task_task_id" class="control-group task_task_id">
+<span<?php echo $task->task_id->ViewAttributes() ?>>
+<?php echo $task->task_id->EditValue ?></span>
+</span>
+<input type="hidden" data-field="x_task_id" name="x<?php echo $task_list->RowIndex ?>_task_id" id="x<?php echo $task_list->RowIndex ?>_task_id" value="<?php echo ew_HtmlEncode($task->task_id->CurrentValue) ?>">
+<?php } ?>
+<?php if ($task->RowType == EW_ROWTYPE_VIEW) { // View record ?>
 <span<?php echo $task->task_id->ViewAttributes() ?>>
 <?php echo $task->task_id->ListViewValue() ?></span>
+<?php } ?>
 <a id="<?php echo $task_list->PageObjName . "_row_" . $task_list->RowCnt ?>"></a></td>
 	<?php } ?>
 	<?php if ($task->task_name->Visible) { // task_name ?>
 		<td<?php echo $task->task_name->CellAttributes() ?>>
+<?php if ($task->RowType == EW_ROWTYPE_ADD) { // Add record ?>
+<span id="el<?php echo $task_list->RowCnt ?>_task_task_name" class="control-group task_task_name">
+<input type="text" data-field="x_task_name" name="x<?php echo $task_list->RowIndex ?>_task_name" id="x<?php echo $task_list->RowIndex ?>_task_name" size="30" maxlength="255" placeholder="<?php echo $task->task_name->PlaceHolder ?>" value="<?php echo $task->task_name->EditValue ?>"<?php echo $task->task_name->EditAttributes() ?>>
+</span>
+<input type="hidden" data-field="x_task_name" name="o<?php echo $task_list->RowIndex ?>_task_name" id="o<?php echo $task_list->RowIndex ?>_task_name" value="<?php echo ew_HtmlEncode($task->task_name->OldValue) ?>">
+<?php } ?>
+<?php if ($task->RowType == EW_ROWTYPE_EDIT) { // Edit record ?>
+<span id="el<?php echo $task_list->RowCnt ?>_task_task_name" class="control-group task_task_name">
+<input type="text" data-field="x_task_name" name="x<?php echo $task_list->RowIndex ?>_task_name" id="x<?php echo $task_list->RowIndex ?>_task_name" size="30" maxlength="255" placeholder="<?php echo $task->task_name->PlaceHolder ?>" value="<?php echo $task->task_name->EditValue ?>"<?php echo $task->task_name->EditAttributes() ?>>
+</span>
+<?php } ?>
+<?php if ($task->RowType == EW_ROWTYPE_VIEW) { // View record ?>
 <span<?php echo $task->task_name->ViewAttributes() ?>>
 <?php echo $task->task_name->ListViewValue() ?></span>
+<?php } ?>
 <a id="<?php echo $task_list->PageObjName . "_row_" . $task_list->RowCnt ?>"></a></td>
 	<?php } ?>
 	<?php if ($task->sqlscript->Visible) { // sqlscript ?>
 		<td<?php echo $task->sqlscript->CellAttributes() ?>>
+<?php if ($task->RowType == EW_ROWTYPE_ADD) { // Add record ?>
+<span id="el<?php echo $task_list->RowCnt ?>_task_sqlscript" class="control-group task_sqlscript">
+<textarea data-field="x_sqlscript" name="x<?php echo $task_list->RowIndex ?>_sqlscript" id="x<?php echo $task_list->RowIndex ?>_sqlscript" cols="35" rows="4" placeholder="<?php echo $task->sqlscript->PlaceHolder ?>"<?php echo $task->sqlscript->EditAttributes() ?>><?php echo $task->sqlscript->EditValue ?></textarea>
+</span>
+<input type="hidden" data-field="x_sqlscript" name="o<?php echo $task_list->RowIndex ?>_sqlscript" id="o<?php echo $task_list->RowIndex ?>_sqlscript" value="<?php echo ew_HtmlEncode($task->sqlscript->OldValue) ?>">
+<?php } ?>
+<?php if ($task->RowType == EW_ROWTYPE_EDIT) { // Edit record ?>
+<span id="el<?php echo $task_list->RowCnt ?>_task_sqlscript" class="control-group task_sqlscript">
+<textarea data-field="x_sqlscript" name="x<?php echo $task_list->RowIndex ?>_sqlscript" id="x<?php echo $task_list->RowIndex ?>_sqlscript" cols="35" rows="4" placeholder="<?php echo $task->sqlscript->PlaceHolder ?>"<?php echo $task->sqlscript->EditAttributes() ?>><?php echo $task->sqlscript->EditValue ?></textarea>
+</span>
+<?php } ?>
+<?php if ($task->RowType == EW_ROWTYPE_VIEW) { // View record ?>
 <span<?php echo $task->sqlscript->ViewAttributes() ?>>
 <?php echo $task->sqlscript->ListViewValue() ?></span>
+<?php } ?>
 <a id="<?php echo $task_list->PageObjName . "_row_" . $task_list->RowCnt ?>"></a></td>
 	<?php } ?>
 	<?php if ($task->phpscript->Visible) { // phpscript ?>
 		<td<?php echo $task->phpscript->CellAttributes() ?>>
+<?php if ($task->RowType == EW_ROWTYPE_ADD) { // Add record ?>
+<span id="el<?php echo $task_list->RowCnt ?>_task_phpscript" class="control-group task_phpscript">
+<textarea data-field="x_phpscript" name="x<?php echo $task_list->RowIndex ?>_phpscript" id="x<?php echo $task_list->RowIndex ?>_phpscript" cols="35" rows="4" placeholder="<?php echo $task->phpscript->PlaceHolder ?>"<?php echo $task->phpscript->EditAttributes() ?>><?php echo $task->phpscript->EditValue ?></textarea>
+</span>
+<input type="hidden" data-field="x_phpscript" name="o<?php echo $task_list->RowIndex ?>_phpscript" id="o<?php echo $task_list->RowIndex ?>_phpscript" value="<?php echo ew_HtmlEncode($task->phpscript->OldValue) ?>">
+<?php } ?>
+<?php if ($task->RowType == EW_ROWTYPE_EDIT) { // Edit record ?>
+<span id="el<?php echo $task_list->RowCnt ?>_task_phpscript" class="control-group task_phpscript">
+<textarea data-field="x_phpscript" name="x<?php echo $task_list->RowIndex ?>_phpscript" id="x<?php echo $task_list->RowIndex ?>_phpscript" cols="35" rows="4" placeholder="<?php echo $task->phpscript->PlaceHolder ?>"<?php echo $task->phpscript->EditAttributes() ?>><?php echo $task->phpscript->EditValue ?></textarea>
+</span>
+<?php } ?>
+<?php if ($task->RowType == EW_ROWTYPE_VIEW) { // View record ?>
 <span<?php echo $task->phpscript->ViewAttributes() ?>>
 <?php echo $task->phpscript->ListViewValue() ?></span>
+<?php } ?>
 <a id="<?php echo $task_list->PageObjName . "_row_" . $task_list->RowCnt ?>"></a></td>
 	<?php } ?>
 <?php
@@ -1996,14 +2946,93 @@ $task_list->ListOptions->Render("body", "left", $task_list->RowCnt);
 $task_list->ListOptions->Render("body", "right", $task_list->RowCnt);
 ?>
 	</tr>
+<?php if ($task->RowType == EW_ROWTYPE_ADD || $task->RowType == EW_ROWTYPE_EDIT) { ?>
+<script type="text/javascript">
+ftasklist.UpdateOpts(<?php echo $task_list->RowIndex ?>);
+</script>
+<?php } ?>
 <?php
 	}
+	} // End delete row checking
 	if ($task->CurrentAction <> "gridadd")
-		$task_list->Recordset->MoveNext();
+		if (!$task_list->Recordset->EOF) $task_list->Recordset->MoveNext();
+}
+?>
+<?php
+	if ($task->CurrentAction == "gridadd" || $task->CurrentAction == "gridedit") {
+		$task_list->RowIndex = '$rowindex$';
+		$task_list->LoadDefaultValues();
+
+		// Set row properties
+		$task->ResetAttrs();
+		$task->RowAttrs = array_merge($task->RowAttrs, array('data-rowindex'=>$task_list->RowIndex, 'id'=>'r0_task', 'data-rowtype'=>EW_ROWTYPE_ADD));
+		ew_AppendClass($task->RowAttrs["class"], "ewTemplate");
+		$task->RowType = EW_ROWTYPE_ADD;
+
+		// Render row
+		$task_list->RenderRow();
+
+		// Render list options
+		$task_list->RenderListOptions();
+		$task_list->StartRowCnt = 0;
+?>
+	<tr<?php echo $task->RowAttributes() ?>>
+<?php
+
+// Render list options (body, left)
+$task_list->ListOptions->Render("body", "left", $task_list->RowIndex);
+?>
+	<?php if ($task->task_id->Visible) { // task_id ?>
+		<td>
+<input type="hidden" data-field="x_task_id" name="o<?php echo $task_list->RowIndex ?>_task_id" id="o<?php echo $task_list->RowIndex ?>_task_id" value="<?php echo ew_HtmlEncode($task->task_id->OldValue) ?>">
+</td>
+	<?php } ?>
+	<?php if ($task->task_name->Visible) { // task_name ?>
+		<td>
+<span id="el$rowindex$_task_task_name" class="control-group task_task_name">
+<input type="text" data-field="x_task_name" name="x<?php echo $task_list->RowIndex ?>_task_name" id="x<?php echo $task_list->RowIndex ?>_task_name" size="30" maxlength="255" placeholder="<?php echo $task->task_name->PlaceHolder ?>" value="<?php echo $task->task_name->EditValue ?>"<?php echo $task->task_name->EditAttributes() ?>>
+</span>
+<input type="hidden" data-field="x_task_name" name="o<?php echo $task_list->RowIndex ?>_task_name" id="o<?php echo $task_list->RowIndex ?>_task_name" value="<?php echo ew_HtmlEncode($task->task_name->OldValue) ?>">
+</td>
+	<?php } ?>
+	<?php if ($task->sqlscript->Visible) { // sqlscript ?>
+		<td>
+<span id="el$rowindex$_task_sqlscript" class="control-group task_sqlscript">
+<textarea data-field="x_sqlscript" name="x<?php echo $task_list->RowIndex ?>_sqlscript" id="x<?php echo $task_list->RowIndex ?>_sqlscript" cols="35" rows="4" placeholder="<?php echo $task->sqlscript->PlaceHolder ?>"<?php echo $task->sqlscript->EditAttributes() ?>><?php echo $task->sqlscript->EditValue ?></textarea>
+</span>
+<input type="hidden" data-field="x_sqlscript" name="o<?php echo $task_list->RowIndex ?>_sqlscript" id="o<?php echo $task_list->RowIndex ?>_sqlscript" value="<?php echo ew_HtmlEncode($task->sqlscript->OldValue) ?>">
+</td>
+	<?php } ?>
+	<?php if ($task->phpscript->Visible) { // phpscript ?>
+		<td>
+<span id="el$rowindex$_task_phpscript" class="control-group task_phpscript">
+<textarea data-field="x_phpscript" name="x<?php echo $task_list->RowIndex ?>_phpscript" id="x<?php echo $task_list->RowIndex ?>_phpscript" cols="35" rows="4" placeholder="<?php echo $task->phpscript->PlaceHolder ?>"<?php echo $task->phpscript->EditAttributes() ?>><?php echo $task->phpscript->EditValue ?></textarea>
+</span>
+<input type="hidden" data-field="x_phpscript" name="o<?php echo $task_list->RowIndex ?>_phpscript" id="o<?php echo $task_list->RowIndex ?>_phpscript" value="<?php echo ew_HtmlEncode($task->phpscript->OldValue) ?>">
+</td>
+	<?php } ?>
+<?php
+
+// Render list options (body, right)
+$task_list->ListOptions->Render("body", "right", $task_list->RowCnt);
+?>
+<script type="text/javascript">
+ftasklist.UpdateOpts(<?php echo $task_list->RowIndex ?>);
+</script>
+	</tr>
+<?php
 }
 ?>
 </tbody>
 </table>
+<?php } ?>
+<?php if ($task->CurrentAction == "edit") { ?>
+<input type="hidden" name="<?php echo $task_list->FormKeyCountName ?>" id="<?php echo $task_list->FormKeyCountName ?>" value="<?php echo $task_list->KeyCount ?>">
+<?php } ?>
+<?php if ($task->CurrentAction == "gridedit") { ?>
+<input type="hidden" name="a_list" id="a_list" value="gridupdate">
+<input type="hidden" name="<?php echo $task_list->FormKeyCountName ?>" id="<?php echo $task_list->FormKeyCountName ?>" value="<?php echo $task_list->KeyCount ?>">
+<?php echo $task_list->MultiSelectKey ?>
 <?php } ?>
 <?php if ($task->CurrentAction == "") { ?>
 <input type="hidden" name="a_list" id="a_list" value="">

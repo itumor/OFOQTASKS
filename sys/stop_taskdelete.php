@@ -353,12 +353,8 @@ class cstop_task_delete extends cstop_task {
 		$this->Row_Selected($row);
 		$this->id->setDbValue($rs->fields('id'));
 		$this->server_id_mysqladmin->setDbValue($rs->fields('server_id_mysqladmin'));
-		$this->HOSTNAME->setDbValue($rs->fields('HOSTNAME'));
-		$this->USERNAME->setDbValue($rs->fields('USERNAME'));
-		$this->PASSWORD->setDbValue($rs->fields('PASSWORD'));
-		$this->DATABASE->setDbValue($rs->fields('DATABASE'));
-		$this->FILEPATH->setDbValue($rs->fields('FILEPATH'));
-		$this->FILENAME->setDbValue($rs->fields('FILENAME'));
+		$this->datetime->setDbValue($rs->fields('datetime'));
+		$this->username->setDbValue($rs->fields('username'));
 	}
 
 	// Load DbValue from recordset
@@ -367,12 +363,8 @@ class cstop_task_delete extends cstop_task {
 		$row = is_array($rs) ? $rs : $rs->fields;
 		$this->id->DbValue = $row['id'];
 		$this->server_id_mysqladmin->DbValue = $row['server_id_mysqladmin'];
-		$this->HOSTNAME->DbValue = $row['HOSTNAME'];
-		$this->USERNAME->DbValue = $row['USERNAME'];
-		$this->PASSWORD->DbValue = $row['PASSWORD'];
-		$this->DATABASE->DbValue = $row['DATABASE'];
-		$this->FILEPATH->DbValue = $row['FILEPATH'];
-		$this->FILENAME->DbValue = $row['FILENAME'];
+		$this->datetime->DbValue = $row['datetime'];
+		$this->username->DbValue = $row['username'];
 	}
 
 	// Render row values based on field settings
@@ -388,12 +380,8 @@ class cstop_task_delete extends cstop_task {
 		// Common render codes for all row types
 		// id
 		// server_id_mysqladmin
-		// HOSTNAME
-		// USERNAME
-		// PASSWORD
-		// DATABASE
-		// FILEPATH
-		// FILENAME
+		// datetime
+		// username
 
 		if ($this->RowType == EW_ROWTYPE_VIEW) { // View row
 
@@ -405,29 +393,13 @@ class cstop_task_delete extends cstop_task {
 			$this->server_id_mysqladmin->ViewValue = $this->server_id_mysqladmin->CurrentValue;
 			$this->server_id_mysqladmin->ViewCustomAttributes = "";
 
-			// HOSTNAME
-			$this->HOSTNAME->ViewValue = $this->HOSTNAME->CurrentValue;
-			$this->HOSTNAME->ViewCustomAttributes = "";
+			// datetime
+			$this->datetime->ViewValue = $this->datetime->CurrentValue;
+			$this->datetime->ViewCustomAttributes = "";
 
-			// USERNAME
-			$this->USERNAME->ViewValue = $this->USERNAME->CurrentValue;
-			$this->USERNAME->ViewCustomAttributes = "";
-
-			// PASSWORD
-			$this->PASSWORD->ViewValue = $this->PASSWORD->CurrentValue;
-			$this->PASSWORD->ViewCustomAttributes = "";
-
-			// DATABASE
-			$this->DATABASE->ViewValue = $this->DATABASE->CurrentValue;
-			$this->DATABASE->ViewCustomAttributes = "";
-
-			// FILEPATH
-			$this->FILEPATH->ViewValue = $this->FILEPATH->CurrentValue;
-			$this->FILEPATH->ViewCustomAttributes = "";
-
-			// FILENAME
-			$this->FILENAME->ViewValue = $this->FILENAME->CurrentValue;
-			$this->FILENAME->ViewCustomAttributes = "";
+			// username
+			$this->username->ViewValue = $this->username->CurrentValue;
+			$this->username->ViewCustomAttributes = "";
 
 			// id
 			$this->id->LinkCustomAttributes = "";
@@ -439,35 +411,15 @@ class cstop_task_delete extends cstop_task {
 			$this->server_id_mysqladmin->HrefValue = "";
 			$this->server_id_mysqladmin->TooltipValue = "";
 
-			// HOSTNAME
-			$this->HOSTNAME->LinkCustomAttributes = "";
-			$this->HOSTNAME->HrefValue = "";
-			$this->HOSTNAME->TooltipValue = "";
+			// datetime
+			$this->datetime->LinkCustomAttributes = "";
+			$this->datetime->HrefValue = "";
+			$this->datetime->TooltipValue = "";
 
-			// USERNAME
-			$this->USERNAME->LinkCustomAttributes = "";
-			$this->USERNAME->HrefValue = "";
-			$this->USERNAME->TooltipValue = "";
-
-			// PASSWORD
-			$this->PASSWORD->LinkCustomAttributes = "";
-			$this->PASSWORD->HrefValue = "";
-			$this->PASSWORD->TooltipValue = "";
-
-			// DATABASE
-			$this->DATABASE->LinkCustomAttributes = "";
-			$this->DATABASE->HrefValue = "";
-			$this->DATABASE->TooltipValue = "";
-
-			// FILEPATH
-			$this->FILEPATH->LinkCustomAttributes = "";
-			$this->FILEPATH->HrefValue = "";
-			$this->FILEPATH->TooltipValue = "";
-
-			// FILENAME
-			$this->FILENAME->LinkCustomAttributes = "";
-			$this->FILENAME->HrefValue = "";
-			$this->FILENAME->TooltipValue = "";
+			// username
+			$this->username->LinkCustomAttributes = "";
+			$this->username->HrefValue = "";
+			$this->username->TooltipValue = "";
 		}
 
 		// Call Row Rendered event
@@ -715,23 +667,11 @@ $stop_task_delete->ShowMessage();
 <?php if ($stop_task->server_id_mysqladmin->Visible) { // server_id_mysqladmin ?>
 		<td><span id="elh_stop_task_server_id_mysqladmin" class="stop_task_server_id_mysqladmin"><?php echo $stop_task->server_id_mysqladmin->FldCaption() ?></span></td>
 <?php } ?>
-<?php if ($stop_task->HOSTNAME->Visible) { // HOSTNAME ?>
-		<td><span id="elh_stop_task_HOSTNAME" class="stop_task_HOSTNAME"><?php echo $stop_task->HOSTNAME->FldCaption() ?></span></td>
+<?php if ($stop_task->datetime->Visible) { // datetime ?>
+		<td><span id="elh_stop_task_datetime" class="stop_task_datetime"><?php echo $stop_task->datetime->FldCaption() ?></span></td>
 <?php } ?>
-<?php if ($stop_task->USERNAME->Visible) { // USERNAME ?>
-		<td><span id="elh_stop_task_USERNAME" class="stop_task_USERNAME"><?php echo $stop_task->USERNAME->FldCaption() ?></span></td>
-<?php } ?>
-<?php if ($stop_task->PASSWORD->Visible) { // PASSWORD ?>
-		<td><span id="elh_stop_task_PASSWORD" class="stop_task_PASSWORD"><?php echo $stop_task->PASSWORD->FldCaption() ?></span></td>
-<?php } ?>
-<?php if ($stop_task->DATABASE->Visible) { // DATABASE ?>
-		<td><span id="elh_stop_task_DATABASE" class="stop_task_DATABASE"><?php echo $stop_task->DATABASE->FldCaption() ?></span></td>
-<?php } ?>
-<?php if ($stop_task->FILEPATH->Visible) { // FILEPATH ?>
-		<td><span id="elh_stop_task_FILEPATH" class="stop_task_FILEPATH"><?php echo $stop_task->FILEPATH->FldCaption() ?></span></td>
-<?php } ?>
-<?php if ($stop_task->FILENAME->Visible) { // FILENAME ?>
-		<td><span id="elh_stop_task_FILENAME" class="stop_task_FILENAME"><?php echo $stop_task->FILENAME->FldCaption() ?></span></td>
+<?php if ($stop_task->username->Visible) { // username ?>
+		<td><span id="elh_stop_task_username" class="stop_task_username"><?php echo $stop_task->username->FldCaption() ?></span></td>
 <?php } ?>
 	</tr>
 	</thead>
@@ -770,51 +710,19 @@ while (!$stop_task_delete->Recordset->EOF) {
 </span>
 </td>
 <?php } ?>
-<?php if ($stop_task->HOSTNAME->Visible) { // HOSTNAME ?>
-		<td<?php echo $stop_task->HOSTNAME->CellAttributes() ?>>
-<span id="el<?php echo $stop_task_delete->RowCnt ?>_stop_task_HOSTNAME" class="control-group stop_task_HOSTNAME">
-<span<?php echo $stop_task->HOSTNAME->ViewAttributes() ?>>
-<?php echo $stop_task->HOSTNAME->ListViewValue() ?></span>
+<?php if ($stop_task->datetime->Visible) { // datetime ?>
+		<td<?php echo $stop_task->datetime->CellAttributes() ?>>
+<span id="el<?php echo $stop_task_delete->RowCnt ?>_stop_task_datetime" class="control-group stop_task_datetime">
+<span<?php echo $stop_task->datetime->ViewAttributes() ?>>
+<?php echo $stop_task->datetime->ListViewValue() ?></span>
 </span>
 </td>
 <?php } ?>
-<?php if ($stop_task->USERNAME->Visible) { // USERNAME ?>
-		<td<?php echo $stop_task->USERNAME->CellAttributes() ?>>
-<span id="el<?php echo $stop_task_delete->RowCnt ?>_stop_task_USERNAME" class="control-group stop_task_USERNAME">
-<span<?php echo $stop_task->USERNAME->ViewAttributes() ?>>
-<?php echo $stop_task->USERNAME->ListViewValue() ?></span>
-</span>
-</td>
-<?php } ?>
-<?php if ($stop_task->PASSWORD->Visible) { // PASSWORD ?>
-		<td<?php echo $stop_task->PASSWORD->CellAttributes() ?>>
-<span id="el<?php echo $stop_task_delete->RowCnt ?>_stop_task_PASSWORD" class="control-group stop_task_PASSWORD">
-<span<?php echo $stop_task->PASSWORD->ViewAttributes() ?>>
-<?php echo $stop_task->PASSWORD->ListViewValue() ?></span>
-</span>
-</td>
-<?php } ?>
-<?php if ($stop_task->DATABASE->Visible) { // DATABASE ?>
-		<td<?php echo $stop_task->DATABASE->CellAttributes() ?>>
-<span id="el<?php echo $stop_task_delete->RowCnt ?>_stop_task_DATABASE" class="control-group stop_task_DATABASE">
-<span<?php echo $stop_task->DATABASE->ViewAttributes() ?>>
-<?php echo $stop_task->DATABASE->ListViewValue() ?></span>
-</span>
-</td>
-<?php } ?>
-<?php if ($stop_task->FILEPATH->Visible) { // FILEPATH ?>
-		<td<?php echo $stop_task->FILEPATH->CellAttributes() ?>>
-<span id="el<?php echo $stop_task_delete->RowCnt ?>_stop_task_FILEPATH" class="control-group stop_task_FILEPATH">
-<span<?php echo $stop_task->FILEPATH->ViewAttributes() ?>>
-<?php echo $stop_task->FILEPATH->ListViewValue() ?></span>
-</span>
-</td>
-<?php } ?>
-<?php if ($stop_task->FILENAME->Visible) { // FILENAME ?>
-		<td<?php echo $stop_task->FILENAME->CellAttributes() ?>>
-<span id="el<?php echo $stop_task_delete->RowCnt ?>_stop_task_FILENAME" class="control-group stop_task_FILENAME">
-<span<?php echo $stop_task->FILENAME->ViewAttributes() ?>>
-<?php echo $stop_task->FILENAME->ListViewValue() ?></span>
+<?php if ($stop_task->username->Visible) { // username ?>
+		<td<?php echo $stop_task->username->CellAttributes() ?>>
+<span id="el<?php echo $stop_task_delete->RowCnt ?>_stop_task_username" class="control-group stop_task_username">
+<span<?php echo $stop_task->username->ViewAttributes() ?>>
+<?php echo $stop_task->username->ListViewValue() ?></span>
 </span>
 </td>
 <?php } ?>

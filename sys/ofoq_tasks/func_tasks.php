@@ -19,6 +19,9 @@ function add_new_task($task_name) {
 
 function add_cron_task($task_name,$parameters) {
     global $ofoq_tasks; // database container from ORM library at connect.inc.php
+
+    $t_parameters = task_parameters($task_name);
+    //print_r($t_parameters);die;
     $task = $ofoq_tasks->task("task_name", "$task_name")->fetch(); // get task information
 
     $update_task['sqlscript'] = create_table_statement($task_name);
@@ -28,24 +31,34 @@ function add_cron_task($task_name,$parameters) {
 
         foreach ($task_function_group->function_group_id->function_group_relation()->order('priority ASC') AS $function_group_relation) {
             $script_path =  $function_group_relation->script_function_id->script_id['script_path'] . ' ';
-            $script_function_name  = $function_group_relation->script_function_id['script_function_name'] . "";
+            $script_function_name  = '"' . $function_group_relation->script_function_id['script_function_name'] . '"';
             $server_id = 'server_id_' . $function_group_relation->script_function_id->script_id['script_name'];
             $parameter_str = "";
+            //echo $server_id;die;
             foreach( $function_group_relation->script_function_id->script_id->parameter() AS $parameter ){
                if ($parameter['parameter_name'] != $server_id ){
-                $parameter_str .= $parameters[$parameter['parameter_name']] . ' ';
+                //print_r($parameter['parameter_name']);die;
+
+                if (in_array($parameter['parameter_name'], $parameters)) {
+                $parameter_str .= '"' . $parameters[$parameter['parameter_name']] . '" ';
+                }else{
+                  $parameter_str .=  '"" ';
+                }
                }else{
+               // print_r($parameters);die;
                 $server_id = $parameters[$server_id];
+
                }
            }
-           $command_data['command_input'] = $script_path . ' ' . $script_function_name . ' ' . $parameter_str;
+           $command_data['command_input'] = "$script_path $script_function_name $parameter_str";
            $command_data['command_status'] = 'pending';
            $command_data['command_time'] = date('Y-m-d h:i:s');
            $command_data['task_id'] = $task['task_id'];
-           $command_data['user_id'] = null;
            $command_data['command_id'] = null;
            $command_data['server_id'] = $server_id;
-		   //print_r($command_data);die;
+		  // print_r($command_data);die;
+       //$conn->prepare($sql);
+        // $ofoq_tasks->command()->prepare($command_data);
          $ofoq_tasks->command()->insert($command_data);
 
         }
@@ -62,8 +75,9 @@ function task_parameters($task_name){
     $task = $ofoq_tasks->task("task_name", "$task_name")->fetch();
     foreach ($task->task_function_group() AS $task_function_group) {
         foreach ($task_function_group->function_group_id->function_group_relation()->order('priority ASC') AS $function_group_relation) {
-           foreach( $function_group_relation->script_function_id->script_id->parameter() AS $parameter ){
-               $parameter_array[$parameter['parameter_name']] = $parameter['parameter_name'];
+           foreach( $function_group_relation->script_function_id->script_function_parameter_relation() AS $script_function_parameter_relation ){
+            $parameter_name = $script_function_parameter_relation->parameter_id['parameter_name'];
+               $parameter_array[$parameter_name] = $parameter_name;
            }
         }
     }

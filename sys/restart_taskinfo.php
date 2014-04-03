@@ -9,6 +9,8 @@ $restart_task = NULL;
 class crestart_task extends cTable {
 	var $id;
 	var $server_id_mysqladmin;
+	var $username;
+	var $datetime;
 
 	//
 	// Table class constructor
@@ -42,6 +44,14 @@ class crestart_task extends cTable {
 		// server_id_mysqladmin
 		$this->server_id_mysqladmin = new cField('restart_task', 'restart_task', 'x_server_id_mysqladmin', 'server_id_mysqladmin', '`server_id_mysqladmin`', '`server_id_mysqladmin`', 200, -1, FALSE, '`server_id_mysqladmin`', FALSE, FALSE, FALSE, 'FORMATTED TEXT');
 		$this->fields['server_id_mysqladmin'] = &$this->server_id_mysqladmin;
+
+		// username
+		$this->username = new cField('restart_task', 'restart_task', 'x_username', 'username', '`username`', '`username`', 200, -1, FALSE, '`username`', FALSE, FALSE, FALSE, 'FORMATTED TEXT');
+		$this->fields['username'] = &$this->username;
+
+		// datetime
+		$this->datetime = new cField('restart_task', 'restart_task', 'x_datetime', 'datetime', '`datetime`', 'DATE_FORMAT(`datetime`, \'%d/%m/%Y %H:%i:%s\')', 135, -1, FALSE, '`datetime`', FALSE, FALSE, FALSE, 'FORMATTED TEXT');
+		$this->fields['datetime'] = &$this->datetime;
 	}
 
 	// Single column sort
@@ -462,6 +472,8 @@ class crestart_task extends cTable {
 	function LoadListRowValues(&$rs) {
 		$this->id->setDbValue($rs->fields('id'));
 		$this->server_id_mysqladmin->setDbValue($rs->fields('server_id_mysqladmin'));
+		$this->username->setDbValue($rs->fields('username'));
+		$this->datetime->setDbValue($rs->fields('datetime'));
 	}
 
 	// Render list row values
@@ -474,6 +486,8 @@ class crestart_task extends cTable {
    // Common render codes
 		// id
 		// server_id_mysqladmin
+		// username
+		// datetime
 		// id
 
 		$this->id->ViewValue = $this->id->CurrentValue;
@@ -503,6 +517,14 @@ class crestart_task extends cTable {
 		}
 		$this->server_id_mysqladmin->ViewCustomAttributes = "";
 
+		// username
+		$this->username->ViewValue = $this->username->CurrentValue;
+		$this->username->ViewCustomAttributes = "";
+
+		// datetime
+		$this->datetime->ViewValue = $this->datetime->CurrentValue;
+		$this->datetime->ViewCustomAttributes = "";
+
 		// id
 		$this->id->LinkCustomAttributes = "";
 		$this->id->HrefValue = "";
@@ -512,6 +534,16 @@ class crestart_task extends cTable {
 		$this->server_id_mysqladmin->LinkCustomAttributes = "";
 		$this->server_id_mysqladmin->HrefValue = "";
 		$this->server_id_mysqladmin->TooltipValue = "";
+
+		// username
+		$this->username->LinkCustomAttributes = "";
+		$this->username->HrefValue = "";
+		$this->username->TooltipValue = "";
+
+		// datetime
+		$this->datetime->LinkCustomAttributes = "";
+		$this->datetime->HrefValue = "";
+		$this->datetime->TooltipValue = "";
 
 		// Call Row Rendered event
 		$this->Row_Rendered();
@@ -537,9 +569,13 @@ class crestart_task extends cTable {
 			if ($ExportPageType == "view") {
 				if ($this->id->Exportable) $Doc->ExportCaption($this->id);
 				if ($this->server_id_mysqladmin->Exportable) $Doc->ExportCaption($this->server_id_mysqladmin);
+				if ($this->username->Exportable) $Doc->ExportCaption($this->username);
+				if ($this->datetime->Exportable) $Doc->ExportCaption($this->datetime);
 			} else {
 				if ($this->id->Exportable) $Doc->ExportCaption($this->id);
 				if ($this->server_id_mysqladmin->Exportable) $Doc->ExportCaption($this->server_id_mysqladmin);
+				if ($this->username->Exportable) $Doc->ExportCaption($this->username);
+				if ($this->datetime->Exportable) $Doc->ExportCaption($this->datetime);
 			}
 			$Doc->EndExportRow();
 		}
@@ -571,9 +607,13 @@ class crestart_task extends cTable {
 				if ($ExportPageType == "view") {
 					if ($this->id->Exportable) $Doc->ExportField($this->id);
 					if ($this->server_id_mysqladmin->Exportable) $Doc->ExportField($this->server_id_mysqladmin);
+					if ($this->username->Exportable) $Doc->ExportField($this->username);
+					if ($this->datetime->Exportable) $Doc->ExportField($this->datetime);
 				} else {
 					if ($this->id->Exportable) $Doc->ExportField($this->id);
 					if ($this->server_id_mysqladmin->Exportable) $Doc->ExportField($this->server_id_mysqladmin);
+					if ($this->username->Exportable) $Doc->ExportField($this->username);
+					if ($this->datetime->Exportable) $Doc->ExportField($this->datetime);
 				}
 				$Doc->EndExportRow();
 			}

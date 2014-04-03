@@ -552,13 +552,9 @@ class cstart_task_view extends cstart_task {
 		$row = &$rs->fields;
 		$this->Row_Selected($row);
 		$this->id->setDbValue($rs->fields('id'));
+		$this->datetime->setDbValue($rs->fields('datetime'));
+		$this->username->setDbValue($rs->fields('username'));
 		$this->server_id_mysqladmin->setDbValue($rs->fields('server_id_mysqladmin'));
-		$this->HOSTNAME->setDbValue($rs->fields('HOSTNAME'));
-		$this->USERNAME->setDbValue($rs->fields('USERNAME'));
-		$this->PASSWORD->setDbValue($rs->fields('PASSWORD'));
-		$this->DATABASE->setDbValue($rs->fields('DATABASE'));
-		$this->FILEPATH->setDbValue($rs->fields('FILEPATH'));
-		$this->FILENAME->setDbValue($rs->fields('FILENAME'));
 	}
 
 	// Load DbValue from recordset
@@ -566,13 +562,9 @@ class cstart_task_view extends cstart_task {
 		if (!$rs || !is_array($rs) && $rs->EOF) return;
 		$row = is_array($rs) ? $rs : $rs->fields;
 		$this->id->DbValue = $row['id'];
+		$this->datetime->DbValue = $row['datetime'];
+		$this->username->DbValue = $row['username'];
 		$this->server_id_mysqladmin->DbValue = $row['server_id_mysqladmin'];
-		$this->HOSTNAME->DbValue = $row['HOSTNAME'];
-		$this->USERNAME->DbValue = $row['USERNAME'];
-		$this->PASSWORD->DbValue = $row['PASSWORD'];
-		$this->DATABASE->DbValue = $row['DATABASE'];
-		$this->FILEPATH->DbValue = $row['FILEPATH'];
-		$this->FILENAME->DbValue = $row['FILENAME'];
 	}
 
 	// Render row values based on field settings
@@ -593,19 +585,23 @@ class cstart_task_view extends cstart_task {
 
 		// Common render codes for all row types
 		// id
+		// datetime
+		// username
 		// server_id_mysqladmin
-		// HOSTNAME
-		// USERNAME
-		// PASSWORD
-		// DATABASE
-		// FILEPATH
-		// FILENAME
 
 		if ($this->RowType == EW_ROWTYPE_VIEW) { // View row
 
 			// id
 			$this->id->ViewValue = $this->id->CurrentValue;
 			$this->id->ViewCustomAttributes = "";
+
+			// datetime
+			$this->datetime->ViewValue = $this->datetime->CurrentValue;
+			$this->datetime->ViewCustomAttributes = "";
+
+			// username
+			$this->username->ViewValue = $this->username->CurrentValue;
+			$this->username->ViewCustomAttributes = "";
 
 			// server_id_mysqladmin
 			if (strval($this->server_id_mysqladmin->CurrentValue) <> "") {
@@ -631,69 +627,25 @@ class cstart_task_view extends cstart_task {
 			}
 			$this->server_id_mysqladmin->ViewCustomAttributes = "";
 
-			// HOSTNAME
-			$this->HOSTNAME->ViewValue = $this->HOSTNAME->CurrentValue;
-			$this->HOSTNAME->ViewCustomAttributes = "";
-
-			// USERNAME
-			$this->USERNAME->ViewValue = $this->USERNAME->CurrentValue;
-			$this->USERNAME->ViewCustomAttributes = "";
-
-			// PASSWORD
-			$this->PASSWORD->ViewValue = $this->PASSWORD->CurrentValue;
-			$this->PASSWORD->ViewCustomAttributes = "";
-
-			// DATABASE
-			$this->DATABASE->ViewValue = $this->DATABASE->CurrentValue;
-			$this->DATABASE->ViewCustomAttributes = "";
-
-			// FILEPATH
-			$this->FILEPATH->ViewValue = $this->FILEPATH->CurrentValue;
-			$this->FILEPATH->ViewCustomAttributes = "";
-
-			// FILENAME
-			$this->FILENAME->ViewValue = $this->FILENAME->CurrentValue;
-			$this->FILENAME->ViewCustomAttributes = "";
-
 			// id
 			$this->id->LinkCustomAttributes = "";
 			$this->id->HrefValue = "";
 			$this->id->TooltipValue = "";
 
+			// datetime
+			$this->datetime->LinkCustomAttributes = "";
+			$this->datetime->HrefValue = "";
+			$this->datetime->TooltipValue = "";
+
+			// username
+			$this->username->LinkCustomAttributes = "";
+			$this->username->HrefValue = "";
+			$this->username->TooltipValue = "";
+
 			// server_id_mysqladmin
 			$this->server_id_mysqladmin->LinkCustomAttributes = "";
 			$this->server_id_mysqladmin->HrefValue = "";
 			$this->server_id_mysqladmin->TooltipValue = "";
-
-			// HOSTNAME
-			$this->HOSTNAME->LinkCustomAttributes = "";
-			$this->HOSTNAME->HrefValue = "";
-			$this->HOSTNAME->TooltipValue = "";
-
-			// USERNAME
-			$this->USERNAME->LinkCustomAttributes = "";
-			$this->USERNAME->HrefValue = "";
-			$this->USERNAME->TooltipValue = "";
-
-			// PASSWORD
-			$this->PASSWORD->LinkCustomAttributes = "";
-			$this->PASSWORD->HrefValue = "";
-			$this->PASSWORD->TooltipValue = "";
-
-			// DATABASE
-			$this->DATABASE->LinkCustomAttributes = "";
-			$this->DATABASE->HrefValue = "";
-			$this->DATABASE->TooltipValue = "";
-
-			// FILEPATH
-			$this->FILEPATH->LinkCustomAttributes = "";
-			$this->FILEPATH->HrefValue = "";
-			$this->FILEPATH->TooltipValue = "";
-
-			// FILENAME
-			$this->FILENAME->LinkCustomAttributes = "";
-			$this->FILENAME->HrefValue = "";
-			$this->FILENAME->TooltipValue = "";
 		}
 
 		// Call Row Rendered event
@@ -1119,6 +1071,28 @@ $start_task_view->ShowMessage();
 </td>
 	</tr>
 <?php } ?>
+<?php if ($start_task->datetime->Visible) { // datetime ?>
+	<tr id="r_datetime">
+		<td><span id="elh_start_task_datetime"><?php echo $start_task->datetime->FldCaption() ?></span></td>
+		<td<?php echo $start_task->datetime->CellAttributes() ?>>
+<span id="el_start_task_datetime" class="control-group">
+<span<?php echo $start_task->datetime->ViewAttributes() ?>>
+<?php echo $start_task->datetime->ViewValue ?></span>
+</span>
+</td>
+	</tr>
+<?php } ?>
+<?php if ($start_task->username->Visible) { // username ?>
+	<tr id="r_username">
+		<td><span id="elh_start_task_username"><?php echo $start_task->username->FldCaption() ?></span></td>
+		<td<?php echo $start_task->username->CellAttributes() ?>>
+<span id="el_start_task_username" class="control-group">
+<span<?php echo $start_task->username->ViewAttributes() ?>>
+<?php echo $start_task->username->ViewValue ?></span>
+</span>
+</td>
+	</tr>
+<?php } ?>
 <?php if ($start_task->server_id_mysqladmin->Visible) { // server_id_mysqladmin ?>
 	<tr id="r_server_id_mysqladmin">
 		<td><span id="elh_start_task_server_id_mysqladmin"><?php echo $start_task->server_id_mysqladmin->FldCaption() ?></span></td>
@@ -1126,72 +1100,6 @@ $start_task_view->ShowMessage();
 <span id="el_start_task_server_id_mysqladmin" class="control-group">
 <span<?php echo $start_task->server_id_mysqladmin->ViewAttributes() ?>>
 <?php echo $start_task->server_id_mysqladmin->ViewValue ?></span>
-</span>
-</td>
-	</tr>
-<?php } ?>
-<?php if ($start_task->HOSTNAME->Visible) { // HOSTNAME ?>
-	<tr id="r_HOSTNAME">
-		<td><span id="elh_start_task_HOSTNAME"><?php echo $start_task->HOSTNAME->FldCaption() ?></span></td>
-		<td<?php echo $start_task->HOSTNAME->CellAttributes() ?>>
-<span id="el_start_task_HOSTNAME" class="control-group">
-<span<?php echo $start_task->HOSTNAME->ViewAttributes() ?>>
-<?php echo $start_task->HOSTNAME->ViewValue ?></span>
-</span>
-</td>
-	</tr>
-<?php } ?>
-<?php if ($start_task->USERNAME->Visible) { // USERNAME ?>
-	<tr id="r_USERNAME">
-		<td><span id="elh_start_task_USERNAME"><?php echo $start_task->USERNAME->FldCaption() ?></span></td>
-		<td<?php echo $start_task->USERNAME->CellAttributes() ?>>
-<span id="el_start_task_USERNAME" class="control-group">
-<span<?php echo $start_task->USERNAME->ViewAttributes() ?>>
-<?php echo $start_task->USERNAME->ViewValue ?></span>
-</span>
-</td>
-	</tr>
-<?php } ?>
-<?php if ($start_task->PASSWORD->Visible) { // PASSWORD ?>
-	<tr id="r_PASSWORD">
-		<td><span id="elh_start_task_PASSWORD"><?php echo $start_task->PASSWORD->FldCaption() ?></span></td>
-		<td<?php echo $start_task->PASSWORD->CellAttributes() ?>>
-<span id="el_start_task_PASSWORD" class="control-group">
-<span<?php echo $start_task->PASSWORD->ViewAttributes() ?>>
-<?php echo $start_task->PASSWORD->ViewValue ?></span>
-</span>
-</td>
-	</tr>
-<?php } ?>
-<?php if ($start_task->DATABASE->Visible) { // DATABASE ?>
-	<tr id="r_DATABASE">
-		<td><span id="elh_start_task_DATABASE"><?php echo $start_task->DATABASE->FldCaption() ?></span></td>
-		<td<?php echo $start_task->DATABASE->CellAttributes() ?>>
-<span id="el_start_task_DATABASE" class="control-group">
-<span<?php echo $start_task->DATABASE->ViewAttributes() ?>>
-<?php echo $start_task->DATABASE->ViewValue ?></span>
-</span>
-</td>
-	</tr>
-<?php } ?>
-<?php if ($start_task->FILEPATH->Visible) { // FILEPATH ?>
-	<tr id="r_FILEPATH">
-		<td><span id="elh_start_task_FILEPATH"><?php echo $start_task->FILEPATH->FldCaption() ?></span></td>
-		<td<?php echo $start_task->FILEPATH->CellAttributes() ?>>
-<span id="el_start_task_FILEPATH" class="control-group">
-<span<?php echo $start_task->FILEPATH->ViewAttributes() ?>>
-<?php echo $start_task->FILEPATH->ViewValue ?></span>
-</span>
-</td>
-	</tr>
-<?php } ?>
-<?php if ($start_task->FILENAME->Visible) { // FILENAME ?>
-	<tr id="r_FILENAME">
-		<td><span id="elh_start_task_FILENAME"><?php echo $start_task->FILENAME->FldCaption() ?></span></td>
-		<td<?php echo $start_task->FILENAME->CellAttributes() ?>>
-<span id="el_start_task_FILENAME" class="control-group">
-<span<?php echo $start_task->FILENAME->ViewAttributes() ?>>
-<?php echo $start_task->FILENAME->ViewValue ?></span>
 </span>
 </td>
 	</tr>

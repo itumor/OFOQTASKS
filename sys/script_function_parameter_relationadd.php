@@ -5,7 +5,7 @@ ob_start(); // Turn on output buffering
 <?php include_once "ewcfg10.php" ?>
 <?php include_once "ewmysql10.php" ?>
 <?php include_once "phpfn10.php" ?>
-<?php include_once "restart_taskinfo.php" ?>
+<?php include_once "script_function_parameter_relationinfo.php" ?>
 <?php include_once "_logininfo.php" ?>
 <?php include_once "userfn10.php" ?>
 <?php
@@ -14,9 +14,9 @@ ob_start(); // Turn on output buffering
 // Page class
 //
 
-$restart_task_add = NULL; // Initialize page object first
+$script_function_parameter_relation_add = NULL; // Initialize page object first
 
-class crestart_task_add extends crestart_task {
+class cscript_function_parameter_relation_add extends cscript_function_parameter_relation {
 
 	// Page ID
 	var $PageID = 'add';
@@ -25,10 +25,10 @@ class crestart_task_add extends crestart_task {
 	var $ProjectID = "{3246B9FA-4C51-4733-8040-34B188FCD87E}";
 
 	// Table name
-	var $TableName = 'restart_task';
+	var $TableName = 'script_function_parameter_relation';
 
 	// Page object name
-	var $PageObjName = 'restart_task_add';
+	var $PageObjName = 'script_function_parameter_relation_add';
 
 	// Page name
 	function PageName() {
@@ -171,10 +171,10 @@ class crestart_task_add extends crestart_task {
 		// Parent constuctor
 		parent::__construct();
 
-		// Table object (restart_task)
-		if (!isset($GLOBALS["restart_task"])) {
-			$GLOBALS["restart_task"] = &$this;
-			$GLOBALS["Table"] = &$GLOBALS["restart_task"];
+		// Table object (script_function_parameter_relation)
+		if (!isset($GLOBALS["script_function_parameter_relation"])) {
+			$GLOBALS["script_function_parameter_relation"] = &$this;
+			$GLOBALS["Table"] = &$GLOBALS["script_function_parameter_relation"];
 		}
 
 		// Table object (_login)
@@ -186,7 +186,7 @@ class crestart_task_add extends crestart_task {
 
 		// Table name (for backward compatibility)
 		if (!defined("EW_TABLE_NAME"))
-			define("EW_TABLE_NAME", 'restart_task', TRUE);
+			define("EW_TABLE_NAME", 'script_function_parameter_relation', TRUE);
 
 		// Start timer
 		if (!isset($GLOBALS["gTimer"])) $GLOBALS["gTimer"] = new cTimer();
@@ -218,7 +218,7 @@ class crestart_task_add extends crestart_task {
 		if (!$Security->CanAdd()) {
 			$Security->SaveLastUrl();
 			$this->setFailureMessage($Language->Phrase("NoPermission")); // Set no permission
-			$this->Page_Terminate("restart_tasklist.php");
+			$this->Page_Terminate("script_function_parameter_relationlist.php");
 		}
 		$Security->UserID_Loading();
 		if ($Security->IsLoggedIn()) $Security->LoadUserID();
@@ -280,11 +280,11 @@ class crestart_task_add extends crestart_task {
 
 			// Load key values from QueryString
 			$this->CopyRecord = TRUE;
-			if (@$_GET["id"] != "") {
-				$this->id->setQueryStringValue($_GET["id"]);
-				$this->setKey("id", $this->id->CurrentValue); // Set up key
+			if (@$_GET["script_function_parameter_relation"] != "") {
+				$this->script_function_parameter_relation->setQueryStringValue($_GET["script_function_parameter_relation"]);
+				$this->setKey("script_function_parameter_relation", $this->script_function_parameter_relation->CurrentValue); // Set up key
 			} else {
-				$this->setKey("id", ""); // Clear key
+				$this->setKey("script_function_parameter_relation", ""); // Clear key
 				$this->CopyRecord = FALSE;
 			}
 			if ($this->CopyRecord) {
@@ -315,7 +315,7 @@ class crestart_task_add extends crestart_task {
 			case "C": // Copy an existing record
 				if (!$this->LoadRow()) { // Load record based on key
 					if ($this->getFailureMessage() == "") $this->setFailureMessage($Language->Phrase("NoRecord")); // No record found
-					$this->Page_Terminate("restart_tasklist.php"); // No matching record, return to list
+					$this->Page_Terminate("script_function_parameter_relationlist.php"); // No matching record, return to list
 				}
 				break;
 			case "A": // Add new record
@@ -324,7 +324,7 @@ class crestart_task_add extends crestart_task {
 					if ($this->getSuccessMessage() == "")
 						$this->setSuccessMessage($Language->Phrase("AddSuccess")); // Set up success message
 					$sReturnUrl = $this->getReturnUrl();
-					if (ew_GetPageName($sReturnUrl) == "restart_taskview.php")
+					if (ew_GetPageName($sReturnUrl) == "script_function_parameter_relationview.php")
 						$sReturnUrl = $this->GetViewUrl(); // View paging, return to view page with keyurl directly
 					$this->Page_Terminate($sReturnUrl); // Clean up and return
 				} else {
@@ -350,12 +350,10 @@ class crestart_task_add extends crestart_task {
 
 	// Load default values
 	function LoadDefaultValues() {
-		$this->server_id_mysqladmin->CurrentValue = NULL;
-		$this->server_id_mysqladmin->OldValue = $this->server_id_mysqladmin->CurrentValue;
-		$this->username->CurrentValue = NULL;
-		$this->username->OldValue = $this->username->CurrentValue;
-		$this->datetime->CurrentValue = NULL;
-		$this->datetime->OldValue = $this->datetime->CurrentValue;
+		$this->parameter_id->CurrentValue = NULL;
+		$this->parameter_id->OldValue = $this->parameter_id->CurrentValue;
+		$this->script_function_id->CurrentValue = NULL;
+		$this->script_function_id->OldValue = $this->script_function_id->CurrentValue;
 	}
 
 	// Load form values
@@ -363,15 +361,11 @@ class crestart_task_add extends crestart_task {
 
 		// Load from form
 		global $objForm;
-		if (!$this->server_id_mysqladmin->FldIsDetailKey) {
-			$this->server_id_mysqladmin->setFormValue($objForm->GetValue("x_server_id_mysqladmin"));
+		if (!$this->parameter_id->FldIsDetailKey) {
+			$this->parameter_id->setFormValue($objForm->GetValue("x_parameter_id"));
 		}
-		if (!$this->username->FldIsDetailKey) {
-			$this->username->setFormValue($objForm->GetValue("x_username"));
-		}
-		if (!$this->datetime->FldIsDetailKey) {
-			$this->datetime->setFormValue($objForm->GetValue("x_datetime"));
-			$this->datetime->CurrentValue = ew_UnFormatDateTime($this->datetime->CurrentValue, 0);
+		if (!$this->script_function_id->FldIsDetailKey) {
+			$this->script_function_id->setFormValue($objForm->GetValue("x_script_function_id"));
 		}
 	}
 
@@ -379,10 +373,8 @@ class crestart_task_add extends crestart_task {
 	function RestoreFormValues() {
 		global $objForm;
 		$this->LoadOldRecord();
-		$this->server_id_mysqladmin->CurrentValue = $this->server_id_mysqladmin->FormValue;
-		$this->username->CurrentValue = $this->username->FormValue;
-		$this->datetime->CurrentValue = $this->datetime->FormValue;
-		$this->datetime->CurrentValue = ew_UnFormatDateTime($this->datetime->CurrentValue, 0);
+		$this->parameter_id->CurrentValue = $this->parameter_id->FormValue;
+		$this->script_function_id->CurrentValue = $this->script_function_id->FormValue;
 	}
 
 	// Load row based on key values
@@ -414,20 +406,18 @@ class crestart_task_add extends crestart_task {
 		// Call Row Selected event
 		$row = &$rs->fields;
 		$this->Row_Selected($row);
-		$this->id->setDbValue($rs->fields('id'));
-		$this->server_id_mysqladmin->setDbValue($rs->fields('server_id_mysqladmin'));
-		$this->username->setDbValue($rs->fields('username'));
-		$this->datetime->setDbValue($rs->fields('datetime'));
+		$this->script_function_parameter_relation->setDbValue($rs->fields('script_function_parameter_relation'));
+		$this->parameter_id->setDbValue($rs->fields('parameter_id'));
+		$this->script_function_id->setDbValue($rs->fields('script_function_id'));
 	}
 
 	// Load DbValue from recordset
 	function LoadDbValues(&$rs) {
 		if (!$rs || !is_array($rs) && $rs->EOF) return;
 		$row = is_array($rs) ? $rs : $rs->fields;
-		$this->id->DbValue = $row['id'];
-		$this->server_id_mysqladmin->DbValue = $row['server_id_mysqladmin'];
-		$this->username->DbValue = $row['username'];
-		$this->datetime->DbValue = $row['datetime'];
+		$this->script_function_parameter_relation->DbValue = $row['script_function_parameter_relation'];
+		$this->parameter_id->DbValue = $row['parameter_id'];
+		$this->script_function_id->DbValue = $row['script_function_id'];
 	}
 
 	// Load old record
@@ -435,8 +425,8 @@ class crestart_task_add extends crestart_task {
 
 		// Load key values from Session
 		$bValidKey = TRUE;
-		if (strval($this->getKey("id")) <> "")
-			$this->id->CurrentValue = $this->getKey("id"); // id
+		if (strval($this->getKey("script_function_parameter_relation")) <> "")
+			$this->script_function_parameter_relation->CurrentValue = $this->getKey("script_function_parameter_relation"); // script_function_parameter_relation
 		else
 			$bValidKey = FALSE;
 
@@ -463,107 +453,126 @@ class crestart_task_add extends crestart_task {
 		$this->Row_Rendering();
 
 		// Common render codes for all row types
-		// id
-		// server_id_mysqladmin
-		// username
-		// datetime
+		// script_function_parameter_relation
+		// parameter_id
+		// script_function_id
 
 		if ($this->RowType == EW_ROWTYPE_VIEW) { // View row
 
-			// id
-			$this->id->ViewValue = $this->id->CurrentValue;
-			$this->id->ViewCustomAttributes = "";
+			// script_function_parameter_relation
+			$this->script_function_parameter_relation->ViewValue = $this->script_function_parameter_relation->CurrentValue;
+			$this->script_function_parameter_relation->ViewCustomAttributes = "";
 
-			// server_id_mysqladmin
-			if (strval($this->server_id_mysqladmin->CurrentValue) <> "") {
-				$sFilterWrk = "`server_id`" . ew_SearchString("=", $this->server_id_mysqladmin->CurrentValue, EW_DATATYPE_NUMBER);
-			$sSqlWrk = "SELECT `server_id`, `server_name` AS `DispFld`, '' AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld` FROM `server`";
+			// parameter_id
+			if (strval($this->parameter_id->CurrentValue) <> "") {
+				$sFilterWrk = "`parameter_id`" . ew_SearchString("=", $this->parameter_id->CurrentValue, EW_DATATYPE_NUMBER);
+			$sSqlWrk = "SELECT `parameter_id`, `parameter_name` AS `DispFld`, '' AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld` FROM `parameter`";
 			$sWhereWrk = "";
 			if ($sFilterWrk <> "") {
 				ew_AddFilter($sWhereWrk, $sFilterWrk);
 			}
 
 			// Call Lookup selecting
-			$this->Lookup_Selecting($this->server_id_mysqladmin, $sWhereWrk);
+			$this->Lookup_Selecting($this->parameter_id, $sWhereWrk);
 			if ($sWhereWrk <> "") $sSqlWrk .= " WHERE " . $sWhereWrk;
 				$rswrk = $conn->Execute($sSqlWrk);
 				if ($rswrk && !$rswrk->EOF) { // Lookup values found
-					$this->server_id_mysqladmin->ViewValue = $rswrk->fields('DispFld');
+					$this->parameter_id->ViewValue = $rswrk->fields('DispFld');
 					$rswrk->Close();
 				} else {
-					$this->server_id_mysqladmin->ViewValue = $this->server_id_mysqladmin->CurrentValue;
+					$this->parameter_id->ViewValue = $this->parameter_id->CurrentValue;
 				}
 			} else {
-				$this->server_id_mysqladmin->ViewValue = NULL;
+				$this->parameter_id->ViewValue = NULL;
 			}
-			$this->server_id_mysqladmin->ViewCustomAttributes = "";
+			$this->parameter_id->ViewCustomAttributes = "";
 
-			// username
-			$this->username->ViewValue = $this->username->CurrentValue;
-			$this->username->ViewCustomAttributes = "";
-
-			// datetime
-			$this->datetime->ViewValue = $this->datetime->CurrentValue;
-			$this->datetime->ViewCustomAttributes = "";
-
-			// server_id_mysqladmin
-			$this->server_id_mysqladmin->LinkCustomAttributes = "";
-			$this->server_id_mysqladmin->HrefValue = "";
-			$this->server_id_mysqladmin->TooltipValue = "";
-
-			// username
-			$this->username->LinkCustomAttributes = "";
-			$this->username->HrefValue = "";
-			$this->username->TooltipValue = "";
-
-			// datetime
-			$this->datetime->LinkCustomAttributes = "";
-			$this->datetime->HrefValue = "";
-			$this->datetime->TooltipValue = "";
-		} elseif ($this->RowType == EW_ROWTYPE_ADD) { // Add row
-
-			// server_id_mysqladmin
-			$this->server_id_mysqladmin->EditCustomAttributes = "";
-			if (trim(strval($this->server_id_mysqladmin->CurrentValue)) == "") {
-				$sFilterWrk = "0=1";
-			} else {
-				$sFilterWrk = "`server_id`" . ew_SearchString("=", $this->server_id_mysqladmin->CurrentValue, EW_DATATYPE_NUMBER);
-			}
-			$sSqlWrk = "SELECT `server_id`, `server_name` AS `DispFld`, '' AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld`, '' AS `SelectFilterFld`, '' AS `SelectFilterFld2`, '' AS `SelectFilterFld3`, '' AS `SelectFilterFld4` FROM `server`";
+			// script_function_id
+			if (strval($this->script_function_id->CurrentValue) <> "") {
+				$sFilterWrk = "`script_function_id`" . ew_SearchString("=", $this->script_function_id->CurrentValue, EW_DATATYPE_NUMBER);
+			$sSqlWrk = "SELECT `script_function_id`, `script_function_name` AS `DispFld`, '' AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld` FROM `script_function`";
 			$sWhereWrk = "";
 			if ($sFilterWrk <> "") {
 				ew_AddFilter($sWhereWrk, $sFilterWrk);
 			}
 
 			// Call Lookup selecting
-			$this->Lookup_Selecting($this->server_id_mysqladmin, $sWhereWrk);
+			$this->Lookup_Selecting($this->script_function_id, $sWhereWrk);
+			if ($sWhereWrk <> "") $sSqlWrk .= " WHERE " . $sWhereWrk;
+				$rswrk = $conn->Execute($sSqlWrk);
+				if ($rswrk && !$rswrk->EOF) { // Lookup values found
+					$this->script_function_id->ViewValue = $rswrk->fields('DispFld');
+					$rswrk->Close();
+				} else {
+					$this->script_function_id->ViewValue = $this->script_function_id->CurrentValue;
+				}
+			} else {
+				$this->script_function_id->ViewValue = NULL;
+			}
+			$this->script_function_id->ViewCustomAttributes = "";
+
+			// parameter_id
+			$this->parameter_id->LinkCustomAttributes = "";
+			$this->parameter_id->HrefValue = "";
+			$this->parameter_id->TooltipValue = "";
+
+			// script_function_id
+			$this->script_function_id->LinkCustomAttributes = "";
+			$this->script_function_id->HrefValue = "";
+			$this->script_function_id->TooltipValue = "";
+		} elseif ($this->RowType == EW_ROWTYPE_ADD) { // Add row
+
+			// parameter_id
+			$this->parameter_id->EditCustomAttributes = "";
+			if (trim(strval($this->parameter_id->CurrentValue)) == "") {
+				$sFilterWrk = "0=1";
+			} else {
+				$sFilterWrk = "`parameter_id`" . ew_SearchString("=", $this->parameter_id->CurrentValue, EW_DATATYPE_NUMBER);
+			}
+			$sSqlWrk = "SELECT `parameter_id`, `parameter_name` AS `DispFld`, '' AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld`, '' AS `SelectFilterFld`, '' AS `SelectFilterFld2`, '' AS `SelectFilterFld3`, '' AS `SelectFilterFld4` FROM `parameter`";
+			$sWhereWrk = "";
+			if ($sFilterWrk <> "") {
+				ew_AddFilter($sWhereWrk, $sFilterWrk);
+			}
+
+			// Call Lookup selecting
+			$this->Lookup_Selecting($this->parameter_id, $sWhereWrk);
 			if ($sWhereWrk <> "") $sSqlWrk .= " WHERE " . $sWhereWrk;
 			$rswrk = $conn->Execute($sSqlWrk);
 			$arwrk = ($rswrk) ? $rswrk->GetRows() : array();
 			if ($rswrk) $rswrk->Close();
 			array_unshift($arwrk, array("", $Language->Phrase("PleaseSelect"), "", "", "", "", "", "", ""));
-			$this->server_id_mysqladmin->EditValue = $arwrk;
+			$this->parameter_id->EditValue = $arwrk;
 
-			// username
-			$this->username->EditCustomAttributes = "";
-			$this->username->EditValue = ew_HtmlEncode($this->username->CurrentValue);
-			$this->username->PlaceHolder = ew_HtmlEncode(ew_RemoveHtml($this->username->FldCaption()));
+			// script_function_id
+			$this->script_function_id->EditCustomAttributes = "";
+			if (trim(strval($this->script_function_id->CurrentValue)) == "") {
+				$sFilterWrk = "0=1";
+			} else {
+				$sFilterWrk = "`script_function_id`" . ew_SearchString("=", $this->script_function_id->CurrentValue, EW_DATATYPE_NUMBER);
+			}
+			$sSqlWrk = "SELECT `script_function_id`, `script_function_name` AS `DispFld`, '' AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld`, '' AS `SelectFilterFld`, '' AS `SelectFilterFld2`, '' AS `SelectFilterFld3`, '' AS `SelectFilterFld4` FROM `script_function`";
+			$sWhereWrk = "";
+			if ($sFilterWrk <> "") {
+				ew_AddFilter($sWhereWrk, $sFilterWrk);
+			}
 
-			// datetime
-			$this->datetime->EditCustomAttributes = "";
-			$this->datetime->EditValue = ew_HtmlEncode($this->datetime->CurrentValue);
-			$this->datetime->PlaceHolder = ew_HtmlEncode(ew_RemoveHtml($this->datetime->FldCaption()));
+			// Call Lookup selecting
+			$this->Lookup_Selecting($this->script_function_id, $sWhereWrk);
+			if ($sWhereWrk <> "") $sSqlWrk .= " WHERE " . $sWhereWrk;
+			$rswrk = $conn->Execute($sSqlWrk);
+			$arwrk = ($rswrk) ? $rswrk->GetRows() : array();
+			if ($rswrk) $rswrk->Close();
+			array_unshift($arwrk, array("", $Language->Phrase("PleaseSelect"), "", "", "", "", "", "", ""));
+			$this->script_function_id->EditValue = $arwrk;
 
 			// Edit refer script
-			// server_id_mysqladmin
+			// parameter_id
 
-			$this->server_id_mysqladmin->HrefValue = "";
+			$this->parameter_id->HrefValue = "";
 
-			// username
-			$this->username->HrefValue = "";
-
-			// datetime
-			$this->datetime->HrefValue = "";
+			// script_function_id
+			$this->script_function_id->HrefValue = "";
 		}
 		if ($this->RowType == EW_ROWTYPE_ADD ||
 			$this->RowType == EW_ROWTYPE_EDIT ||
@@ -586,15 +595,6 @@ class crestart_task_add extends crestart_task {
 		// Check if validation required
 		if (!EW_SERVER_VALIDATE)
 			return ($gsFormError == "");
-		if (!$this->server_id_mysqladmin->FldIsDetailKey && !is_null($this->server_id_mysqladmin->FormValue) && $this->server_id_mysqladmin->FormValue == "") {
-			ew_AddMessage($gsFormError, $Language->Phrase("EnterRequiredField") . " - " . $this->server_id_mysqladmin->FldCaption());
-		}
-		if (!$this->username->FldIsDetailKey && !is_null($this->username->FormValue) && $this->username->FormValue == "") {
-			ew_AddMessage($gsFormError, $Language->Phrase("EnterRequiredField") . " - " . $this->username->FldCaption());
-		}
-		if (!$this->datetime->FldIsDetailKey && !is_null($this->datetime->FormValue) && $this->datetime->FormValue == "") {
-			ew_AddMessage($gsFormError, $Language->Phrase("EnterRequiredField") . " - " . $this->datetime->FldCaption());
-		}
 
 		// Return validate result
 		$ValidateForm = ($gsFormError == "");
@@ -618,14 +618,11 @@ class crestart_task_add extends crestart_task {
 		}
 		$rsnew = array();
 
-		// server_id_mysqladmin
-		$this->server_id_mysqladmin->SetDbValueDef($rsnew, $this->server_id_mysqladmin->CurrentValue, "", FALSE);
+		// parameter_id
+		$this->parameter_id->SetDbValueDef($rsnew, $this->parameter_id->CurrentValue, NULL, FALSE);
 
-		// username
-		$this->username->SetDbValueDef($rsnew, $this->username->CurrentValue, "", FALSE);
-
-		// datetime
-		$this->datetime->SetDbValueDef($rsnew, $this->datetime->CurrentValue, ew_CurrentDate(), FALSE);
+		// script_function_id
+		$this->script_function_id->SetDbValueDef($rsnew, $this->script_function_id->CurrentValue, NULL, FALSE);
 
 		// Call Row Inserting event
 		$rs = ($rsold == NULL) ? NULL : $rsold->fields;
@@ -651,8 +648,8 @@ class crestart_task_add extends crestart_task {
 
 		// Get insert id if necessary
 		if ($AddRow) {
-			$this->id->setDbValue($conn->Insert_ID());
-			$rsnew['id'] = $this->id->DbValue;
+			$this->script_function_parameter_relation->setDbValue($conn->Insert_ID());
+			$rsnew['script_function_parameter_relation'] = $this->script_function_parameter_relation->DbValue;
 		}
 		if ($AddRow) {
 
@@ -668,7 +665,7 @@ class crestart_task_add extends crestart_task {
 		global $Breadcrumb, $Language;
 		$Breadcrumb = new cBreadcrumb();
 		$PageCaption = $this->TableCaption();
-		$Breadcrumb->Add("list", "<span id=\"ewPageCaption\">" . $PageCaption . "</span>", "restart_tasklist.php", $this->TableVar);
+		$Breadcrumb->Add("list", "<span id=\"ewPageCaption\">" . $PageCaption . "</span>", "script_function_parameter_relationlist.php", $this->TableVar);
 		$PageCaption = ($this->CurrentAction == "C") ? $Language->Phrase("Copy") : $Language->Phrase("Add");
 		$Breadcrumb->Add("add", "<span id=\"ewPageCaption\">" . $PageCaption . "</span>", ew_CurrentUrl(), $this->TableVar);
 	}
@@ -745,33 +742,33 @@ class crestart_task_add extends crestart_task {
 <?php
 
 // Create page object
-if (!isset($restart_task_add)) $restart_task_add = new crestart_task_add();
+if (!isset($script_function_parameter_relation_add)) $script_function_parameter_relation_add = new cscript_function_parameter_relation_add();
 
 // Page init
-$restart_task_add->Page_Init();
+$script_function_parameter_relation_add->Page_Init();
 
 // Page main
-$restart_task_add->Page_Main();
+$script_function_parameter_relation_add->Page_Main();
 
 // Global Page Rendering event (in userfn*.php)
 Page_Rendering();
 
 // Page Rendering event
-$restart_task_add->Page_Render();
+$script_function_parameter_relation_add->Page_Render();
 ?>
 <?php include_once "header.php" ?>
 <script type="text/javascript">
 
 // Page object
-var restart_task_add = new ew_Page("restart_task_add");
-restart_task_add.PageID = "add"; // Page ID
-var EW_PAGE_ID = restart_task_add.PageID; // For backward compatibility
+var script_function_parameter_relation_add = new ew_Page("script_function_parameter_relation_add");
+script_function_parameter_relation_add.PageID = "add"; // Page ID
+var EW_PAGE_ID = script_function_parameter_relation_add.PageID; // For backward compatibility
 
 // Form object
-var frestart_taskadd = new ew_Form("frestart_taskadd");
+var fscript_function_parameter_relationadd = new ew_Form("fscript_function_parameter_relationadd");
 
 // Validate form
-frestart_taskadd.Validate = function() {
+fscript_function_parameter_relationadd.Validate = function() {
 	if (!this.ValidateRequired)
 		return true; // Ignore validation
 	var $ = jQuery, fobj = this.GetForm(), $fobj = $(fobj);
@@ -786,15 +783,6 @@ frestart_taskadd.Validate = function() {
 	for (var i = startcnt; i <= rowcnt; i++) {
 		var infix = ($k[0]) ? String(i) : "";
 		$fobj.data("rowindex", infix);
-			elm = this.GetElements("x" + infix + "_server_id_mysqladmin");
-			if (elm && !ew_HasValue(elm))
-				return this.OnError(elm, ewLanguage.Phrase("EnterRequiredField") + " - <?php echo ew_JsEncode2($restart_task->server_id_mysqladmin->FldCaption()) ?>");
-			elm = this.GetElements("x" + infix + "_username");
-			if (elm && !ew_HasValue(elm))
-				return this.OnError(elm, ewLanguage.Phrase("EnterRequiredField") + " - <?php echo ew_JsEncode2($restart_task->username->FldCaption()) ?>");
-			elm = this.GetElements("x" + infix + "_datetime");
-			if (elm && !ew_HasValue(elm))
-				return this.OnError(elm, ewLanguage.Phrase("EnterRequiredField") + " - <?php echo ew_JsEncode2($restart_task->datetime->FldCaption()) ?>");
 
 			// Set up row object
 			ew_ElementsToRow(fobj);
@@ -816,7 +804,7 @@ frestart_taskadd.Validate = function() {
 }
 
 // Form_CustomValidate event
-frestart_taskadd.Form_CustomValidate = 
+fscript_function_parameter_relationadd.Form_CustomValidate = 
  function(fobj) { // DO NOT CHANGE THIS LINE!
 
  	// Your custom validation code here, return false if invalid. 
@@ -825,13 +813,14 @@ frestart_taskadd.Form_CustomValidate =
 
 // Use JavaScript validation or not
 <?php if (EW_CLIENT_VALIDATE) { ?>
-frestart_taskadd.ValidateRequired = true;
+fscript_function_parameter_relationadd.ValidateRequired = true;
 <?php } else { ?>
-frestart_taskadd.ValidateRequired = false; 
+fscript_function_parameter_relationadd.ValidateRequired = false; 
 <?php } ?>
 
 // Dynamic selection lists
-frestart_taskadd.Lists["x_server_id_mysqladmin"] = {"LinkField":"x_server_id","Ajax":true,"AutoFill":false,"DisplayFields":["x_server_name","","",""],"ParentFields":[],"FilterFields":[],"Options":[]};
+fscript_function_parameter_relationadd.Lists["x_parameter_id"] = {"LinkField":"x_parameter_id","Ajax":true,"AutoFill":false,"DisplayFields":["x_parameter_name","","",""],"ParentFields":[],"FilterFields":[],"Options":[]};
+fscript_function_parameter_relationadd.Lists["x_script_function_id"] = {"LinkField":"x_script_function_id","Ajax":true,"AutoFill":false,"DisplayFields":["x_script_function_name","","",""],"ParentFields":[],"FilterFields":[],"Options":[]};
 
 // Form object for search
 </script>
@@ -840,28 +829,28 @@ frestart_taskadd.Lists["x_server_id_mysqladmin"] = {"LinkField":"x_server_id","A
 // Write your client script here, no need to add script tags.
 </script>
 <?php $Breadcrumb->Render(); ?>
-<?php $restart_task_add->ShowPageHeader(); ?>
+<?php $script_function_parameter_relation_add->ShowPageHeader(); ?>
 <?php
-$restart_task_add->ShowMessage();
+$script_function_parameter_relation_add->ShowMessage();
 ?>
-<form name="frestart_taskadd" id="frestart_taskadd" class="ewForm form-horizontal" action="<?php echo ew_CurrentPage() ?>" method="post">
-<input type="hidden" name="t" value="restart_task">
+<form name="fscript_function_parameter_relationadd" id="fscript_function_parameter_relationadd" class="ewForm form-horizontal" action="<?php echo ew_CurrentPage() ?>" method="post">
+<input type="hidden" name="t" value="script_function_parameter_relation">
 <input type="hidden" name="a_add" id="a_add" value="A">
 <table cellspacing="0" class="ewGrid"><tr><td>
-<table id="tbl_restart_taskadd" class="table table-bordered table-striped">
-<?php if ($restart_task->server_id_mysqladmin->Visible) { // server_id_mysqladmin ?>
-	<tr id="r_server_id_mysqladmin">
-		<td><span id="elh_restart_task_server_id_mysqladmin"><?php echo $restart_task->server_id_mysqladmin->FldCaption() ?><?php echo $Language->Phrase("FieldRequiredIndicator") ?></span></td>
-		<td<?php echo $restart_task->server_id_mysqladmin->CellAttributes() ?>>
-<span id="el_restart_task_server_id_mysqladmin" class="control-group">
-<select data-field="x_server_id_mysqladmin" id="x_server_id_mysqladmin" name="x_server_id_mysqladmin"<?php echo $restart_task->server_id_mysqladmin->EditAttributes() ?>>
+<table id="tbl_script_function_parameter_relationadd" class="table table-bordered table-striped">
+<?php if ($script_function_parameter_relation->parameter_id->Visible) { // parameter_id ?>
+	<tr id="r_parameter_id">
+		<td><span id="elh_script_function_parameter_relation_parameter_id"><?php echo $script_function_parameter_relation->parameter_id->FldCaption() ?></span></td>
+		<td<?php echo $script_function_parameter_relation->parameter_id->CellAttributes() ?>>
+<span id="el_script_function_parameter_relation_parameter_id" class="control-group">
+<select data-field="x_parameter_id" id="x_parameter_id" name="x_parameter_id"<?php echo $script_function_parameter_relation->parameter_id->EditAttributes() ?>>
 <?php
-if (is_array($restart_task->server_id_mysqladmin->EditValue)) {
-	$arwrk = $restart_task->server_id_mysqladmin->EditValue;
+if (is_array($script_function_parameter_relation->parameter_id->EditValue)) {
+	$arwrk = $script_function_parameter_relation->parameter_id->EditValue;
 	$rowswrk = count($arwrk);
 	$emptywrk = TRUE;
 	for ($rowcntwrk = 0; $rowcntwrk < $rowswrk; $rowcntwrk++) {
-		$selwrk = (strval($restart_task->server_id_mysqladmin->CurrentValue) == strval($arwrk[$rowcntwrk][0])) ? " selected=\"selected\"" : "";
+		$selwrk = (strval($script_function_parameter_relation->parameter_id->CurrentValue) == strval($arwrk[$rowcntwrk][0])) ? " selected=\"selected\"" : "";
 		if ($selwrk <> "") $emptywrk = FALSE;
 ?>
 <option value="<?php echo ew_HtmlEncode($arwrk[$rowcntwrk][0]) ?>"<?php echo $selwrk ?>>
@@ -873,36 +862,52 @@ if (is_array($restart_task->server_id_mysqladmin->EditValue)) {
 ?>
 </select>
 <?php
-$sSqlWrk = "SELECT `server_id`, `server_name` AS `DispFld`, '' AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld` FROM `server`";
+$sSqlWrk = "SELECT `parameter_id`, `parameter_name` AS `DispFld`, '' AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld` FROM `parameter`";
 $sWhereWrk = "";
 
 // Call Lookup selecting
-$restart_task->Lookup_Selecting($restart_task->server_id_mysqladmin, $sWhereWrk);
+$script_function_parameter_relation->Lookup_Selecting($script_function_parameter_relation->parameter_id, $sWhereWrk);
 if ($sWhereWrk <> "") $sSqlWrk .= " WHERE " . $sWhereWrk;
 ?>
-<input type="hidden" name="s_x_server_id_mysqladmin" id="s_x_server_id_mysqladmin" value="s=<?php echo ew_Encrypt($sSqlWrk) ?>&f0=<?php echo ew_Encrypt("`server_id` = {filter_value}"); ?>&t0=3">
+<input type="hidden" name="s_x_parameter_id" id="s_x_parameter_id" value="s=<?php echo ew_Encrypt($sSqlWrk) ?>&f0=<?php echo ew_Encrypt("`parameter_id` = {filter_value}"); ?>&t0=3">
 </span>
-<?php echo $restart_task->server_id_mysqladmin->CustomMsg ?></td>
+<?php echo $script_function_parameter_relation->parameter_id->CustomMsg ?></td>
 	</tr>
 <?php } ?>
-<?php if ($restart_task->username->Visible) { // username ?>
-	<tr id="r_username">
-		<td><span id="elh_restart_task_username"><?php echo $restart_task->username->FldCaption() ?><?php echo $Language->Phrase("FieldRequiredIndicator") ?></span></td>
-		<td<?php echo $restart_task->username->CellAttributes() ?>>
-<span id="el_restart_task_username" class="control-group">
-<input type="text" data-field="x_username" name="x_username" id="x_username" size="30" maxlength="255" placeholder="<?php echo $restart_task->username->PlaceHolder ?>" value="<?php echo $restart_task->username->EditValue ?>"<?php echo $restart_task->username->EditAttributes() ?>>
+<?php if ($script_function_parameter_relation->script_function_id->Visible) { // script_function_id ?>
+	<tr id="r_script_function_id">
+		<td><span id="elh_script_function_parameter_relation_script_function_id"><?php echo $script_function_parameter_relation->script_function_id->FldCaption() ?></span></td>
+		<td<?php echo $script_function_parameter_relation->script_function_id->CellAttributes() ?>>
+<span id="el_script_function_parameter_relation_script_function_id" class="control-group">
+<select data-field="x_script_function_id" id="x_script_function_id" name="x_script_function_id"<?php echo $script_function_parameter_relation->script_function_id->EditAttributes() ?>>
+<?php
+if (is_array($script_function_parameter_relation->script_function_id->EditValue)) {
+	$arwrk = $script_function_parameter_relation->script_function_id->EditValue;
+	$rowswrk = count($arwrk);
+	$emptywrk = TRUE;
+	for ($rowcntwrk = 0; $rowcntwrk < $rowswrk; $rowcntwrk++) {
+		$selwrk = (strval($script_function_parameter_relation->script_function_id->CurrentValue) == strval($arwrk[$rowcntwrk][0])) ? " selected=\"selected\"" : "";
+		if ($selwrk <> "") $emptywrk = FALSE;
+?>
+<option value="<?php echo ew_HtmlEncode($arwrk[$rowcntwrk][0]) ?>"<?php echo $selwrk ?>>
+<?php echo $arwrk[$rowcntwrk][1] ?>
+</option>
+<?php
+	}
+}
+?>
+</select>
+<?php
+$sSqlWrk = "SELECT `script_function_id`, `script_function_name` AS `DispFld`, '' AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld` FROM `script_function`";
+$sWhereWrk = "";
+
+// Call Lookup selecting
+$script_function_parameter_relation->Lookup_Selecting($script_function_parameter_relation->script_function_id, $sWhereWrk);
+if ($sWhereWrk <> "") $sSqlWrk .= " WHERE " . $sWhereWrk;
+?>
+<input type="hidden" name="s_x_script_function_id" id="s_x_script_function_id" value="s=<?php echo ew_Encrypt($sSqlWrk) ?>&f0=<?php echo ew_Encrypt("`script_function_id` = {filter_value}"); ?>&t0=3">
 </span>
-<?php echo $restart_task->username->CustomMsg ?></td>
-	</tr>
-<?php } ?>
-<?php if ($restart_task->datetime->Visible) { // datetime ?>
-	<tr id="r_datetime">
-		<td><span id="elh_restart_task_datetime"><?php echo $restart_task->datetime->FldCaption() ?><?php echo $Language->Phrase("FieldRequiredIndicator") ?></span></td>
-		<td<?php echo $restart_task->datetime->CellAttributes() ?>>
-<span id="el_restart_task_datetime" class="control-group">
-<input type="text" data-field="x_datetime" name="x_datetime" id="x_datetime" placeholder="<?php echo $restart_task->datetime->PlaceHolder ?>" value="<?php echo $restart_task->datetime->EditValue ?>"<?php echo $restart_task->datetime->EditAttributes() ?>>
-</span>
-<?php echo $restart_task->datetime->CustomMsg ?></td>
+<?php echo $script_function_parameter_relation->script_function_id->CustomMsg ?></td>
 	</tr>
 <?php } ?>
 </table>
@@ -910,13 +915,13 @@ if ($sWhereWrk <> "") $sSqlWrk .= " WHERE " . $sWhereWrk;
 <button class="btn btn-primary ewButton" name="btnAction" id="btnAction" type="submit"><?php echo $Language->Phrase("AddBtn") ?></button>
 </form>
 <script type="text/javascript">
-frestart_taskadd.Init();
+fscript_function_parameter_relationadd.Init();
 <?php if (EW_MOBILE_REFLOW && ew_IsMobile()) { ?>
 ew_Reflow();
 <?php } ?>
 </script>
 <?php
-$restart_task_add->ShowPageFooter();
+$script_function_parameter_relation_add->ShowPageFooter();
 if (EW_DEBUG_ENABLED)
 	echo ew_DebugMsg();
 ?>
@@ -928,5 +933,5 @@ if (EW_DEBUG_ENABLED)
 </script>
 <?php include_once "footer.php" ?>
 <?php
-$restart_task_add->Page_Terminate();
+$script_function_parameter_relation_add->Page_Terminate();
 ?>

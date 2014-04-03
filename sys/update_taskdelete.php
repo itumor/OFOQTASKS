@@ -354,11 +354,13 @@ class cupdate_task_delete extends cupdate_task {
 		$this->id->setDbValue($rs->fields('id'));
 		$this->server_id_mysqladmin->setDbValue($rs->fields('server_id_mysqladmin'));
 		$this->HOSTNAME->setDbValue($rs->fields('HOSTNAME'));
-		$this->USERNAME->setDbValue($rs->fields('USERNAME'));
 		$this->PASSWORD->setDbValue($rs->fields('PASSWORD'));
 		$this->DATABASE->setDbValue($rs->fields('DATABASE'));
 		$this->FILEPATH->setDbValue($rs->fields('FILEPATH'));
 		$this->FILENAME->setDbValue($rs->fields('FILENAME'));
+		$this->datetime->setDbValue($rs->fields('datetime'));
+		$this->DBUSERNAME->setDbValue($rs->fields('DBUSERNAME'));
+		$this->username->setDbValue($rs->fields('username'));
 	}
 
 	// Load DbValue from recordset
@@ -368,11 +370,13 @@ class cupdate_task_delete extends cupdate_task {
 		$this->id->DbValue = $row['id'];
 		$this->server_id_mysqladmin->DbValue = $row['server_id_mysqladmin'];
 		$this->HOSTNAME->DbValue = $row['HOSTNAME'];
-		$this->USERNAME->DbValue = $row['USERNAME'];
 		$this->PASSWORD->DbValue = $row['PASSWORD'];
 		$this->DATABASE->DbValue = $row['DATABASE'];
 		$this->FILEPATH->DbValue = $row['FILEPATH'];
 		$this->FILENAME->DbValue = $row['FILENAME'];
+		$this->datetime->DbValue = $row['datetime'];
+		$this->DBUSERNAME->DbValue = $row['DBUSERNAME'];
+		$this->username->DbValue = $row['username'];
 	}
 
 	// Render row values based on field settings
@@ -389,11 +393,13 @@ class cupdate_task_delete extends cupdate_task {
 		// id
 		// server_id_mysqladmin
 		// HOSTNAME
-		// USERNAME
 		// PASSWORD
 		// DATABASE
 		// FILEPATH
 		// FILENAME
+		// datetime
+		// DBUSERNAME
+		// username
 
 		if ($this->RowType == EW_ROWTYPE_VIEW) { // View row
 
@@ -408,10 +414,6 @@ class cupdate_task_delete extends cupdate_task {
 			// HOSTNAME
 			$this->HOSTNAME->ViewValue = $this->HOSTNAME->CurrentValue;
 			$this->HOSTNAME->ViewCustomAttributes = "";
-
-			// USERNAME
-			$this->USERNAME->ViewValue = $this->USERNAME->CurrentValue;
-			$this->USERNAME->ViewCustomAttributes = "";
 
 			// PASSWORD
 			$this->PASSWORD->ViewValue = $this->PASSWORD->CurrentValue;
@@ -429,6 +431,18 @@ class cupdate_task_delete extends cupdate_task {
 			$this->FILENAME->ViewValue = $this->FILENAME->CurrentValue;
 			$this->FILENAME->ViewCustomAttributes = "";
 
+			// datetime
+			$this->datetime->ViewValue = $this->datetime->CurrentValue;
+			$this->datetime->ViewCustomAttributes = "";
+
+			// DBUSERNAME
+			$this->DBUSERNAME->ViewValue = $this->DBUSERNAME->CurrentValue;
+			$this->DBUSERNAME->ViewCustomAttributes = "";
+
+			// username
+			$this->username->ViewValue = $this->username->CurrentValue;
+			$this->username->ViewCustomAttributes = "";
+
 			// id
 			$this->id->LinkCustomAttributes = "";
 			$this->id->HrefValue = "";
@@ -443,11 +457,6 @@ class cupdate_task_delete extends cupdate_task {
 			$this->HOSTNAME->LinkCustomAttributes = "";
 			$this->HOSTNAME->HrefValue = "";
 			$this->HOSTNAME->TooltipValue = "";
-
-			// USERNAME
-			$this->USERNAME->LinkCustomAttributes = "";
-			$this->USERNAME->HrefValue = "";
-			$this->USERNAME->TooltipValue = "";
 
 			// PASSWORD
 			$this->PASSWORD->LinkCustomAttributes = "";
@@ -468,6 +477,21 @@ class cupdate_task_delete extends cupdate_task {
 			$this->FILENAME->LinkCustomAttributes = "";
 			$this->FILENAME->HrefValue = "";
 			$this->FILENAME->TooltipValue = "";
+
+			// datetime
+			$this->datetime->LinkCustomAttributes = "";
+			$this->datetime->HrefValue = "";
+			$this->datetime->TooltipValue = "";
+
+			// DBUSERNAME
+			$this->DBUSERNAME->LinkCustomAttributes = "";
+			$this->DBUSERNAME->HrefValue = "";
+			$this->DBUSERNAME->TooltipValue = "";
+
+			// username
+			$this->username->LinkCustomAttributes = "";
+			$this->username->HrefValue = "";
+			$this->username->TooltipValue = "";
 		}
 
 		// Call Row Rendered event
@@ -718,9 +742,6 @@ $update_task_delete->ShowMessage();
 <?php if ($update_task->HOSTNAME->Visible) { // HOSTNAME ?>
 		<td><span id="elh_update_task_HOSTNAME" class="update_task_HOSTNAME"><?php echo $update_task->HOSTNAME->FldCaption() ?></span></td>
 <?php } ?>
-<?php if ($update_task->USERNAME->Visible) { // USERNAME ?>
-		<td><span id="elh_update_task_USERNAME" class="update_task_USERNAME"><?php echo $update_task->USERNAME->FldCaption() ?></span></td>
-<?php } ?>
 <?php if ($update_task->PASSWORD->Visible) { // PASSWORD ?>
 		<td><span id="elh_update_task_PASSWORD" class="update_task_PASSWORD"><?php echo $update_task->PASSWORD->FldCaption() ?></span></td>
 <?php } ?>
@@ -732,6 +753,15 @@ $update_task_delete->ShowMessage();
 <?php } ?>
 <?php if ($update_task->FILENAME->Visible) { // FILENAME ?>
 		<td><span id="elh_update_task_FILENAME" class="update_task_FILENAME"><?php echo $update_task->FILENAME->FldCaption() ?></span></td>
+<?php } ?>
+<?php if ($update_task->datetime->Visible) { // datetime ?>
+		<td><span id="elh_update_task_datetime" class="update_task_datetime"><?php echo $update_task->datetime->FldCaption() ?></span></td>
+<?php } ?>
+<?php if ($update_task->DBUSERNAME->Visible) { // DBUSERNAME ?>
+		<td><span id="elh_update_task_DBUSERNAME" class="update_task_DBUSERNAME"><?php echo $update_task->DBUSERNAME->FldCaption() ?></span></td>
+<?php } ?>
+<?php if ($update_task->username->Visible) { // username ?>
+		<td><span id="elh_update_task_username" class="update_task_username"><?php echo $update_task->username->FldCaption() ?></span></td>
 <?php } ?>
 	</tr>
 	</thead>
@@ -778,14 +808,6 @@ while (!$update_task_delete->Recordset->EOF) {
 </span>
 </td>
 <?php } ?>
-<?php if ($update_task->USERNAME->Visible) { // USERNAME ?>
-		<td<?php echo $update_task->USERNAME->CellAttributes() ?>>
-<span id="el<?php echo $update_task_delete->RowCnt ?>_update_task_USERNAME" class="control-group update_task_USERNAME">
-<span<?php echo $update_task->USERNAME->ViewAttributes() ?>>
-<?php echo $update_task->USERNAME->ListViewValue() ?></span>
-</span>
-</td>
-<?php } ?>
 <?php if ($update_task->PASSWORD->Visible) { // PASSWORD ?>
 		<td<?php echo $update_task->PASSWORD->CellAttributes() ?>>
 <span id="el<?php echo $update_task_delete->RowCnt ?>_update_task_PASSWORD" class="control-group update_task_PASSWORD">
@@ -815,6 +837,30 @@ while (!$update_task_delete->Recordset->EOF) {
 <span id="el<?php echo $update_task_delete->RowCnt ?>_update_task_FILENAME" class="control-group update_task_FILENAME">
 <span<?php echo $update_task->FILENAME->ViewAttributes() ?>>
 <?php echo $update_task->FILENAME->ListViewValue() ?></span>
+</span>
+</td>
+<?php } ?>
+<?php if ($update_task->datetime->Visible) { // datetime ?>
+		<td<?php echo $update_task->datetime->CellAttributes() ?>>
+<span id="el<?php echo $update_task_delete->RowCnt ?>_update_task_datetime" class="control-group update_task_datetime">
+<span<?php echo $update_task->datetime->ViewAttributes() ?>>
+<?php echo $update_task->datetime->ListViewValue() ?></span>
+</span>
+</td>
+<?php } ?>
+<?php if ($update_task->DBUSERNAME->Visible) { // DBUSERNAME ?>
+		<td<?php echo $update_task->DBUSERNAME->CellAttributes() ?>>
+<span id="el<?php echo $update_task_delete->RowCnt ?>_update_task_DBUSERNAME" class="control-group update_task_DBUSERNAME">
+<span<?php echo $update_task->DBUSERNAME->ViewAttributes() ?>>
+<?php echo $update_task->DBUSERNAME->ListViewValue() ?></span>
+</span>
+</td>
+<?php } ?>
+<?php if ($update_task->username->Visible) { // username ?>
+		<td<?php echo $update_task->username->CellAttributes() ?>>
+<span id="el<?php echo $update_task_delete->RowCnt ?>_update_task_username" class="control-group update_task_username">
+<span<?php echo $update_task->username->ViewAttributes() ?>>
+<?php echo $update_task->username->ListViewValue() ?></span>
 </span>
 </td>
 <?php } ?>

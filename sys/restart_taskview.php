@@ -553,6 +553,8 @@ class crestart_task_view extends crestart_task {
 		$this->Row_Selected($row);
 		$this->id->setDbValue($rs->fields('id'));
 		$this->server_id_mysqladmin->setDbValue($rs->fields('server_id_mysqladmin'));
+		$this->username->setDbValue($rs->fields('username'));
+		$this->datetime->setDbValue($rs->fields('datetime'));
 	}
 
 	// Load DbValue from recordset
@@ -561,6 +563,8 @@ class crestart_task_view extends crestart_task {
 		$row = is_array($rs) ? $rs : $rs->fields;
 		$this->id->DbValue = $row['id'];
 		$this->server_id_mysqladmin->DbValue = $row['server_id_mysqladmin'];
+		$this->username->DbValue = $row['username'];
+		$this->datetime->DbValue = $row['datetime'];
 	}
 
 	// Render row values based on field settings
@@ -582,6 +586,8 @@ class crestart_task_view extends crestart_task {
 		// Common render codes for all row types
 		// id
 		// server_id_mysqladmin
+		// username
+		// datetime
 
 		if ($this->RowType == EW_ROWTYPE_VIEW) { // View row
 
@@ -613,6 +619,14 @@ class crestart_task_view extends crestart_task {
 			}
 			$this->server_id_mysqladmin->ViewCustomAttributes = "";
 
+			// username
+			$this->username->ViewValue = $this->username->CurrentValue;
+			$this->username->ViewCustomAttributes = "";
+
+			// datetime
+			$this->datetime->ViewValue = $this->datetime->CurrentValue;
+			$this->datetime->ViewCustomAttributes = "";
+
 			// id
 			$this->id->LinkCustomAttributes = "";
 			$this->id->HrefValue = "";
@@ -622,6 +636,16 @@ class crestart_task_view extends crestart_task {
 			$this->server_id_mysqladmin->LinkCustomAttributes = "";
 			$this->server_id_mysqladmin->HrefValue = "";
 			$this->server_id_mysqladmin->TooltipValue = "";
+
+			// username
+			$this->username->LinkCustomAttributes = "";
+			$this->username->HrefValue = "";
+			$this->username->TooltipValue = "";
+
+			// datetime
+			$this->datetime->LinkCustomAttributes = "";
+			$this->datetime->HrefValue = "";
+			$this->datetime->TooltipValue = "";
 		}
 
 		// Call Row Rendered event
@@ -1054,6 +1078,28 @@ $restart_task_view->ShowMessage();
 <span id="el_restart_task_server_id_mysqladmin" class="control-group">
 <span<?php echo $restart_task->server_id_mysqladmin->ViewAttributes() ?>>
 <?php echo $restart_task->server_id_mysqladmin->ViewValue ?></span>
+</span>
+</td>
+	</tr>
+<?php } ?>
+<?php if ($restart_task->username->Visible) { // username ?>
+	<tr id="r_username">
+		<td><span id="elh_restart_task_username"><?php echo $restart_task->username->FldCaption() ?></span></td>
+		<td<?php echo $restart_task->username->CellAttributes() ?>>
+<span id="el_restart_task_username" class="control-group">
+<span<?php echo $restart_task->username->ViewAttributes() ?>>
+<?php echo $restart_task->username->ViewValue ?></span>
+</span>
+</td>
+	</tr>
+<?php } ?>
+<?php if ($restart_task->datetime->Visible) { // datetime ?>
+	<tr id="r_datetime">
+		<td><span id="elh_restart_task_datetime"><?php echo $restart_task->datetime->FldCaption() ?></span></td>
+		<td<?php echo $restart_task->datetime->CellAttributes() ?>>
+<span id="el_restart_task_datetime" class="control-group">
+<span<?php echo $restart_task->datetime->ViewAttributes() ?>>
+<?php echo $restart_task->datetime->ViewValue ?></span>
 </span>
 </td>
 	</tr>

@@ -352,13 +352,9 @@ class cstart_task_delete extends cstart_task {
 		$row = &$rs->fields;
 		$this->Row_Selected($row);
 		$this->id->setDbValue($rs->fields('id'));
+		$this->datetime->setDbValue($rs->fields('datetime'));
+		$this->username->setDbValue($rs->fields('username'));
 		$this->server_id_mysqladmin->setDbValue($rs->fields('server_id_mysqladmin'));
-		$this->HOSTNAME->setDbValue($rs->fields('HOSTNAME'));
-		$this->USERNAME->setDbValue($rs->fields('USERNAME'));
-		$this->PASSWORD->setDbValue($rs->fields('PASSWORD'));
-		$this->DATABASE->setDbValue($rs->fields('DATABASE'));
-		$this->FILEPATH->setDbValue($rs->fields('FILEPATH'));
-		$this->FILENAME->setDbValue($rs->fields('FILENAME'));
 	}
 
 	// Load DbValue from recordset
@@ -366,13 +362,9 @@ class cstart_task_delete extends cstart_task {
 		if (!$rs || !is_array($rs) && $rs->EOF) return;
 		$row = is_array($rs) ? $rs : $rs->fields;
 		$this->id->DbValue = $row['id'];
+		$this->datetime->DbValue = $row['datetime'];
+		$this->username->DbValue = $row['username'];
 		$this->server_id_mysqladmin->DbValue = $row['server_id_mysqladmin'];
-		$this->HOSTNAME->DbValue = $row['HOSTNAME'];
-		$this->USERNAME->DbValue = $row['USERNAME'];
-		$this->PASSWORD->DbValue = $row['PASSWORD'];
-		$this->DATABASE->DbValue = $row['DATABASE'];
-		$this->FILEPATH->DbValue = $row['FILEPATH'];
-		$this->FILENAME->DbValue = $row['FILENAME'];
 	}
 
 	// Render row values based on field settings
@@ -387,19 +379,23 @@ class cstart_task_delete extends cstart_task {
 
 		// Common render codes for all row types
 		// id
+		// datetime
+		// username
 		// server_id_mysqladmin
-		// HOSTNAME
-		// USERNAME
-		// PASSWORD
-		// DATABASE
-		// FILEPATH
-		// FILENAME
 
 		if ($this->RowType == EW_ROWTYPE_VIEW) { // View row
 
 			// id
 			$this->id->ViewValue = $this->id->CurrentValue;
 			$this->id->ViewCustomAttributes = "";
+
+			// datetime
+			$this->datetime->ViewValue = $this->datetime->CurrentValue;
+			$this->datetime->ViewCustomAttributes = "";
+
+			// username
+			$this->username->ViewValue = $this->username->CurrentValue;
+			$this->username->ViewCustomAttributes = "";
 
 			// server_id_mysqladmin
 			if (strval($this->server_id_mysqladmin->CurrentValue) <> "") {
@@ -425,34 +421,20 @@ class cstart_task_delete extends cstart_task {
 			}
 			$this->server_id_mysqladmin->ViewCustomAttributes = "";
 
-			// HOSTNAME
-			$this->HOSTNAME->ViewValue = $this->HOSTNAME->CurrentValue;
-			$this->HOSTNAME->ViewCustomAttributes = "";
-
-			// USERNAME
-			$this->USERNAME->ViewValue = $this->USERNAME->CurrentValue;
-			$this->USERNAME->ViewCustomAttributes = "";
-
-			// PASSWORD
-			$this->PASSWORD->ViewValue = $this->PASSWORD->CurrentValue;
-			$this->PASSWORD->ViewCustomAttributes = "";
-
-			// DATABASE
-			$this->DATABASE->ViewValue = $this->DATABASE->CurrentValue;
-			$this->DATABASE->ViewCustomAttributes = "";
-
-			// FILEPATH
-			$this->FILEPATH->ViewValue = $this->FILEPATH->CurrentValue;
-			$this->FILEPATH->ViewCustomAttributes = "";
-
-			// FILENAME
-			$this->FILENAME->ViewValue = $this->FILENAME->CurrentValue;
-			$this->FILENAME->ViewCustomAttributes = "";
-
 			// id
 			$this->id->LinkCustomAttributes = "";
 			$this->id->HrefValue = "";
 			$this->id->TooltipValue = "";
+
+			// datetime
+			$this->datetime->LinkCustomAttributes = "";
+			$this->datetime->HrefValue = "";
+			$this->datetime->TooltipValue = "";
+
+			// username
+			$this->username->LinkCustomAttributes = "";
+			$this->username->HrefValue = "";
+			$this->username->TooltipValue = "";
 
 			// server_id_mysqladmin
 			$this->server_id_mysqladmin->LinkCustomAttributes = "";
@@ -703,6 +685,12 @@ $start_task_delete->ShowMessage();
 <?php if ($start_task->id->Visible) { // id ?>
 		<td><span id="elh_start_task_id" class="start_task_id"><?php echo $start_task->id->FldCaption() ?></span></td>
 <?php } ?>
+<?php if ($start_task->datetime->Visible) { // datetime ?>
+		<td><span id="elh_start_task_datetime" class="start_task_datetime"><?php echo $start_task->datetime->FldCaption() ?></span></td>
+<?php } ?>
+<?php if ($start_task->username->Visible) { // username ?>
+		<td><span id="elh_start_task_username" class="start_task_username"><?php echo $start_task->username->FldCaption() ?></span></td>
+<?php } ?>
 <?php if ($start_task->server_id_mysqladmin->Visible) { // server_id_mysqladmin ?>
 		<td><span id="elh_start_task_server_id_mysqladmin" class="start_task_server_id_mysqladmin"><?php echo $start_task->server_id_mysqladmin->FldCaption() ?></span></td>
 <?php } ?>
@@ -732,6 +720,22 @@ while (!$start_task_delete->Recordset->EOF) {
 <span id="el<?php echo $start_task_delete->RowCnt ?>_start_task_id" class="control-group start_task_id">
 <span<?php echo $start_task->id->ViewAttributes() ?>>
 <?php echo $start_task->id->ListViewValue() ?></span>
+</span>
+</td>
+<?php } ?>
+<?php if ($start_task->datetime->Visible) { // datetime ?>
+		<td<?php echo $start_task->datetime->CellAttributes() ?>>
+<span id="el<?php echo $start_task_delete->RowCnt ?>_start_task_datetime" class="control-group start_task_datetime">
+<span<?php echo $start_task->datetime->ViewAttributes() ?>>
+<?php echo $start_task->datetime->ListViewValue() ?></span>
+</span>
+</td>
+<?php } ?>
+<?php if ($start_task->username->Visible) { // username ?>
+		<td<?php echo $start_task->username->CellAttributes() ?>>
+<span id="el<?php echo $start_task_delete->RowCnt ?>_start_task_username" class="control-group start_task_username">
+<span<?php echo $start_task->username->ViewAttributes() ?>>
+<?php echo $start_task->username->ListViewValue() ?></span>
 </span>
 </td>
 <?php } ?>

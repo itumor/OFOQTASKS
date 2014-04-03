@@ -427,9 +427,6 @@ class cupdate_task_edit extends cupdate_task {
 		if (!$this->HOSTNAME->FldIsDetailKey) {
 			$this->HOSTNAME->setFormValue($objForm->GetValue("x_HOSTNAME"));
 		}
-		if (!$this->USERNAME->FldIsDetailKey) {
-			$this->USERNAME->setFormValue($objForm->GetValue("x_USERNAME"));
-		}
 		if (!$this->PASSWORD->FldIsDetailKey) {
 			$this->PASSWORD->setFormValue($objForm->GetValue("x_PASSWORD"));
 		}
@@ -442,6 +439,16 @@ class cupdate_task_edit extends cupdate_task {
 		if (!$this->FILENAME->FldIsDetailKey) {
 			$this->FILENAME->setFormValue($objForm->GetValue("x_FILENAME"));
 		}
+		if (!$this->datetime->FldIsDetailKey) {
+			$this->datetime->setFormValue($objForm->GetValue("x_datetime"));
+			$this->datetime->CurrentValue = ew_UnFormatDateTime($this->datetime->CurrentValue, 0);
+		}
+		if (!$this->DBUSERNAME->FldIsDetailKey) {
+			$this->DBUSERNAME->setFormValue($objForm->GetValue("x_DBUSERNAME"));
+		}
+		if (!$this->username->FldIsDetailKey) {
+			$this->username->setFormValue($objForm->GetValue("x_username"));
+		}
 	}
 
 	// Restore form values
@@ -451,11 +458,14 @@ class cupdate_task_edit extends cupdate_task {
 		$this->id->CurrentValue = $this->id->FormValue;
 		$this->server_id_mysqladmin->CurrentValue = $this->server_id_mysqladmin->FormValue;
 		$this->HOSTNAME->CurrentValue = $this->HOSTNAME->FormValue;
-		$this->USERNAME->CurrentValue = $this->USERNAME->FormValue;
 		$this->PASSWORD->CurrentValue = $this->PASSWORD->FormValue;
 		$this->DATABASE->CurrentValue = $this->DATABASE->FormValue;
 		$this->FILEPATH->CurrentValue = $this->FILEPATH->FormValue;
 		$this->FILENAME->CurrentValue = $this->FILENAME->FormValue;
+		$this->datetime->CurrentValue = $this->datetime->FormValue;
+		$this->datetime->CurrentValue = ew_UnFormatDateTime($this->datetime->CurrentValue, 0);
+		$this->DBUSERNAME->CurrentValue = $this->DBUSERNAME->FormValue;
+		$this->username->CurrentValue = $this->username->FormValue;
 	}
 
 	// Load recordset
@@ -510,11 +520,13 @@ class cupdate_task_edit extends cupdate_task {
 		$this->id->setDbValue($rs->fields('id'));
 		$this->server_id_mysqladmin->setDbValue($rs->fields('server_id_mysqladmin'));
 		$this->HOSTNAME->setDbValue($rs->fields('HOSTNAME'));
-		$this->USERNAME->setDbValue($rs->fields('USERNAME'));
 		$this->PASSWORD->setDbValue($rs->fields('PASSWORD'));
 		$this->DATABASE->setDbValue($rs->fields('DATABASE'));
 		$this->FILEPATH->setDbValue($rs->fields('FILEPATH'));
 		$this->FILENAME->setDbValue($rs->fields('FILENAME'));
+		$this->datetime->setDbValue($rs->fields('datetime'));
+		$this->DBUSERNAME->setDbValue($rs->fields('DBUSERNAME'));
+		$this->username->setDbValue($rs->fields('username'));
 	}
 
 	// Load DbValue from recordset
@@ -524,11 +536,13 @@ class cupdate_task_edit extends cupdate_task {
 		$this->id->DbValue = $row['id'];
 		$this->server_id_mysqladmin->DbValue = $row['server_id_mysqladmin'];
 		$this->HOSTNAME->DbValue = $row['HOSTNAME'];
-		$this->USERNAME->DbValue = $row['USERNAME'];
 		$this->PASSWORD->DbValue = $row['PASSWORD'];
 		$this->DATABASE->DbValue = $row['DATABASE'];
 		$this->FILEPATH->DbValue = $row['FILEPATH'];
 		$this->FILENAME->DbValue = $row['FILENAME'];
+		$this->datetime->DbValue = $row['datetime'];
+		$this->DBUSERNAME->DbValue = $row['DBUSERNAME'];
+		$this->username->DbValue = $row['username'];
 	}
 
 	// Render row values based on field settings
@@ -545,11 +559,13 @@ class cupdate_task_edit extends cupdate_task {
 		// id
 		// server_id_mysqladmin
 		// HOSTNAME
-		// USERNAME
 		// PASSWORD
 		// DATABASE
 		// FILEPATH
 		// FILENAME
+		// datetime
+		// DBUSERNAME
+		// username
 
 		if ($this->RowType == EW_ROWTYPE_VIEW) { // View row
 
@@ -564,10 +580,6 @@ class cupdate_task_edit extends cupdate_task {
 			// HOSTNAME
 			$this->HOSTNAME->ViewValue = $this->HOSTNAME->CurrentValue;
 			$this->HOSTNAME->ViewCustomAttributes = "";
-
-			// USERNAME
-			$this->USERNAME->ViewValue = $this->USERNAME->CurrentValue;
-			$this->USERNAME->ViewCustomAttributes = "";
 
 			// PASSWORD
 			$this->PASSWORD->ViewValue = $this->PASSWORD->CurrentValue;
@@ -585,6 +597,18 @@ class cupdate_task_edit extends cupdate_task {
 			$this->FILENAME->ViewValue = $this->FILENAME->CurrentValue;
 			$this->FILENAME->ViewCustomAttributes = "";
 
+			// datetime
+			$this->datetime->ViewValue = $this->datetime->CurrentValue;
+			$this->datetime->ViewCustomAttributes = "";
+
+			// DBUSERNAME
+			$this->DBUSERNAME->ViewValue = $this->DBUSERNAME->CurrentValue;
+			$this->DBUSERNAME->ViewCustomAttributes = "";
+
+			// username
+			$this->username->ViewValue = $this->username->CurrentValue;
+			$this->username->ViewCustomAttributes = "";
+
 			// id
 			$this->id->LinkCustomAttributes = "";
 			$this->id->HrefValue = "";
@@ -599,11 +623,6 @@ class cupdate_task_edit extends cupdate_task {
 			$this->HOSTNAME->LinkCustomAttributes = "";
 			$this->HOSTNAME->HrefValue = "";
 			$this->HOSTNAME->TooltipValue = "";
-
-			// USERNAME
-			$this->USERNAME->LinkCustomAttributes = "";
-			$this->USERNAME->HrefValue = "";
-			$this->USERNAME->TooltipValue = "";
 
 			// PASSWORD
 			$this->PASSWORD->LinkCustomAttributes = "";
@@ -624,6 +643,21 @@ class cupdate_task_edit extends cupdate_task {
 			$this->FILENAME->LinkCustomAttributes = "";
 			$this->FILENAME->HrefValue = "";
 			$this->FILENAME->TooltipValue = "";
+
+			// datetime
+			$this->datetime->LinkCustomAttributes = "";
+			$this->datetime->HrefValue = "";
+			$this->datetime->TooltipValue = "";
+
+			// DBUSERNAME
+			$this->DBUSERNAME->LinkCustomAttributes = "";
+			$this->DBUSERNAME->HrefValue = "";
+			$this->DBUSERNAME->TooltipValue = "";
+
+			// username
+			$this->username->LinkCustomAttributes = "";
+			$this->username->HrefValue = "";
+			$this->username->TooltipValue = "";
 		} elseif ($this->RowType == EW_ROWTYPE_EDIT) { // Edit row
 
 			// id
@@ -640,11 +674,6 @@ class cupdate_task_edit extends cupdate_task {
 			$this->HOSTNAME->EditCustomAttributes = "";
 			$this->HOSTNAME->EditValue = ew_HtmlEncode($this->HOSTNAME->CurrentValue);
 			$this->HOSTNAME->PlaceHolder = ew_HtmlEncode(ew_RemoveHtml($this->HOSTNAME->FldCaption()));
-
-			// USERNAME
-			$this->USERNAME->EditCustomAttributes = "";
-			$this->USERNAME->EditValue = ew_HtmlEncode($this->USERNAME->CurrentValue);
-			$this->USERNAME->PlaceHolder = ew_HtmlEncode(ew_RemoveHtml($this->USERNAME->FldCaption()));
 
 			// PASSWORD
 			$this->PASSWORD->EditCustomAttributes = "";
@@ -666,6 +695,21 @@ class cupdate_task_edit extends cupdate_task {
 			$this->FILENAME->EditValue = ew_HtmlEncode($this->FILENAME->CurrentValue);
 			$this->FILENAME->PlaceHolder = ew_HtmlEncode(ew_RemoveHtml($this->FILENAME->FldCaption()));
 
+			// datetime
+			$this->datetime->EditCustomAttributes = "";
+			$this->datetime->EditValue = ew_HtmlEncode($this->datetime->CurrentValue);
+			$this->datetime->PlaceHolder = ew_HtmlEncode(ew_RemoveHtml($this->datetime->FldCaption()));
+
+			// DBUSERNAME
+			$this->DBUSERNAME->EditCustomAttributes = "";
+			$this->DBUSERNAME->EditValue = ew_HtmlEncode($this->DBUSERNAME->CurrentValue);
+			$this->DBUSERNAME->PlaceHolder = ew_HtmlEncode(ew_RemoveHtml($this->DBUSERNAME->FldCaption()));
+
+			// username
+			$this->username->EditCustomAttributes = "";
+			$this->username->EditValue = ew_HtmlEncode($this->username->CurrentValue);
+			$this->username->PlaceHolder = ew_HtmlEncode(ew_RemoveHtml($this->username->FldCaption()));
+
 			// Edit refer script
 			// id
 
@@ -676,9 +720,6 @@ class cupdate_task_edit extends cupdate_task {
 
 			// HOSTNAME
 			$this->HOSTNAME->HrefValue = "";
-
-			// USERNAME
-			$this->USERNAME->HrefValue = "";
 
 			// PASSWORD
 			$this->PASSWORD->HrefValue = "";
@@ -691,6 +732,15 @@ class cupdate_task_edit extends cupdate_task {
 
 			// FILENAME
 			$this->FILENAME->HrefValue = "";
+
+			// datetime
+			$this->datetime->HrefValue = "";
+
+			// DBUSERNAME
+			$this->DBUSERNAME->HrefValue = "";
+
+			// username
+			$this->username->HrefValue = "";
 		}
 		if ($this->RowType == EW_ROWTYPE_ADD ||
 			$this->RowType == EW_ROWTYPE_EDIT ||
@@ -719,9 +769,6 @@ class cupdate_task_edit extends cupdate_task {
 		if (!$this->HOSTNAME->FldIsDetailKey && !is_null($this->HOSTNAME->FormValue) && $this->HOSTNAME->FormValue == "") {
 			ew_AddMessage($gsFormError, $Language->Phrase("EnterRequiredField") . " - " . $this->HOSTNAME->FldCaption());
 		}
-		if (!$this->USERNAME->FldIsDetailKey && !is_null($this->USERNAME->FormValue) && $this->USERNAME->FormValue == "") {
-			ew_AddMessage($gsFormError, $Language->Phrase("EnterRequiredField") . " - " . $this->USERNAME->FldCaption());
-		}
 		if (!$this->PASSWORD->FldIsDetailKey && !is_null($this->PASSWORD->FormValue) && $this->PASSWORD->FormValue == "") {
 			ew_AddMessage($gsFormError, $Language->Phrase("EnterRequiredField") . " - " . $this->PASSWORD->FldCaption());
 		}
@@ -733,6 +780,15 @@ class cupdate_task_edit extends cupdate_task {
 		}
 		if (!$this->FILENAME->FldIsDetailKey && !is_null($this->FILENAME->FormValue) && $this->FILENAME->FormValue == "") {
 			ew_AddMessage($gsFormError, $Language->Phrase("EnterRequiredField") . " - " . $this->FILENAME->FldCaption());
+		}
+		if (!$this->datetime->FldIsDetailKey && !is_null($this->datetime->FormValue) && $this->datetime->FormValue == "") {
+			ew_AddMessage($gsFormError, $Language->Phrase("EnterRequiredField") . " - " . $this->datetime->FldCaption());
+		}
+		if (!$this->DBUSERNAME->FldIsDetailKey && !is_null($this->DBUSERNAME->FormValue) && $this->DBUSERNAME->FormValue == "") {
+			ew_AddMessage($gsFormError, $Language->Phrase("EnterRequiredField") . " - " . $this->DBUSERNAME->FldCaption());
+		}
+		if (!$this->username->FldIsDetailKey && !is_null($this->username->FormValue) && $this->username->FormValue == "") {
+			ew_AddMessage($gsFormError, $Language->Phrase("EnterRequiredField") . " - " . $this->username->FldCaption());
 		}
 
 		// Return validate result
@@ -773,9 +829,6 @@ class cupdate_task_edit extends cupdate_task {
 			// HOSTNAME
 			$this->HOSTNAME->SetDbValueDef($rsnew, $this->HOSTNAME->CurrentValue, "", $this->HOSTNAME->ReadOnly);
 
-			// USERNAME
-			$this->USERNAME->SetDbValueDef($rsnew, $this->USERNAME->CurrentValue, "", $this->USERNAME->ReadOnly);
-
 			// PASSWORD
 			$this->PASSWORD->SetDbValueDef($rsnew, $this->PASSWORD->CurrentValue, "", $this->PASSWORD->ReadOnly);
 
@@ -787,6 +840,15 @@ class cupdate_task_edit extends cupdate_task {
 
 			// FILENAME
 			$this->FILENAME->SetDbValueDef($rsnew, $this->FILENAME->CurrentValue, "", $this->FILENAME->ReadOnly);
+
+			// datetime
+			$this->datetime->SetDbValueDef($rsnew, $this->datetime->CurrentValue, ew_CurrentDate(), $this->datetime->ReadOnly);
+
+			// DBUSERNAME
+			$this->DBUSERNAME->SetDbValueDef($rsnew, $this->DBUSERNAME->CurrentValue, "", $this->DBUSERNAME->ReadOnly);
+
+			// username
+			$this->username->SetDbValueDef($rsnew, $this->username->CurrentValue, "", $this->username->ReadOnly);
 
 			// Call Row Updating event
 			$bUpdateRow = $this->Row_Updating($rsold, $rsnew);
@@ -949,9 +1011,6 @@ fupdate_taskedit.Validate = function() {
 			elm = this.GetElements("x" + infix + "_HOSTNAME");
 			if (elm && !ew_HasValue(elm))
 				return this.OnError(elm, ewLanguage.Phrase("EnterRequiredField") + " - <?php echo ew_JsEncode2($update_task->HOSTNAME->FldCaption()) ?>");
-			elm = this.GetElements("x" + infix + "_USERNAME");
-			if (elm && !ew_HasValue(elm))
-				return this.OnError(elm, ewLanguage.Phrase("EnterRequiredField") + " - <?php echo ew_JsEncode2($update_task->USERNAME->FldCaption()) ?>");
 			elm = this.GetElements("x" + infix + "_PASSWORD");
 			if (elm && !ew_HasValue(elm))
 				return this.OnError(elm, ewLanguage.Phrase("EnterRequiredField") + " - <?php echo ew_JsEncode2($update_task->PASSWORD->FldCaption()) ?>");
@@ -964,6 +1023,15 @@ fupdate_taskedit.Validate = function() {
 			elm = this.GetElements("x" + infix + "_FILENAME");
 			if (elm && !ew_HasValue(elm))
 				return this.OnError(elm, ewLanguage.Phrase("EnterRequiredField") + " - <?php echo ew_JsEncode2($update_task->FILENAME->FldCaption()) ?>");
+			elm = this.GetElements("x" + infix + "_datetime");
+			if (elm && !ew_HasValue(elm))
+				return this.OnError(elm, ewLanguage.Phrase("EnterRequiredField") + " - <?php echo ew_JsEncode2($update_task->datetime->FldCaption()) ?>");
+			elm = this.GetElements("x" + infix + "_DBUSERNAME");
+			if (elm && !ew_HasValue(elm))
+				return this.OnError(elm, ewLanguage.Phrase("EnterRequiredField") + " - <?php echo ew_JsEncode2($update_task->DBUSERNAME->FldCaption()) ?>");
+			elm = this.GetElements("x" + infix + "_username");
+			if (elm && !ew_HasValue(elm))
+				return this.OnError(elm, ewLanguage.Phrase("EnterRequiredField") + " - <?php echo ew_JsEncode2($update_task->username->FldCaption()) ?>");
 
 			// Set up row object
 			ew_ElementsToRow(fobj);
@@ -1080,16 +1148,6 @@ $update_task_edit->ShowMessage();
 <?php echo $update_task->HOSTNAME->CustomMsg ?></td>
 	</tr>
 <?php } ?>
-<?php if ($update_task->USERNAME->Visible) { // USERNAME ?>
-	<tr id="r_USERNAME">
-		<td><span id="elh_update_task_USERNAME"><?php echo $update_task->USERNAME->FldCaption() ?><?php echo $Language->Phrase("FieldRequiredIndicator") ?></span></td>
-		<td<?php echo $update_task->USERNAME->CellAttributes() ?>>
-<span id="el_update_task_USERNAME" class="control-group">
-<input type="text" data-field="x_USERNAME" name="x_USERNAME" id="x_USERNAME" size="30" maxlength="255" placeholder="<?php echo $update_task->USERNAME->PlaceHolder ?>" value="<?php echo $update_task->USERNAME->EditValue ?>"<?php echo $update_task->USERNAME->EditAttributes() ?>>
-</span>
-<?php echo $update_task->USERNAME->CustomMsg ?></td>
-	</tr>
-<?php } ?>
 <?php if ($update_task->PASSWORD->Visible) { // PASSWORD ?>
 	<tr id="r_PASSWORD">
 		<td><span id="elh_update_task_PASSWORD"><?php echo $update_task->PASSWORD->FldCaption() ?><?php echo $Language->Phrase("FieldRequiredIndicator") ?></span></td>
@@ -1128,6 +1186,36 @@ $update_task_edit->ShowMessage();
 <input type="text" data-field="x_FILENAME" name="x_FILENAME" id="x_FILENAME" size="30" maxlength="255" placeholder="<?php echo $update_task->FILENAME->PlaceHolder ?>" value="<?php echo $update_task->FILENAME->EditValue ?>"<?php echo $update_task->FILENAME->EditAttributes() ?>>
 </span>
 <?php echo $update_task->FILENAME->CustomMsg ?></td>
+	</tr>
+<?php } ?>
+<?php if ($update_task->datetime->Visible) { // datetime ?>
+	<tr id="r_datetime">
+		<td><span id="elh_update_task_datetime"><?php echo $update_task->datetime->FldCaption() ?><?php echo $Language->Phrase("FieldRequiredIndicator") ?></span></td>
+		<td<?php echo $update_task->datetime->CellAttributes() ?>>
+<span id="el_update_task_datetime" class="control-group">
+<input type="text" data-field="x_datetime" name="x_datetime" id="x_datetime" placeholder="<?php echo $update_task->datetime->PlaceHolder ?>" value="<?php echo $update_task->datetime->EditValue ?>"<?php echo $update_task->datetime->EditAttributes() ?>>
+</span>
+<?php echo $update_task->datetime->CustomMsg ?></td>
+	</tr>
+<?php } ?>
+<?php if ($update_task->DBUSERNAME->Visible) { // DBUSERNAME ?>
+	<tr id="r_DBUSERNAME">
+		<td><span id="elh_update_task_DBUSERNAME"><?php echo $update_task->DBUSERNAME->FldCaption() ?><?php echo $Language->Phrase("FieldRequiredIndicator") ?></span></td>
+		<td<?php echo $update_task->DBUSERNAME->CellAttributes() ?>>
+<span id="el_update_task_DBUSERNAME" class="control-group">
+<input type="text" data-field="x_DBUSERNAME" name="x_DBUSERNAME" id="x_DBUSERNAME" size="30" maxlength="255" placeholder="<?php echo $update_task->DBUSERNAME->PlaceHolder ?>" value="<?php echo $update_task->DBUSERNAME->EditValue ?>"<?php echo $update_task->DBUSERNAME->EditAttributes() ?>>
+</span>
+<?php echo $update_task->DBUSERNAME->CustomMsg ?></td>
+	</tr>
+<?php } ?>
+<?php if ($update_task->username->Visible) { // username ?>
+	<tr id="r_username">
+		<td><span id="elh_update_task_username"><?php echo $update_task->username->FldCaption() ?><?php echo $Language->Phrase("FieldRequiredIndicator") ?></span></td>
+		<td<?php echo $update_task->username->CellAttributes() ?>>
+<span id="el_update_task_username" class="control-group">
+<input type="text" data-field="x_username" name="x_username" id="x_username" size="30" maxlength="255" placeholder="<?php echo $update_task->username->PlaceHolder ?>" value="<?php echo $update_task->username->EditValue ?>"<?php echo $update_task->username->EditAttributes() ?>>
+</span>
+<?php echo $update_task->username->CustomMsg ?></td>
 	</tr>
 <?php } ?>
 </table>

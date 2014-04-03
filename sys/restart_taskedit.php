@@ -424,6 +424,13 @@ class crestart_task_edit extends crestart_task {
 		if (!$this->server_id_mysqladmin->FldIsDetailKey) {
 			$this->server_id_mysqladmin->setFormValue($objForm->GetValue("x_server_id_mysqladmin"));
 		}
+		if (!$this->username->FldIsDetailKey) {
+			$this->username->setFormValue($objForm->GetValue("x_username"));
+		}
+		if (!$this->datetime->FldIsDetailKey) {
+			$this->datetime->setFormValue($objForm->GetValue("x_datetime"));
+			$this->datetime->CurrentValue = ew_UnFormatDateTime($this->datetime->CurrentValue, 0);
+		}
 	}
 
 	// Restore form values
@@ -432,6 +439,9 @@ class crestart_task_edit extends crestart_task {
 		$this->LoadRow();
 		$this->id->CurrentValue = $this->id->FormValue;
 		$this->server_id_mysqladmin->CurrentValue = $this->server_id_mysqladmin->FormValue;
+		$this->username->CurrentValue = $this->username->FormValue;
+		$this->datetime->CurrentValue = $this->datetime->FormValue;
+		$this->datetime->CurrentValue = ew_UnFormatDateTime($this->datetime->CurrentValue, 0);
 	}
 
 	// Load recordset
@@ -485,6 +495,8 @@ class crestart_task_edit extends crestart_task {
 		$this->Row_Selected($row);
 		$this->id->setDbValue($rs->fields('id'));
 		$this->server_id_mysqladmin->setDbValue($rs->fields('server_id_mysqladmin'));
+		$this->username->setDbValue($rs->fields('username'));
+		$this->datetime->setDbValue($rs->fields('datetime'));
 	}
 
 	// Load DbValue from recordset
@@ -493,6 +505,8 @@ class crestart_task_edit extends crestart_task {
 		$row = is_array($rs) ? $rs : $rs->fields;
 		$this->id->DbValue = $row['id'];
 		$this->server_id_mysqladmin->DbValue = $row['server_id_mysqladmin'];
+		$this->username->DbValue = $row['username'];
+		$this->datetime->DbValue = $row['datetime'];
 	}
 
 	// Render row values based on field settings
@@ -508,6 +522,8 @@ class crestart_task_edit extends crestart_task {
 		// Common render codes for all row types
 		// id
 		// server_id_mysqladmin
+		// username
+		// datetime
 
 		if ($this->RowType == EW_ROWTYPE_VIEW) { // View row
 
@@ -539,6 +555,14 @@ class crestart_task_edit extends crestart_task {
 			}
 			$this->server_id_mysqladmin->ViewCustomAttributes = "";
 
+			// username
+			$this->username->ViewValue = $this->username->CurrentValue;
+			$this->username->ViewCustomAttributes = "";
+
+			// datetime
+			$this->datetime->ViewValue = $this->datetime->CurrentValue;
+			$this->datetime->ViewCustomAttributes = "";
+
 			// id
 			$this->id->LinkCustomAttributes = "";
 			$this->id->HrefValue = "";
@@ -548,6 +572,16 @@ class crestart_task_edit extends crestart_task {
 			$this->server_id_mysqladmin->LinkCustomAttributes = "";
 			$this->server_id_mysqladmin->HrefValue = "";
 			$this->server_id_mysqladmin->TooltipValue = "";
+
+			// username
+			$this->username->LinkCustomAttributes = "";
+			$this->username->HrefValue = "";
+			$this->username->TooltipValue = "";
+
+			// datetime
+			$this->datetime->LinkCustomAttributes = "";
+			$this->datetime->HrefValue = "";
+			$this->datetime->TooltipValue = "";
 		} elseif ($this->RowType == EW_ROWTYPE_EDIT) { // Edit row
 
 			// id
@@ -577,6 +611,16 @@ class crestart_task_edit extends crestart_task {
 			array_unshift($arwrk, array("", $Language->Phrase("PleaseSelect"), "", "", "", "", "", "", ""));
 			$this->server_id_mysqladmin->EditValue = $arwrk;
 
+			// username
+			$this->username->EditCustomAttributes = "";
+			$this->username->EditValue = ew_HtmlEncode($this->username->CurrentValue);
+			$this->username->PlaceHolder = ew_HtmlEncode(ew_RemoveHtml($this->username->FldCaption()));
+
+			// datetime
+			$this->datetime->EditCustomAttributes = "";
+			$this->datetime->EditValue = ew_HtmlEncode($this->datetime->CurrentValue);
+			$this->datetime->PlaceHolder = ew_HtmlEncode(ew_RemoveHtml($this->datetime->FldCaption()));
+
 			// Edit refer script
 			// id
 
@@ -584,6 +628,12 @@ class crestart_task_edit extends crestart_task {
 
 			// server_id_mysqladmin
 			$this->server_id_mysqladmin->HrefValue = "";
+
+			// username
+			$this->username->HrefValue = "";
+
+			// datetime
+			$this->datetime->HrefValue = "";
 		}
 		if ($this->RowType == EW_ROWTYPE_ADD ||
 			$this->RowType == EW_ROWTYPE_EDIT ||
@@ -608,6 +658,12 @@ class crestart_task_edit extends crestart_task {
 			return ($gsFormError == "");
 		if (!$this->server_id_mysqladmin->FldIsDetailKey && !is_null($this->server_id_mysqladmin->FormValue) && $this->server_id_mysqladmin->FormValue == "") {
 			ew_AddMessage($gsFormError, $Language->Phrase("EnterRequiredField") . " - " . $this->server_id_mysqladmin->FldCaption());
+		}
+		if (!$this->username->FldIsDetailKey && !is_null($this->username->FormValue) && $this->username->FormValue == "") {
+			ew_AddMessage($gsFormError, $Language->Phrase("EnterRequiredField") . " - " . $this->username->FldCaption());
+		}
+		if (!$this->datetime->FldIsDetailKey && !is_null($this->datetime->FormValue) && $this->datetime->FormValue == "") {
+			ew_AddMessage($gsFormError, $Language->Phrase("EnterRequiredField") . " - " . $this->datetime->FldCaption());
 		}
 
 		// Return validate result
@@ -644,6 +700,12 @@ class crestart_task_edit extends crestart_task {
 
 			// server_id_mysqladmin
 			$this->server_id_mysqladmin->SetDbValueDef($rsnew, $this->server_id_mysqladmin->CurrentValue, "", $this->server_id_mysqladmin->ReadOnly);
+
+			// username
+			$this->username->SetDbValueDef($rsnew, $this->username->CurrentValue, "", $this->username->ReadOnly);
+
+			// datetime
+			$this->datetime->SetDbValueDef($rsnew, $this->datetime->CurrentValue, ew_CurrentDate(), $this->datetime->ReadOnly);
 
 			// Call Row Updating event
 			$bUpdateRow = $this->Row_Updating($rsold, $rsnew);
@@ -803,6 +865,12 @@ frestart_taskedit.Validate = function() {
 			elm = this.GetElements("x" + infix + "_server_id_mysqladmin");
 			if (elm && !ew_HasValue(elm))
 				return this.OnError(elm, ewLanguage.Phrase("EnterRequiredField") + " - <?php echo ew_JsEncode2($restart_task->server_id_mysqladmin->FldCaption()) ?>");
+			elm = this.GetElements("x" + infix + "_username");
+			if (elm && !ew_HasValue(elm))
+				return this.OnError(elm, ewLanguage.Phrase("EnterRequiredField") + " - <?php echo ew_JsEncode2($restart_task->username->FldCaption()) ?>");
+			elm = this.GetElements("x" + infix + "_datetime");
+			if (elm && !ew_HasValue(elm))
+				return this.OnError(elm, ewLanguage.Phrase("EnterRequiredField") + " - <?php echo ew_JsEncode2($restart_task->datetime->FldCaption()) ?>");
 
 			// Set up row object
 			ew_ElementsToRow(fobj);
@@ -934,6 +1002,26 @@ if ($sWhereWrk <> "") $sSqlWrk .= " WHERE " . $sWhereWrk;
 <input type="hidden" name="s_x_server_id_mysqladmin" id="s_x_server_id_mysqladmin" value="s=<?php echo ew_Encrypt($sSqlWrk) ?>&f0=<?php echo ew_Encrypt("`server_id` = {filter_value}"); ?>&t0=3">
 </span>
 <?php echo $restart_task->server_id_mysqladmin->CustomMsg ?></td>
+	</tr>
+<?php } ?>
+<?php if ($restart_task->username->Visible) { // username ?>
+	<tr id="r_username">
+		<td><span id="elh_restart_task_username"><?php echo $restart_task->username->FldCaption() ?><?php echo $Language->Phrase("FieldRequiredIndicator") ?></span></td>
+		<td<?php echo $restart_task->username->CellAttributes() ?>>
+<span id="el_restart_task_username" class="control-group">
+<input type="text" data-field="x_username" name="x_username" id="x_username" size="30" maxlength="255" placeholder="<?php echo $restart_task->username->PlaceHolder ?>" value="<?php echo $restart_task->username->EditValue ?>"<?php echo $restart_task->username->EditAttributes() ?>>
+</span>
+<?php echo $restart_task->username->CustomMsg ?></td>
+	</tr>
+<?php } ?>
+<?php if ($restart_task->datetime->Visible) { // datetime ?>
+	<tr id="r_datetime">
+		<td><span id="elh_restart_task_datetime"><?php echo $restart_task->datetime->FldCaption() ?><?php echo $Language->Phrase("FieldRequiredIndicator") ?></span></td>
+		<td<?php echo $restart_task->datetime->CellAttributes() ?>>
+<span id="el_restart_task_datetime" class="control-group">
+<input type="text" data-field="x_datetime" name="x_datetime" id="x_datetime" placeholder="<?php echo $restart_task->datetime->PlaceHolder ?>" value="<?php echo $restart_task->datetime->EditValue ?>"<?php echo $restart_task->datetime->EditAttributes() ?>>
+</span>
+<?php echo $restart_task->datetime->CustomMsg ?></td>
 	</tr>
 <?php } ?>
 </table>

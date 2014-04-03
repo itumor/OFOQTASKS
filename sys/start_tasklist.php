@@ -317,6 +317,8 @@ class cstart_task_list extends cstart_task {
 		// Setup export options
 		$this->SetupExportOptions();
 		$this->id->Visible = !$this->IsAdd() && !$this->IsCopy() && !$this->IsGridAdd();
+		$this->datetime->Visible = !$this->IsAddOrEdit();
+		$this->username->Visible = !$this->IsAddOrEdit();
 
 		// Global Page Loading event (in userfn*.php)
 		Page_Loading();
@@ -581,13 +583,8 @@ class cstart_task_list extends cstart_task {
 	function BasicSearchSQL($Keyword) {
 		$sKeyword = ew_AdjustSql($Keyword);
 		$sWhere = "";
+		$this->BuildBasicSearchSQL($sWhere, $this->username, $Keyword);
 		$this->BuildBasicSearchSQL($sWhere, $this->server_id_mysqladmin, $Keyword);
-		$this->BuildBasicSearchSQL($sWhere, $this->HOSTNAME, $Keyword);
-		$this->BuildBasicSearchSQL($sWhere, $this->USERNAME, $Keyword);
-		$this->BuildBasicSearchSQL($sWhere, $this->PASSWORD, $Keyword);
-		$this->BuildBasicSearchSQL($sWhere, $this->DATABASE, $Keyword);
-		$this->BuildBasicSearchSQL($sWhere, $this->FILEPATH, $Keyword);
-		$this->BuildBasicSearchSQL($sWhere, $this->FILENAME, $Keyword);
 		return $sWhere;
 	}
 
@@ -680,6 +677,8 @@ class cstart_task_list extends cstart_task {
 			$this->CurrentOrder = ew_StripSlashes(@$_GET["order"]);
 			$this->CurrentOrderType = @$_GET["ordertype"];
 			$this->UpdateSort($this->id); // id
+			$this->UpdateSort($this->datetime); // datetime
+			$this->UpdateSort($this->username); // username
 			$this->UpdateSort($this->server_id_mysqladmin); // server_id_mysqladmin
 			$this->setStartRecordNumber(1); // Reset start position
 		}
@@ -714,6 +713,8 @@ class cstart_task_list extends cstart_task {
 				$sOrderBy = "";
 				$this->setSessionOrderBy($sOrderBy);
 				$this->id->setSort("");
+				$this->datetime->setSort("");
+				$this->username->setSort("");
 				$this->server_id_mysqladmin->setSort("");
 			}
 
@@ -1006,13 +1007,9 @@ class cstart_task_list extends cstart_task {
 		$row = &$rs->fields;
 		$this->Row_Selected($row);
 		$this->id->setDbValue($rs->fields('id'));
+		$this->datetime->setDbValue($rs->fields('datetime'));
+		$this->username->setDbValue($rs->fields('username'));
 		$this->server_id_mysqladmin->setDbValue($rs->fields('server_id_mysqladmin'));
-		$this->HOSTNAME->setDbValue($rs->fields('HOSTNAME'));
-		$this->USERNAME->setDbValue($rs->fields('USERNAME'));
-		$this->PASSWORD->setDbValue($rs->fields('PASSWORD'));
-		$this->DATABASE->setDbValue($rs->fields('DATABASE'));
-		$this->FILEPATH->setDbValue($rs->fields('FILEPATH'));
-		$this->FILENAME->setDbValue($rs->fields('FILENAME'));
 	}
 
 	// Load DbValue from recordset
@@ -1020,13 +1017,9 @@ class cstart_task_list extends cstart_task {
 		if (!$rs || !is_array($rs) && $rs->EOF) return;
 		$row = is_array($rs) ? $rs : $rs->fields;
 		$this->id->DbValue = $row['id'];
+		$this->datetime->DbValue = $row['datetime'];
+		$this->username->DbValue = $row['username'];
 		$this->server_id_mysqladmin->DbValue = $row['server_id_mysqladmin'];
-		$this->HOSTNAME->DbValue = $row['HOSTNAME'];
-		$this->USERNAME->DbValue = $row['USERNAME'];
-		$this->PASSWORD->DbValue = $row['PASSWORD'];
-		$this->DATABASE->DbValue = $row['DATABASE'];
-		$this->FILEPATH->DbValue = $row['FILEPATH'];
-		$this->FILENAME->DbValue = $row['FILENAME'];
 	}
 
 	// Load old record
@@ -1069,19 +1062,23 @@ class cstart_task_list extends cstart_task {
 
 		// Common render codes for all row types
 		// id
+		// datetime
+		// username
 		// server_id_mysqladmin
-		// HOSTNAME
-		// USERNAME
-		// PASSWORD
-		// DATABASE
-		// FILEPATH
-		// FILENAME
 
 		if ($this->RowType == EW_ROWTYPE_VIEW) { // View row
 
 			// id
 			$this->id->ViewValue = $this->id->CurrentValue;
 			$this->id->ViewCustomAttributes = "";
+
+			// datetime
+			$this->datetime->ViewValue = $this->datetime->CurrentValue;
+			$this->datetime->ViewCustomAttributes = "";
+
+			// username
+			$this->username->ViewValue = $this->username->CurrentValue;
+			$this->username->ViewCustomAttributes = "";
 
 			// server_id_mysqladmin
 			if (strval($this->server_id_mysqladmin->CurrentValue) <> "") {
@@ -1107,34 +1104,20 @@ class cstart_task_list extends cstart_task {
 			}
 			$this->server_id_mysqladmin->ViewCustomAttributes = "";
 
-			// HOSTNAME
-			$this->HOSTNAME->ViewValue = $this->HOSTNAME->CurrentValue;
-			$this->HOSTNAME->ViewCustomAttributes = "";
-
-			// USERNAME
-			$this->USERNAME->ViewValue = $this->USERNAME->CurrentValue;
-			$this->USERNAME->ViewCustomAttributes = "";
-
-			// PASSWORD
-			$this->PASSWORD->ViewValue = $this->PASSWORD->CurrentValue;
-			$this->PASSWORD->ViewCustomAttributes = "";
-
-			// DATABASE
-			$this->DATABASE->ViewValue = $this->DATABASE->CurrentValue;
-			$this->DATABASE->ViewCustomAttributes = "";
-
-			// FILEPATH
-			$this->FILEPATH->ViewValue = $this->FILEPATH->CurrentValue;
-			$this->FILEPATH->ViewCustomAttributes = "";
-
-			// FILENAME
-			$this->FILENAME->ViewValue = $this->FILENAME->CurrentValue;
-			$this->FILENAME->ViewCustomAttributes = "";
-
 			// id
 			$this->id->LinkCustomAttributes = "";
 			$this->id->HrefValue = "";
 			$this->id->TooltipValue = "";
+
+			// datetime
+			$this->datetime->LinkCustomAttributes = "";
+			$this->datetime->HrefValue = "";
+			$this->datetime->TooltipValue = "";
+
+			// username
+			$this->username->LinkCustomAttributes = "";
+			$this->username->HrefValue = "";
+			$this->username->TooltipValue = "";
 
 			// server_id_mysqladmin
 			$this->server_id_mysqladmin->LinkCustomAttributes = "";
@@ -1723,6 +1706,24 @@ $start_task_list->ListOptions->Render("header", "left");
         </div></div></td>
 	<?php } ?>
 <?php } ?>		
+<?php if ($start_task->datetime->Visible) { // datetime ?>
+	<?php if ($start_task->SortUrl($start_task->datetime) == "") { ?>
+		<td><div id="elh_start_task_datetime" class="start_task_datetime"><div class="ewTableHeaderCaption"><?php echo $start_task->datetime->FldCaption() ?></div></div></td>
+	<?php } else { ?>
+		<td><div class="ewPointer" onclick="ew_Sort(event,'<?php echo $start_task->SortUrl($start_task->datetime) ?>',1);"><div id="elh_start_task_datetime" class="start_task_datetime">
+			<div class="ewTableHeaderBtn"><span class="ewTableHeaderCaption"><?php echo $start_task->datetime->FldCaption() ?></span><span class="ewTableHeaderSort"><?php if ($start_task->datetime->getSort() == "ASC") { ?><span class="caret ewSortUp"></span><?php } elseif ($start_task->datetime->getSort() == "DESC") { ?><span class="caret"></span><?php } ?></span></div>
+        </div></div></td>
+	<?php } ?>
+<?php } ?>		
+<?php if ($start_task->username->Visible) { // username ?>
+	<?php if ($start_task->SortUrl($start_task->username) == "") { ?>
+		<td><div id="elh_start_task_username" class="start_task_username"><div class="ewTableHeaderCaption"><?php echo $start_task->username->FldCaption() ?></div></div></td>
+	<?php } else { ?>
+		<td><div class="ewPointer" onclick="ew_Sort(event,'<?php echo $start_task->SortUrl($start_task->username) ?>',1);"><div id="elh_start_task_username" class="start_task_username">
+			<div class="ewTableHeaderBtn"><span class="ewTableHeaderCaption"><?php echo $start_task->username->FldCaption() ?><?php echo $Language->Phrase("SrchLegend") ?></span><span class="ewTableHeaderSort"><?php if ($start_task->username->getSort() == "ASC") { ?><span class="caret ewSortUp"></span><?php } elseif ($start_task->username->getSort() == "DESC") { ?><span class="caret"></span><?php } ?></span></div>
+        </div></div></td>
+	<?php } ?>
+<?php } ?>		
 <?php if ($start_task->server_id_mysqladmin->Visible) { // server_id_mysqladmin ?>
 	<?php if ($start_task->SortUrl($start_task->server_id_mysqladmin) == "") { ?>
 		<td><div id="elh_start_task_server_id_mysqladmin" class="start_task_server_id_mysqladmin"><div class="ewTableHeaderCaption"><?php echo $start_task->server_id_mysqladmin->FldCaption() ?></div></div></td>
@@ -1800,6 +1801,18 @@ $start_task_list->ListOptions->Render("body", "left", $start_task_list->RowCnt);
 		<td<?php echo $start_task->id->CellAttributes() ?>>
 <span<?php echo $start_task->id->ViewAttributes() ?>>
 <?php echo $start_task->id->ListViewValue() ?></span>
+<a id="<?php echo $start_task_list->PageObjName . "_row_" . $start_task_list->RowCnt ?>"></a></td>
+	<?php } ?>
+	<?php if ($start_task->datetime->Visible) { // datetime ?>
+		<td<?php echo $start_task->datetime->CellAttributes() ?>>
+<span<?php echo $start_task->datetime->ViewAttributes() ?>>
+<?php echo $start_task->datetime->ListViewValue() ?></span>
+<a id="<?php echo $start_task_list->PageObjName . "_row_" . $start_task_list->RowCnt ?>"></a></td>
+	<?php } ?>
+	<?php if ($start_task->username->Visible) { // username ?>
+		<td<?php echo $start_task->username->CellAttributes() ?>>
+<span<?php echo $start_task->username->ViewAttributes() ?>>
+<?php echo $start_task->username->ListViewValue() ?></span>
 <a id="<?php echo $start_task_list->PageObjName . "_row_" . $start_task_list->RowCnt ?>"></a></td>
 	<?php } ?>
 	<?php if ($start_task->server_id_mysqladmin->Visible) { // server_id_mysqladmin ?>
