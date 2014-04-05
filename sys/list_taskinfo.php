@@ -1,22 +1,19 @@
 <?php
 
 // Global variable for table object
-$backup_task = NULL;
+$list_task = NULL;
 
 //
-// Table class for backup_task
+// Table class for list_task
 //
-class cbackup_task extends cTable {
+class clist_task extends cTable {
 	var $id;
+	var $username;
+	var $datetime;
 	var $server_id_mysqladmin;
 	var $HOSTNAME;
-	var $PASSWORD;
-	var $DATABASE;
-	var $FILEPATH;
-	var $FILENAME;
-	var $datetime;
 	var $DBUSERNAME;
-	var $username;
+	var $PASSWORD;
 
 	//
 	// Table class constructor
@@ -26,8 +23,8 @@ class cbackup_task extends cTable {
 
 		// Language object
 		if (!isset($Language)) $Language = new cLanguage();
-		$this->TableVar = 'backup_task';
-		$this->TableName = 'backup_task';
+		$this->TableVar = 'list_task';
+		$this->TableName = 'list_task';
 		$this->TableType = 'TABLE';
 		$this->ExportAll = TRUE;
 		$this->ExportPageBreakCount = 0; // Page break per every n record (PDF only)
@@ -43,45 +40,33 @@ class cbackup_task extends cTable {
 		$this->BasicSearch = new cBasicSearch($this->TableVar);
 
 		// id
-		$this->id = new cField('backup_task', 'backup_task', 'x_id', 'id', '`id`', '`id`', 19, -1, FALSE, '`id`', FALSE, FALSE, FALSE, 'FORMATTED TEXT');
+		$this->id = new cField('list_task', 'list_task', 'x_id', 'id', '`id`', '`id`', 19, -1, FALSE, '`id`', FALSE, FALSE, FALSE, 'FORMATTED TEXT');
 		$this->id->FldDefaultErrMsg = $Language->Phrase("IncorrectInteger");
 		$this->fields['id'] = &$this->id;
 
+		// username
+		$this->username = new cField('list_task', 'list_task', 'x_username', 'username', '`username`', '`username`', 200, -1, FALSE, '`username`', FALSE, FALSE, FALSE, 'FORMATTED TEXT');
+		$this->fields['username'] = &$this->username;
+
+		// datetime
+		$this->datetime = new cField('list_task', 'list_task', 'x_datetime', 'datetime', '`datetime`', 'DATE_FORMAT(`datetime`, \'%d/%m/%Y %H:%i:%s\')', 135, -1, FALSE, '`datetime`', FALSE, FALSE, FALSE, 'FORMATTED TEXT');
+		$this->fields['datetime'] = &$this->datetime;
+
 		// server_id_mysqladmin
-		$this->server_id_mysqladmin = new cField('backup_task', 'backup_task', 'x_server_id_mysqladmin', 'server_id_mysqladmin', '`server_id_mysqladmin`', '`server_id_mysqladmin`', 200, -1, FALSE, '`server_id_mysqladmin`', FALSE, FALSE, FALSE, 'FORMATTED TEXT');
+		$this->server_id_mysqladmin = new cField('list_task', 'list_task', 'x_server_id_mysqladmin', 'server_id_mysqladmin', '`server_id_mysqladmin`', '`server_id_mysqladmin`', 200, -1, FALSE, '`server_id_mysqladmin`', FALSE, FALSE, FALSE, 'FORMATTED TEXT');
 		$this->fields['server_id_mysqladmin'] = &$this->server_id_mysqladmin;
 
 		// HOSTNAME
-		$this->HOSTNAME = new cField('backup_task', 'backup_task', 'x_HOSTNAME', 'HOSTNAME', '`HOSTNAME`', '`HOSTNAME`', 200, -1, FALSE, '`HOSTNAME`', FALSE, FALSE, FALSE, 'FORMATTED TEXT');
+		$this->HOSTNAME = new cField('list_task', 'list_task', 'x_HOSTNAME', 'HOSTNAME', '`HOSTNAME`', '`HOSTNAME`', 200, -1, FALSE, '`HOSTNAME`', FALSE, FALSE, FALSE, 'FORMATTED TEXT');
 		$this->fields['HOSTNAME'] = &$this->HOSTNAME;
 
-		// PASSWORD
-		$this->PASSWORD = new cField('backup_task', 'backup_task', 'x_PASSWORD', 'PASSWORD', '`PASSWORD`', '`PASSWORD`', 200, -1, FALSE, '`PASSWORD`', FALSE, FALSE, FALSE, 'FORMATTED TEXT');
-		$this->fields['PASSWORD'] = &$this->PASSWORD;
-
-		// DATABASE
-		$this->DATABASE = new cField('backup_task', 'backup_task', 'x_DATABASE', 'DATABASE', '`DATABASE`', '`DATABASE`', 200, -1, FALSE, '`DATABASE`', FALSE, FALSE, FALSE, 'FORMATTED TEXT');
-		$this->fields['DATABASE'] = &$this->DATABASE;
-
-		// FILEPATH
-		$this->FILEPATH = new cField('backup_task', 'backup_task', 'x_FILEPATH', 'FILEPATH', '`FILEPATH`', '`FILEPATH`', 200, -1, TRUE, '`FILEPATH`', FALSE, FALSE, FALSE, 'FORMATTED TEXT');
-		$this->fields['FILEPATH'] = &$this->FILEPATH;
-
-		// FILENAME
-		$this->FILENAME = new cField('backup_task', 'backup_task', 'x_FILENAME', 'FILENAME', '`FILENAME`', '`FILENAME`', 200, -1, FALSE, '`FILENAME`', FALSE, FALSE, FALSE, 'FORMATTED TEXT');
-		$this->fields['FILENAME'] = &$this->FILENAME;
-
-		// datetime
-		$this->datetime = new cField('backup_task', 'backup_task', 'x_datetime', 'datetime', '`datetime`', 'DATE_FORMAT(`datetime`, \'%d/%m/%Y %H:%i:%s\')', 135, -1, FALSE, '`datetime`', FALSE, FALSE, FALSE, 'FORMATTED TEXT');
-		$this->fields['datetime'] = &$this->datetime;
-
 		// DBUSERNAME
-		$this->DBUSERNAME = new cField('backup_task', 'backup_task', 'x_DBUSERNAME', 'DBUSERNAME', '`DBUSERNAME`', '`DBUSERNAME`', 200, -1, FALSE, '`DBUSERNAME`', FALSE, FALSE, FALSE, 'FORMATTED TEXT');
+		$this->DBUSERNAME = new cField('list_task', 'list_task', 'x_DBUSERNAME', 'DBUSERNAME', '`DBUSERNAME`', '`DBUSERNAME`', 200, -1, FALSE, '`DBUSERNAME`', FALSE, FALSE, FALSE, 'FORMATTED TEXT');
 		$this->fields['DBUSERNAME'] = &$this->DBUSERNAME;
 
-		// username
-		$this->username = new cField('backup_task', 'backup_task', 'x_username', 'username', '`username`', '`username`', 200, -1, FALSE, '`username`', FALSE, FALSE, FALSE, 'FORMATTED TEXT');
-		$this->fields['username'] = &$this->username;
+		// PASSWORD
+		$this->PASSWORD = new cField('list_task', 'list_task', 'x_PASSWORD', 'PASSWORD', '`PASSWORD`', '`PASSWORD`', 200, -1, FALSE, '`PASSWORD`', FALSE, FALSE, FALSE, 'FORMATTED TEXT');
+		$this->fields['PASSWORD'] = &$this->PASSWORD;
 	}
 
 	// Single column sort
@@ -103,7 +88,7 @@ class cbackup_task extends cTable {
 
 	// Table level SQL
 	function SqlFrom() { // From
-		return "`backup_task`";
+		return "`list_task`";
 	}
 
 	function SqlSelect() { // Select
@@ -275,7 +260,7 @@ class cbackup_task extends cTable {
 	}
 
 	// Update Table
-	var $UpdateTable = "`backup_task`";
+	var $UpdateTable = "`list_task`";
 
 	// INSERT statement
 	function InsertSQL(&$rs) {
@@ -370,7 +355,7 @@ class cbackup_task extends cTable {
 		if (@$_SESSION[$name] <> "") {
 			return $_SESSION[$name];
 		} else {
-			return "backup_tasklist.php";
+			return "list_tasklist.php";
 		}
 	}
 
@@ -380,25 +365,25 @@ class cbackup_task extends cTable {
 
 	// List URL
 	function GetListUrl() {
-		return "backup_tasklist.php";
+		return "list_tasklist.php";
 	}
 
 	// View URL
 	function GetViewUrl($parm = "") {
 		if ($parm <> "")
-			return $this->KeyUrl("backup_taskview.php", $this->UrlParm($parm));
+			return $this->KeyUrl("list_taskview.php", $this->UrlParm($parm));
 		else
-			return $this->KeyUrl("backup_taskview.php", $this->UrlParm(EW_TABLE_SHOW_DETAIL . "="));
+			return $this->KeyUrl("list_taskview.php", $this->UrlParm(EW_TABLE_SHOW_DETAIL . "="));
 	}
 
 	// Add URL
 	function GetAddUrl() {
-		return "backup_taskadd.php";
+		return "list_taskadd.php";
 	}
 
 	// Edit URL
 	function GetEditUrl($parm = "") {
-		return $this->KeyUrl("backup_taskedit.php", $this->UrlParm($parm));
+		return $this->KeyUrl("list_taskedit.php", $this->UrlParm($parm));
 	}
 
 	// Inline edit URL
@@ -408,7 +393,7 @@ class cbackup_task extends cTable {
 
 	// Copy URL
 	function GetCopyUrl($parm = "") {
-		return $this->KeyUrl("backup_taskadd.php", $this->UrlParm($parm));
+		return $this->KeyUrl("list_taskadd.php", $this->UrlParm($parm));
 	}
 
 	// Inline copy URL
@@ -418,7 +403,7 @@ class cbackup_task extends cTable {
 
 	// Delete URL
 	function GetDeleteUrl() {
-		return $this->KeyUrl("backup_taskdelete.php", $this->UrlParm());
+		return $this->KeyUrl("list_taskdelete.php", $this->UrlParm());
 	}
 
 	// Add key value to URL
@@ -501,15 +486,12 @@ class cbackup_task extends cTable {
 	// Load row values from recordset
 	function LoadListRowValues(&$rs) {
 		$this->id->setDbValue($rs->fields('id'));
+		$this->username->setDbValue($rs->fields('username'));
+		$this->datetime->setDbValue($rs->fields('datetime'));
 		$this->server_id_mysqladmin->setDbValue($rs->fields('server_id_mysqladmin'));
 		$this->HOSTNAME->setDbValue($rs->fields('HOSTNAME'));
-		$this->PASSWORD->setDbValue($rs->fields('PASSWORD'));
-		$this->DATABASE->setDbValue($rs->fields('DATABASE'));
-		$this->FILEPATH->Upload->DbValue = $rs->fields('FILEPATH');
-		$this->FILENAME->setDbValue($rs->fields('FILENAME'));
-		$this->datetime->setDbValue($rs->fields('datetime'));
 		$this->DBUSERNAME->setDbValue($rs->fields('DBUSERNAME'));
-		$this->username->setDbValue($rs->fields('username'));
+		$this->PASSWORD->setDbValue($rs->fields('PASSWORD'));
 	}
 
 	// Render list row values
@@ -521,19 +503,24 @@ class cbackup_task extends cTable {
 
    // Common render codes
 		// id
+		// username
+		// datetime
 		// server_id_mysqladmin
 		// HOSTNAME
-		// PASSWORD
-		// DATABASE
-		// FILEPATH
-		// FILENAME
-		// datetime
 		// DBUSERNAME
-		// username
+		// PASSWORD
 		// id
 
 		$this->id->ViewValue = $this->id->CurrentValue;
 		$this->id->ViewCustomAttributes = "";
+
+		// username
+		$this->username->ViewValue = $this->username->CurrentValue;
+		$this->username->ViewCustomAttributes = "";
+
+		// datetime
+		$this->datetime->ViewValue = $this->datetime->CurrentValue;
+		$this->datetime->ViewCustomAttributes = "";
 
 		// server_id_mysqladmin
 		if (strval($this->server_id_mysqladmin->CurrentValue) <> "") {
@@ -561,8 +548,8 @@ class cbackup_task extends cTable {
 
 		// HOSTNAME
 		if (strval($this->HOSTNAME->CurrentValue) <> "") {
-			$sFilterWrk = "`server_id`" . ew_SearchString("=", $this->HOSTNAME->CurrentValue, EW_DATATYPE_NUMBER);
-		$sSqlWrk = "SELECT `server_id`, `server_name` AS `DispFld`, '' AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld` FROM `server`";
+			$sFilterWrk = "`server_hostname`" . ew_SearchString("=", $this->HOSTNAME->CurrentValue, EW_DATATYPE_STRING);
+		$sSqlWrk = "SELECT `server_hostname`, `server_name` AS `DispFld`, '' AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld` FROM `server`";
 		$sWhereWrk = "";
 		if ($sFilterWrk <> "") {
 			ew_AddFilter($sWhereWrk, $sFilterWrk);
@@ -583,42 +570,28 @@ class cbackup_task extends cTable {
 		}
 		$this->HOSTNAME->ViewCustomAttributes = "";
 
-		// PASSWORD
-		$this->PASSWORD->ViewValue = $this->PASSWORD->CurrentValue;
-		$this->PASSWORD->ViewCustomAttributes = "";
-
-		// DATABASE
-		$this->DATABASE->ViewValue = $this->DATABASE->CurrentValue;
-		$this->DATABASE->ViewCustomAttributes = "";
-
-		// FILEPATH
-		if (!ew_Empty($this->FILEPATH->Upload->DbValue)) {
-			$this->FILEPATH->ViewValue = $this->FILEPATH->Upload->DbValue;
-		} else {
-			$this->FILEPATH->ViewValue = "";
-		}
-		$this->FILEPATH->ViewCustomAttributes = "";
-
-		// FILENAME
-		$this->FILENAME->ViewValue = $this->FILENAME->CurrentValue;
-		$this->FILENAME->ViewCustomAttributes = "";
-
-		// datetime
-		$this->datetime->ViewValue = $this->datetime->CurrentValue;
-		$this->datetime->ViewCustomAttributes = "";
-
 		// DBUSERNAME
 		$this->DBUSERNAME->ViewValue = $this->DBUSERNAME->CurrentValue;
 		$this->DBUSERNAME->ViewCustomAttributes = "";
 
-		// username
-		$this->username->ViewValue = $this->username->CurrentValue;
-		$this->username->ViewCustomAttributes = "";
+		// PASSWORD
+		$this->PASSWORD->ViewValue = $this->PASSWORD->CurrentValue;
+		$this->PASSWORD->ViewCustomAttributes = "";
 
 		// id
 		$this->id->LinkCustomAttributes = "";
 		$this->id->HrefValue = "";
 		$this->id->TooltipValue = "";
+
+		// username
+		$this->username->LinkCustomAttributes = "";
+		$this->username->HrefValue = "";
+		$this->username->TooltipValue = "";
+
+		// datetime
+		$this->datetime->LinkCustomAttributes = "";
+		$this->datetime->HrefValue = "";
+		$this->datetime->TooltipValue = "";
 
 		// server_id_mysqladmin
 		$this->server_id_mysqladmin->LinkCustomAttributes = "";
@@ -630,41 +603,15 @@ class cbackup_task extends cTable {
 		$this->HOSTNAME->HrefValue = "";
 		$this->HOSTNAME->TooltipValue = "";
 
-		// PASSWORD
-		$this->PASSWORD->LinkCustomAttributes = "";
-		$this->PASSWORD->HrefValue = "";
-		$this->PASSWORD->TooltipValue = "";
-
-		// DATABASE
-		$this->DATABASE->LinkCustomAttributes = "";
-		$this->DATABASE->HrefValue = "";
-		$this->DATABASE->TooltipValue = "";
-
-		// FILEPATH
-		$this->FILEPATH->LinkCustomAttributes = "";
-		$this->FILEPATH->HrefValue = "";
-		$this->FILEPATH->HrefValue2 = $this->FILEPATH->UploadPath . $this->FILEPATH->Upload->DbValue;
-		$this->FILEPATH->TooltipValue = "";
-
-		// FILENAME
-		$this->FILENAME->LinkCustomAttributes = "";
-		$this->FILENAME->HrefValue = "";
-		$this->FILENAME->TooltipValue = "";
-
-		// datetime
-		$this->datetime->LinkCustomAttributes = "";
-		$this->datetime->HrefValue = "";
-		$this->datetime->TooltipValue = "";
-
 		// DBUSERNAME
 		$this->DBUSERNAME->LinkCustomAttributes = "";
 		$this->DBUSERNAME->HrefValue = "";
 		$this->DBUSERNAME->TooltipValue = "";
 
-		// username
-		$this->username->LinkCustomAttributes = "";
-		$this->username->HrefValue = "";
-		$this->username->TooltipValue = "";
+		// PASSWORD
+		$this->PASSWORD->LinkCustomAttributes = "";
+		$this->PASSWORD->HrefValue = "";
+		$this->PASSWORD->TooltipValue = "";
 
 		// Call Row Rendered event
 		$this->Row_Rendered();
@@ -689,26 +636,20 @@ class cbackup_task extends cTable {
 			$Doc->BeginExportRow();
 			if ($ExportPageType == "view") {
 				if ($this->id->Exportable) $Doc->ExportCaption($this->id);
+				if ($this->username->Exportable) $Doc->ExportCaption($this->username);
+				if ($this->datetime->Exportable) $Doc->ExportCaption($this->datetime);
 				if ($this->server_id_mysqladmin->Exportable) $Doc->ExportCaption($this->server_id_mysqladmin);
 				if ($this->HOSTNAME->Exportable) $Doc->ExportCaption($this->HOSTNAME);
-				if ($this->PASSWORD->Exportable) $Doc->ExportCaption($this->PASSWORD);
-				if ($this->DATABASE->Exportable) $Doc->ExportCaption($this->DATABASE);
-				if ($this->FILEPATH->Exportable) $Doc->ExportCaption($this->FILEPATH);
-				if ($this->FILENAME->Exportable) $Doc->ExportCaption($this->FILENAME);
-				if ($this->datetime->Exportable) $Doc->ExportCaption($this->datetime);
 				if ($this->DBUSERNAME->Exportable) $Doc->ExportCaption($this->DBUSERNAME);
-				if ($this->username->Exportable) $Doc->ExportCaption($this->username);
+				if ($this->PASSWORD->Exportable) $Doc->ExportCaption($this->PASSWORD);
 			} else {
 				if ($this->id->Exportable) $Doc->ExportCaption($this->id);
+				if ($this->username->Exportable) $Doc->ExportCaption($this->username);
+				if ($this->datetime->Exportable) $Doc->ExportCaption($this->datetime);
 				if ($this->server_id_mysqladmin->Exportable) $Doc->ExportCaption($this->server_id_mysqladmin);
 				if ($this->HOSTNAME->Exportable) $Doc->ExportCaption($this->HOSTNAME);
-				if ($this->PASSWORD->Exportable) $Doc->ExportCaption($this->PASSWORD);
-				if ($this->DATABASE->Exportable) $Doc->ExportCaption($this->DATABASE);
-				if ($this->FILEPATH->Exportable) $Doc->ExportCaption($this->FILEPATH);
-				if ($this->FILENAME->Exportable) $Doc->ExportCaption($this->FILENAME);
-				if ($this->datetime->Exportable) $Doc->ExportCaption($this->datetime);
 				if ($this->DBUSERNAME->Exportable) $Doc->ExportCaption($this->DBUSERNAME);
-				if ($this->username->Exportable) $Doc->ExportCaption($this->username);
+				if ($this->PASSWORD->Exportable) $Doc->ExportCaption($this->PASSWORD);
 			}
 			$Doc->EndExportRow();
 		}
@@ -739,26 +680,20 @@ class cbackup_task extends cTable {
 				$Doc->BeginExportRow($RowCnt); // Allow CSS styles if enabled
 				if ($ExportPageType == "view") {
 					if ($this->id->Exportable) $Doc->ExportField($this->id);
+					if ($this->username->Exportable) $Doc->ExportField($this->username);
+					if ($this->datetime->Exportable) $Doc->ExportField($this->datetime);
 					if ($this->server_id_mysqladmin->Exportable) $Doc->ExportField($this->server_id_mysqladmin);
 					if ($this->HOSTNAME->Exportable) $Doc->ExportField($this->HOSTNAME);
-					if ($this->PASSWORD->Exportable) $Doc->ExportField($this->PASSWORD);
-					if ($this->DATABASE->Exportable) $Doc->ExportField($this->DATABASE);
-					if ($this->FILEPATH->Exportable) $Doc->ExportField($this->FILEPATH);
-					if ($this->FILENAME->Exportable) $Doc->ExportField($this->FILENAME);
-					if ($this->datetime->Exportable) $Doc->ExportField($this->datetime);
 					if ($this->DBUSERNAME->Exportable) $Doc->ExportField($this->DBUSERNAME);
-					if ($this->username->Exportable) $Doc->ExportField($this->username);
+					if ($this->PASSWORD->Exportable) $Doc->ExportField($this->PASSWORD);
 				} else {
 					if ($this->id->Exportable) $Doc->ExportField($this->id);
+					if ($this->username->Exportable) $Doc->ExportField($this->username);
+					if ($this->datetime->Exportable) $Doc->ExportField($this->datetime);
 					if ($this->server_id_mysqladmin->Exportable) $Doc->ExportField($this->server_id_mysqladmin);
 					if ($this->HOSTNAME->Exportable) $Doc->ExportField($this->HOSTNAME);
-					if ($this->PASSWORD->Exportable) $Doc->ExportField($this->PASSWORD);
-					if ($this->DATABASE->Exportable) $Doc->ExportField($this->DATABASE);
-					if ($this->FILEPATH->Exportable) $Doc->ExportField($this->FILEPATH);
-					if ($this->FILENAME->Exportable) $Doc->ExportField($this->FILENAME);
-					if ($this->datetime->Exportable) $Doc->ExportField($this->datetime);
 					if ($this->DBUSERNAME->Exportable) $Doc->ExportField($this->DBUSERNAME);
-					if ($this->username->Exportable) $Doc->ExportField($this->username);
+					if ($this->PASSWORD->Exportable) $Doc->ExportField($this->PASSWORD);
 				}
 				$Doc->EndExportRow();
 			}
@@ -818,8 +753,15 @@ class cbackup_task extends cTable {
 	// Row Inserted event
 	function Row_Inserted($rsold, &$rsnew) {
 
-		//echo "Row Inserted"
-	}
+		//echo "Row Inserted"    
+		$parameters = array(
+	'server_id_mysqladmin'=>$rsnew["server_id_mysqladmin"],
+	'HOSTNAME'=>$rsnew["HOSTNAME"],
+	'DBUSERNAME'=>$rsnew["DBUSERNAME"],
+	'PASSWORD'=>$rsnew["PASSWORD"],
+	);
+	add_cron_task("list",$parameters);  
+	}                             
 
 	// Row Updating event
 	function Row_Updating($rsold, &$rsnew) {

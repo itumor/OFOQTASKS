@@ -47,6 +47,7 @@ ob_start(); // Turn on output buffering
 
 // Generate all menu items
 $RootMenu->IsRoot = TRUE;
+$RootMenu->AddMenuItem(75, $Language->MenuPhrase("75", "MenuText"), "list_tasklist.php", -1, "", AllowListMenu('{3246B9FA-4C51-4733-8040-34B188FCD87E}list_task'), FALSE);
 $RootMenu->AddMenuItem(15, $Language->MenuPhrase("15", "MenuText"), "", -1, "", IsLoggedIn(), FALSE, TRUE);
 $RootMenu->AddMenuItem(41, $Language->MenuPhrase("41", "MenuText"), "start_tasklist.php", 15, "", AllowListMenu('{3246B9FA-4C51-4733-8040-34B188FCD87E}start_task'), FALSE);
 $RootMenu->AddMenuItem(7, $Language->MenuPhrase("7", "MenuText"), "serverlist.php", 15, "", AllowListMenu('{3246B9FA-4C51-4733-8040-34B188FCD87E}server'), FALSE);

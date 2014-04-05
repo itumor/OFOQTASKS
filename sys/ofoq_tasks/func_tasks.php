@@ -39,11 +39,11 @@ function add_cron_task($task_name,$parameters) {
                if ($parameter['parameter_name'] != $server_id ){
                 //print_r($parameter['parameter_name']);die;
 
-                if (in_array($parameter['parameter_name'], $parameters)) {
+ 
                 $parameter_str .= '"' . $parameters[$parameter['parameter_name']] . '" ';
-                }else{
-                  $parameter_str .=  '"" ';
-                }
+              
+                  //$parameter_str .=  '"" ';
+               
                }else{
                // print_r($parameters);die;
                 $server_id = $parameters[$server_id];

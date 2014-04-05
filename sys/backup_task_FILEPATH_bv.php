@@ -5,6 +5,7 @@ ob_start(); // Turn on output buffering
 <?php include_once "ewcfg10.php" ?>
 <?php include_once "ewmysql10.php" ?>
 <?php include_once "phpfn10.php" ?>
+<?php include_once "backup_taskinfo.php" ?>
 <?php include_once "_logininfo.php" ?>
 <?php include_once "userfn10.php" ?>
 <?php
@@ -13,18 +14,18 @@ ob_start(); // Turn on output buffering
 // Page class
 //
 
-$default = NULL; // Initialize page object first
+$backup_task_FILEPATH_blobview = NULL; // Initialize page object first
 
-class cdefault {
+class cbackup_task_FILEPATH_blobview extends cbackup_task {
 
 	// Page ID
-	var $PageID = 'default';
+	var $PageID = 'blobview';
 
 	// Project ID
 	var $ProjectID = "{3246B9FA-4C51-4733-8040-34B188FCD87E}";
 
 	// Page object name
-	var $PageObjName = 'default';
+	var $PageObjName = 'backup_task_FILEPATH_blobview';
 
 	// Page name
 	function PageName() {
@@ -130,12 +131,25 @@ class cdefault {
 		// Language object
 		if (!isset($Language)) $Language = new cLanguage();
 
-		// User table object (_login)
-		if (!isset($GLOBALS["_login"])) $GLOBALS["_login"] = new c_login;
+		// Parent constuctor
+		parent::__construct();
+
+		// Table object (backup_task)
+		if (!isset($GLOBALS["backup_task"])) {
+			$GLOBALS["backup_task"] = &$this;
+			$GLOBALS["Table"] = &$GLOBALS["backup_task"];
+		}
+
+		// Table object (_login)
+		if (!isset($GLOBALS['_login'])) $GLOBALS['_login'] = new c_login();
 
 		// Page ID
 		if (!defined("EW_PAGE_ID"))
-			define("EW_PAGE_ID", 'default', TRUE);
+			define("EW_PAGE_ID", 'blobview', TRUE);
+
+		// Table name (for backward compatibility)
+		if (!defined("EW_TABLE_NAME"))
+			define("EW_TABLE_NAME", 'backup_task', TRUE);
 
 		// Start timer
 		if (!isset($GLOBALS["gTimer"])) $GLOBALS["gTimer"] = new cTimer();
@@ -152,10 +166,25 @@ class cdefault {
 
 		// Security
 		$Security = new cAdvancedSecurity();
+		if (!$Security->IsLoggedIn()) $Security->AutoLogin();
+		if (!$Security->IsLoggedIn()) {
+			$Security->SaveLastUrl();
+			$this->Page_Terminate("login.php");
+		}
+		$Security->TablePermission_Loading();
+		$Security->LoadCurrentUserLevel(CurrentProjectID() . 'backup_task');
+		$Security->TablePermission_Loaded();
+		if (!$Security->IsLoggedIn()) {
+			$Security->SaveLastUrl();
+			$this->Page_Terminate("login.php");
+		}
+		if (!$Security->CanList()) {
+			$this->Page_Terminate();
+		}
+		$Security->UserID_Loading();
+		if ($Security->IsLoggedIn()) $Security->LoadUserID();
+		$Security->UserID_Loaded();
 		$this->CurrentAction = (@$_GET["a"] <> "") ? $_GET["a"] : @$_POST["a_list"]; // Set up curent action
-
-		// Global Page Loading event (in userfn*.php)
-		Page_Loading();
 
 		// Page Load event
 		$this->Page_Load();
@@ -169,9 +198,6 @@ class cdefault {
 
 		// Page Unload event
 		$this->Page_Unload();
-
-		// Global Page Unloaded event (in userfn*.php)
-		Page_Unloaded();
 		$this->Page_Redirecting($url);
 
 		 // Close connection
@@ -185,70 +211,74 @@ class cdefault {
 		}
 		exit();
 	}
+	var $Recordset;
 
 	//
 	// Page main
 	//
 	function Page_Main() {
-		global $Security, $Language;
-		if (!$Security->IsLoggedIn()) $Security->AutoLogin();
-		$Security->LoadUserLevel(); // Load User Level
-		if ($Security->AllowList(CurrentProjectID() . 'command'))
-		$this->Page_Terminate("commandlist.php"); // Exit and go to default page
-		if ($Security->AllowList(CurrentProjectID() . 'function_group'))
-			$this->Page_Terminate("function_grouplist.php");
-		if ($Security->AllowList(CurrentProjectID() . 'function_group_relation'))
-			$this->Page_Terminate("function_group_relationlist.php");
-		if ($Security->AllowList(CurrentProjectID() . 'parameter'))
-			$this->Page_Terminate("parameterlist.php");
-		if ($Security->AllowList(CurrentProjectID() . 'script'))
-			$this->Page_Terminate("scriptlist.php");
-		if ($Security->AllowList(CurrentProjectID() . 'script_function'))
-			$this->Page_Terminate("script_functionlist.php");
-		if ($Security->AllowList(CurrentProjectID() . 'server'))
-			$this->Page_Terminate("serverlist.php");
-		if ($Security->AllowList(CurrentProjectID() . 'task'))
-			$this->Page_Terminate("tasklist.php");
-		if ($Security->AllowList(CurrentProjectID() . 'task_function_group'))
-			$this->Page_Terminate("task_function_grouplist.php");
-		if ($Security->AllowList(CurrentProjectID() . 'audittrail'))
-			$this->Page_Terminate("audittraillist.php");
-		if ($Security->AllowList(CurrentProjectID() . 'login'))
-			$this->Page_Terminate("_loginlist.php");
-		if ($Security->AllowList(CurrentProjectID() . 'generator report'))
-			$this->Page_Terminate("generator_reportlist.php");
-		if ($Security->AllowList(CurrentProjectID() . 'Report Grouping by Task'))
-			$this->Page_Terminate("Report_Grouping_by_Taskreport.php");
-		if ($Security->AllowList(CurrentProjectID() . 'userlevelpermissions'))
-			$this->Page_Terminate("userlevelpermissionslist.php");
-		if ($Security->AllowList(CurrentProjectID() . 'userlevels'))
-			$this->Page_Terminate("userlevelslist.php");
-		if ($Security->AllowList(CurrentProjectID() . 'start_task'))
-			$this->Page_Terminate("start_tasklist.php");
-		if ($Security->AllowList(CurrentProjectID() . 'restart_task'))
-			$this->Page_Terminate("restart_tasklist.php");
-		if ($Security->AllowList(CurrentProjectID() . 'listandstart_task'))
-			$this->Page_Terminate("listandstart_tasklist.php");
-		if ($Security->AllowList(CurrentProjectID() . 'backup_task'))
-			$this->Page_Terminate("backup_tasklist.php");
-		if ($Security->AllowList(CurrentProjectID() . 'create_task'))
-			$this->Page_Terminate("create_tasklist.php");
-		if ($Security->AllowList(CurrentProjectID() . 'drop_task'))
-			$this->Page_Terminate("drop_tasklist.php");
-		if ($Security->AllowList(CurrentProjectID() . 'restore_task'))
-			$this->Page_Terminate("restore_tasklist.php");
-		if ($Security->AllowList(CurrentProjectID() . 'stop_task'))
-			$this->Page_Terminate("stop_tasklist.php");
-		if ($Security->AllowList(CurrentProjectID() . 'update_task'))
-			$this->Page_Terminate("update_tasklist.php");
-		if ($Security->AllowList(CurrentProjectID() . 'script_function_parameter_relation'))
-			$this->Page_Terminate("script_function_parameter_relationlist.php");
-		if ($Security->AllowList(CurrentProjectID() . 'list_task'))
-			$this->Page_Terminate("list_tasklist.php");
-		if ($Security->IsLoggedIn()) {
-			$this->setFailureMessage($Language->Phrase("NoPermission") . "<br><br><a href=\"logout.php\">" . $Language->Phrase("BackToLogin") . "</a>");
+		global $conn;
+
+		// Get key
+		if (@$_GET["id"] <> "") {
+			$this->id->setQueryStringValue($_GET["id"]);
 		} else {
-			$this->Page_Terminate("login.php"); // Exit and go to login page
+			$this->Page_Terminate(); // Exit
+			exit();
+		}
+		$objBinary = new cUpload('backup_task', 'x_FILEPATH');
+
+		// Show thumbnail
+		$bShowThumbnail = (@$_GET["showthumbnail"] == "1");
+		if (@$_GET["thumbnailwidth"] == "" && @$_GET["thumbnailheight"] == "") {
+			$iThumbnailWidth = EW_THUMBNAIL_DEFAULT_WIDTH; // Set default width
+			$iThumbnailHeight = EW_THUMBNAIL_DEFAULT_HEIGHT; // Set default height
+		} else {
+			if (@$_GET["thumbnailwidth"] <> "") {
+				$iThumbnailWidth = $_GET["thumbnailwidth"];
+				if (!is_numeric($iThumbnailWidth) || $iThumbnailWidth < 0) $iThumbnailWidth = 0;
+			}
+			if (@$_GET["thumbnailheight"] <> "") {
+				$iThumbnailHeight = $_GET["thumbnailheight"];
+				if (!is_numeric($iThumbnailHeight) || $iThumbnailHeight < 0) $iThumbnailHeight = 0;
+			}
+		}
+		if (is_numeric(@$_GET["quality"])) {
+			$quality = intval($_GET["quality"]);
+			if ($quality <= 0) $quality = EW_THUMBNAIL_DEFAULT_QUALITY;
+		} else {
+			$quality = EW_THUMBNAIL_DEFAULT_QUALITY;
+		}
+		$sFilter = $this->KeyFilter();
+
+		// Set up filter (SQL WHERE clause) and get return SQL
+		// SQL constructor in backup_task class, backup_taskinfo.php
+
+		$this->CurrentFilter = $sFilter;
+		$sSql = $this->SQL();
+		if ($this->Recordset = $conn->Execute($sSql)) {
+			if (!$this->Recordset->EOF) {
+				if (!EW_DEBUG_ENABLED && ob_get_length())
+					ob_end_clean();
+				$objBinary->Value = $this->Recordset->fields('FILEPATH');
+				$objBinary->Value = $objBinary->Value;
+				if ($bShowThumbnail) {
+					ew_ResizeBinary($objBinary->Value, $iThumbnailWidth, $iThumbnailHeight, $quality);
+				}
+				$data = $objBinary->Value;
+				if (strpos(ew_ServerVar("HTTP_USER_AGENT"), "MSIE") === FALSE)
+					header("Content-type: " . ew_ContentType(substr($data, 0, 11)));
+				if (trim(strval($this->Recordset->fields('FILEPATH'))) <> "") {
+					header("Content-Disposition: attachment; filename=\"" . $this->Recordset->fields('FILEPATH') . "\"");
+				}
+				if (substr($data, 0, 2) == "PK" && strpos($data, "[Content_Types].xml") > 0 &&
+					strpos($data, "_rels") > 0 && strpos($data, "docProps") > 0) { // Fix Office 2007 documents
+					if (substr($data, -4) <> "\0\0\0\0")
+						$data .= "\0\0\0\0";
+				}
+				echo $data;
+			}
+			$this->Recordset->Close();
 		}
 	}
 
@@ -286,19 +316,14 @@ class cdefault {
 <?php
 
 // Create page object
-if (!isset($default)) $default = new cdefault();
+if (!isset($backup_task_FILEPATH_blobview)) $backup_task_FILEPATH_blobview = new cbackup_task_FILEPATH_blobview();
 
 // Page init
-$default->Page_Init();
+$backup_task_FILEPATH_blobview->Page_Init();
 
 // Page main
-$default->Page_Main();
+$backup_task_FILEPATH_blobview->Page_Main();
 ?>
-<?php include_once "header.php" ?>
 <?php
-$default->ShowMessage();
-?>
-<?php include_once "footer.php" ?>
-<?php
-$default->Page_Terminate();
+$backup_task_FILEPATH_blobview->Page_Terminate();
 ?>

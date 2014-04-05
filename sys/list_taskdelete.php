@@ -5,7 +5,7 @@ ob_start(); // Turn on output buffering
 <?php include_once "ewcfg10.php" ?>
 <?php include_once "ewmysql10.php" ?>
 <?php include_once "phpfn10.php" ?>
-<?php include_once "listandstart_taskinfo.php" ?>
+<?php include_once "list_taskinfo.php" ?>
 <?php include_once "_logininfo.php" ?>
 <?php include_once "userfn10.php" ?>
 <?php
@@ -14,9 +14,9 @@ ob_start(); // Turn on output buffering
 // Page class
 //
 
-$listandstart_task_delete = NULL; // Initialize page object first
+$list_task_delete = NULL; // Initialize page object first
 
-class clistandstart_task_delete extends clistandstart_task {
+class clist_task_delete extends clist_task {
 
 	// Page ID
 	var $PageID = 'delete';
@@ -25,10 +25,10 @@ class clistandstart_task_delete extends clistandstart_task {
 	var $ProjectID = "{3246B9FA-4C51-4733-8040-34B188FCD87E}";
 
 	// Table name
-	var $TableName = 'listandstart_task';
+	var $TableName = 'list_task';
 
 	// Page object name
-	var $PageObjName = 'listandstart_task_delete';
+	var $PageObjName = 'list_task_delete';
 
 	// Page name
 	function PageName() {
@@ -171,10 +171,10 @@ class clistandstart_task_delete extends clistandstart_task {
 		// Parent constuctor
 		parent::__construct();
 
-		// Table object (listandstart_task)
-		if (!isset($GLOBALS["listandstart_task"])) {
-			$GLOBALS["listandstart_task"] = &$this;
-			$GLOBALS["Table"] = &$GLOBALS["listandstart_task"];
+		// Table object (list_task)
+		if (!isset($GLOBALS["list_task"])) {
+			$GLOBALS["list_task"] = &$this;
+			$GLOBALS["Table"] = &$GLOBALS["list_task"];
 		}
 
 		// Table object (_login)
@@ -186,7 +186,7 @@ class clistandstart_task_delete extends clistandstart_task {
 
 		// Table name (for backward compatibility)
 		if (!defined("EW_TABLE_NAME"))
-			define("EW_TABLE_NAME", 'listandstart_task', TRUE);
+			define("EW_TABLE_NAME", 'list_task', TRUE);
 
 		// Start timer
 		if (!isset($GLOBALS["gTimer"])) $GLOBALS["gTimer"] = new cTimer();
@@ -218,7 +218,7 @@ class clistandstart_task_delete extends clistandstart_task {
 		if (!$Security->CanDelete()) {
 			$Security->SaveLastUrl();
 			$this->setFailureMessage($Language->Phrase("NoPermission")); // Set no permission
-			$this->Page_Terminate("listandstart_tasklist.php");
+			$this->Page_Terminate("list_tasklist.php");
 		}
 		$Security->UserID_Loading();
 		if ($Security->IsLoggedIn()) $Security->LoadUserID();
@@ -277,10 +277,10 @@ class clistandstart_task_delete extends clistandstart_task {
 		$this->RecKeys = $this->GetRecordKeys(); // Load record keys
 		$sFilter = $this->GetKeyFilter();
 		if ($sFilter == "")
-			$this->Page_Terminate("listandstart_tasklist.php"); // Prevent SQL injection, return to list
+			$this->Page_Terminate("list_tasklist.php"); // Prevent SQL injection, return to list
 
 		// Set up filter (SQL WHHERE clause) and get return SQL
-		// SQL constructor in listandstart_task class, listandstart_taskinfo.php
+		// SQL constructor in list_task class, list_taskinfo.php
 
 		$this->CurrentFilter = $sFilter;
 
@@ -352,12 +352,12 @@ class clistandstart_task_delete extends clistandstart_task {
 		$row = &$rs->fields;
 		$this->Row_Selected($row);
 		$this->id->setDbValue($rs->fields('id'));
+		$this->username->setDbValue($rs->fields('username'));
+		$this->datetime->setDbValue($rs->fields('datetime'));
 		$this->server_id_mysqladmin->setDbValue($rs->fields('server_id_mysqladmin'));
 		$this->HOSTNAME->setDbValue($rs->fields('HOSTNAME'));
-		$this->PASSWORD->setDbValue($rs->fields('PASSWORD'));
 		$this->DBUSERNAME->setDbValue($rs->fields('DBUSERNAME'));
-		$this->datetime->setDbValue($rs->fields('datetime'));
-		$this->username->setDbValue($rs->fields('username'));
+		$this->PASSWORD->setDbValue($rs->fields('PASSWORD'));
 	}
 
 	// Load DbValue from recordset
@@ -365,12 +365,12 @@ class clistandstart_task_delete extends clistandstart_task {
 		if (!$rs || !is_array($rs) && $rs->EOF) return;
 		$row = is_array($rs) ? $rs : $rs->fields;
 		$this->id->DbValue = $row['id'];
+		$this->username->DbValue = $row['username'];
+		$this->datetime->DbValue = $row['datetime'];
 		$this->server_id_mysqladmin->DbValue = $row['server_id_mysqladmin'];
 		$this->HOSTNAME->DbValue = $row['HOSTNAME'];
-		$this->PASSWORD->DbValue = $row['PASSWORD'];
 		$this->DBUSERNAME->DbValue = $row['DBUSERNAME'];
-		$this->datetime->DbValue = $row['datetime'];
-		$this->username->DbValue = $row['username'];
+		$this->PASSWORD->DbValue = $row['PASSWORD'];
 	}
 
 	// Render row values based on field settings
@@ -385,18 +385,26 @@ class clistandstart_task_delete extends clistandstart_task {
 
 		// Common render codes for all row types
 		// id
+		// username
+		// datetime
 		// server_id_mysqladmin
 		// HOSTNAME
-		// PASSWORD
 		// DBUSERNAME
-		// datetime
-		// username
+		// PASSWORD
 
 		if ($this->RowType == EW_ROWTYPE_VIEW) { // View row
 
 			// id
 			$this->id->ViewValue = $this->id->CurrentValue;
 			$this->id->ViewCustomAttributes = "";
+
+			// username
+			$this->username->ViewValue = $this->username->CurrentValue;
+			$this->username->ViewCustomAttributes = "";
+
+			// datetime
+			$this->datetime->ViewValue = $this->datetime->CurrentValue;
+			$this->datetime->ViewCustomAttributes = "";
 
 			// server_id_mysqladmin
 			if (strval($this->server_id_mysqladmin->CurrentValue) <> "") {
@@ -425,7 +433,7 @@ class clistandstart_task_delete extends clistandstart_task {
 			// HOSTNAME
 			if (strval($this->HOSTNAME->CurrentValue) <> "") {
 				$sFilterWrk = "`server_hostname`" . ew_SearchString("=", $this->HOSTNAME->CurrentValue, EW_DATATYPE_STRING);
-			$sSqlWrk = "SELECT `server_hostname`, `server_hostname` AS `DispFld`, '' AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld` FROM `server`";
+			$sSqlWrk = "SELECT `server_hostname`, `server_name` AS `DispFld`, '' AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld` FROM `server`";
 			$sWhereWrk = "";
 			if ($sFilterWrk <> "") {
 				ew_AddFilter($sWhereWrk, $sFilterWrk);
@@ -446,26 +454,28 @@ class clistandstart_task_delete extends clistandstart_task {
 			}
 			$this->HOSTNAME->ViewCustomAttributes = "";
 
-			// PASSWORD
-			$this->PASSWORD->ViewValue = "********";
-			$this->PASSWORD->ViewCustomAttributes = "";
-
 			// DBUSERNAME
 			$this->DBUSERNAME->ViewValue = $this->DBUSERNAME->CurrentValue;
 			$this->DBUSERNAME->ViewCustomAttributes = "";
 
-			// datetime
-			$this->datetime->ViewValue = $this->datetime->CurrentValue;
-			$this->datetime->ViewCustomAttributes = "";
-
-			// username
-			$this->username->ViewValue = $this->username->CurrentValue;
-			$this->username->ViewCustomAttributes = "";
+			// PASSWORD
+			$this->PASSWORD->ViewValue = $this->PASSWORD->CurrentValue;
+			$this->PASSWORD->ViewCustomAttributes = "";
 
 			// id
 			$this->id->LinkCustomAttributes = "";
 			$this->id->HrefValue = "";
 			$this->id->TooltipValue = "";
+
+			// username
+			$this->username->LinkCustomAttributes = "";
+			$this->username->HrefValue = "";
+			$this->username->TooltipValue = "";
+
+			// datetime
+			$this->datetime->LinkCustomAttributes = "";
+			$this->datetime->HrefValue = "";
+			$this->datetime->TooltipValue = "";
 
 			// server_id_mysqladmin
 			$this->server_id_mysqladmin->LinkCustomAttributes = "";
@@ -477,25 +487,15 @@ class clistandstart_task_delete extends clistandstart_task {
 			$this->HOSTNAME->HrefValue = "";
 			$this->HOSTNAME->TooltipValue = "";
 
-			// PASSWORD
-			$this->PASSWORD->LinkCustomAttributes = "";
-			$this->PASSWORD->HrefValue = "";
-			$this->PASSWORD->TooltipValue = "";
-
 			// DBUSERNAME
 			$this->DBUSERNAME->LinkCustomAttributes = "";
 			$this->DBUSERNAME->HrefValue = "";
 			$this->DBUSERNAME->TooltipValue = "";
 
-			// datetime
-			$this->datetime->LinkCustomAttributes = "";
-			$this->datetime->HrefValue = "";
-			$this->datetime->TooltipValue = "";
-
-			// username
-			$this->username->LinkCustomAttributes = "";
-			$this->username->HrefValue = "";
-			$this->username->TooltipValue = "";
+			// PASSWORD
+			$this->PASSWORD->LinkCustomAttributes = "";
+			$this->PASSWORD->HrefValue = "";
+			$this->PASSWORD->TooltipValue = "";
 		}
 
 		// Call Row Rendered event
@@ -590,7 +590,7 @@ class clistandstart_task_delete extends clistandstart_task {
 		global $Breadcrumb, $Language;
 		$Breadcrumb = new cBreadcrumb();
 		$PageCaption = $this->TableCaption();
-		$Breadcrumb->Add("list", "<span id=\"ewPageCaption\">" . $PageCaption . "</span>", "listandstart_tasklist.php", $this->TableVar);
+		$Breadcrumb->Add("list", "<span id=\"ewPageCaption\">" . $PageCaption . "</span>", "list_tasklist.php", $this->TableVar);
 		$PageCaption = $Language->Phrase("delete");
 		$Breadcrumb->Add("delete", "<span id=\"ewPageCaption\">" . $PageCaption . "</span>", ew_CurrentUrl(), $this->TableVar);
 	}
@@ -660,33 +660,33 @@ class clistandstart_task_delete extends clistandstart_task {
 <?php
 
 // Create page object
-if (!isset($listandstart_task_delete)) $listandstart_task_delete = new clistandstart_task_delete();
+if (!isset($list_task_delete)) $list_task_delete = new clist_task_delete();
 
 // Page init
-$listandstart_task_delete->Page_Init();
+$list_task_delete->Page_Init();
 
 // Page main
-$listandstart_task_delete->Page_Main();
+$list_task_delete->Page_Main();
 
 // Global Page Rendering event (in userfn*.php)
 Page_Rendering();
 
 // Page Rendering event
-$listandstart_task_delete->Page_Render();
+$list_task_delete->Page_Render();
 ?>
 <?php include_once "header.php" ?>
 <script type="text/javascript">
 
 // Page object
-var listandstart_task_delete = new ew_Page("listandstart_task_delete");
-listandstart_task_delete.PageID = "delete"; // Page ID
-var EW_PAGE_ID = listandstart_task_delete.PageID; // For backward compatibility
+var list_task_delete = new ew_Page("list_task_delete");
+list_task_delete.PageID = "delete"; // Page ID
+var EW_PAGE_ID = list_task_delete.PageID; // For backward compatibility
 
 // Form object
-var flistandstart_taskdelete = new ew_Form("flistandstart_taskdelete");
+var flist_taskdelete = new ew_Form("flist_taskdelete");
 
 // Form_CustomValidate event
-flistandstart_taskdelete.Form_CustomValidate = 
+flist_taskdelete.Form_CustomValidate = 
  function(fobj) { // DO NOT CHANGE THIS LINE!
 
  	// Your custom validation code here, return false if invalid. 
@@ -695,14 +695,14 @@ flistandstart_taskdelete.Form_CustomValidate =
 
 // Use JavaScript validation or not
 <?php if (EW_CLIENT_VALIDATE) { ?>
-flistandstart_taskdelete.ValidateRequired = true;
+flist_taskdelete.ValidateRequired = true;
 <?php } else { ?>
-flistandstart_taskdelete.ValidateRequired = false; 
+flist_taskdelete.ValidateRequired = false; 
 <?php } ?>
 
 // Dynamic selection lists
-flistandstart_taskdelete.Lists["x_server_id_mysqladmin"] = {"LinkField":"x_server_id","Ajax":true,"AutoFill":false,"DisplayFields":["x_server_name","","",""],"ParentFields":[],"FilterFields":[],"Options":[]};
-flistandstart_taskdelete.Lists["x_HOSTNAME"] = {"LinkField":"x_server_hostname","Ajax":true,"AutoFill":false,"DisplayFields":["x_server_hostname","","",""],"ParentFields":[],"FilterFields":[],"Options":[]};
+flist_taskdelete.Lists["x_server_id_mysqladmin"] = {"LinkField":"x_server_id","Ajax":true,"AutoFill":false,"DisplayFields":["x_server_name","","",""],"ParentFields":[],"FilterFields":[],"Options":[]};
+flist_taskdelete.Lists["x_HOSTNAME"] = {"LinkField":"x_server_hostname","Ajax":true,"AutoFill":false,"DisplayFields":["x_server_name","","",""],"ParentFields":[],"FilterFields":[],"Options":[]};
 
 // Form object for search
 </script>
@@ -713,135 +713,135 @@ flistandstart_taskdelete.Lists["x_HOSTNAME"] = {"LinkField":"x_server_hostname",
 <?php
 
 // Load records for display
-if ($listandstart_task_delete->Recordset = $listandstart_task_delete->LoadRecordset())
-	$listandstart_task_deleteTotalRecs = $listandstart_task_delete->Recordset->RecordCount(); // Get record count
-if ($listandstart_task_deleteTotalRecs <= 0) { // No record found, exit
-	if ($listandstart_task_delete->Recordset)
-		$listandstart_task_delete->Recordset->Close();
-	$listandstart_task_delete->Page_Terminate("listandstart_tasklist.php"); // Return to list
+if ($list_task_delete->Recordset = $list_task_delete->LoadRecordset())
+	$list_task_deleteTotalRecs = $list_task_delete->Recordset->RecordCount(); // Get record count
+if ($list_task_deleteTotalRecs <= 0) { // No record found, exit
+	if ($list_task_delete->Recordset)
+		$list_task_delete->Recordset->Close();
+	$list_task_delete->Page_Terminate("list_tasklist.php"); // Return to list
 }
 ?>
 <?php $Breadcrumb->Render(); ?>
-<?php $listandstart_task_delete->ShowPageHeader(); ?>
+<?php $list_task_delete->ShowPageHeader(); ?>
 <?php
-$listandstart_task_delete->ShowMessage();
+$list_task_delete->ShowMessage();
 ?>
-<form name="flistandstart_taskdelete" id="flistandstart_taskdelete" class="ewForm form-horizontal" action="<?php echo ew_CurrentPage() ?>" method="post">
-<input type="hidden" name="t" value="listandstart_task">
+<form name="flist_taskdelete" id="flist_taskdelete" class="ewForm form-horizontal" action="<?php echo ew_CurrentPage() ?>" method="post">
+<input type="hidden" name="t" value="list_task">
 <input type="hidden" name="a_delete" id="a_delete" value="D">
-<?php foreach ($listandstart_task_delete->RecKeys as $key) { ?>
+<?php foreach ($list_task_delete->RecKeys as $key) { ?>
 <?php $keyvalue = is_array($key) ? implode($EW_COMPOSITE_KEY_SEPARATOR, $key) : $key; ?>
 <input type="hidden" name="key_m[]" value="<?php echo ew_HtmlEncode($keyvalue) ?>">
 <?php } ?>
 <table cellspacing="0" class="ewGrid"><tr><td class="ewGridContent">
 <div class="ewGridMiddlePanel">
-<table id="tbl_listandstart_taskdelete" class="ewTable ewTableSeparate">
-<?php echo $listandstart_task->TableCustomInnerHtml ?>
+<table id="tbl_list_taskdelete" class="ewTable ewTableSeparate">
+<?php echo $list_task->TableCustomInnerHtml ?>
 	<thead>
 	<tr class="ewTableHeader">
-<?php if ($listandstart_task->id->Visible) { // id ?>
-		<td><span id="elh_listandstart_task_id" class="listandstart_task_id"><?php echo $listandstart_task->id->FldCaption() ?></span></td>
+<?php if ($list_task->id->Visible) { // id ?>
+		<td><span id="elh_list_task_id" class="list_task_id"><?php echo $list_task->id->FldCaption() ?></span></td>
 <?php } ?>
-<?php if ($listandstart_task->server_id_mysqladmin->Visible) { // server_id_mysqladmin ?>
-		<td><span id="elh_listandstart_task_server_id_mysqladmin" class="listandstart_task_server_id_mysqladmin"><?php echo $listandstart_task->server_id_mysqladmin->FldCaption() ?></span></td>
+<?php if ($list_task->username->Visible) { // username ?>
+		<td><span id="elh_list_task_username" class="list_task_username"><?php echo $list_task->username->FldCaption() ?></span></td>
 <?php } ?>
-<?php if ($listandstart_task->HOSTNAME->Visible) { // HOSTNAME ?>
-		<td><span id="elh_listandstart_task_HOSTNAME" class="listandstart_task_HOSTNAME"><?php echo $listandstart_task->HOSTNAME->FldCaption() ?></span></td>
+<?php if ($list_task->datetime->Visible) { // datetime ?>
+		<td><span id="elh_list_task_datetime" class="list_task_datetime"><?php echo $list_task->datetime->FldCaption() ?></span></td>
 <?php } ?>
-<?php if ($listandstart_task->PASSWORD->Visible) { // PASSWORD ?>
-		<td><span id="elh_listandstart_task_PASSWORD" class="listandstart_task_PASSWORD"><?php echo $listandstart_task->PASSWORD->FldCaption() ?></span></td>
+<?php if ($list_task->server_id_mysqladmin->Visible) { // server_id_mysqladmin ?>
+		<td><span id="elh_list_task_server_id_mysqladmin" class="list_task_server_id_mysqladmin"><?php echo $list_task->server_id_mysqladmin->FldCaption() ?></span></td>
 <?php } ?>
-<?php if ($listandstart_task->DBUSERNAME->Visible) { // DBUSERNAME ?>
-		<td><span id="elh_listandstart_task_DBUSERNAME" class="listandstart_task_DBUSERNAME"><?php echo $listandstart_task->DBUSERNAME->FldCaption() ?></span></td>
+<?php if ($list_task->HOSTNAME->Visible) { // HOSTNAME ?>
+		<td><span id="elh_list_task_HOSTNAME" class="list_task_HOSTNAME"><?php echo $list_task->HOSTNAME->FldCaption() ?></span></td>
 <?php } ?>
-<?php if ($listandstart_task->datetime->Visible) { // datetime ?>
-		<td><span id="elh_listandstart_task_datetime" class="listandstart_task_datetime"><?php echo $listandstart_task->datetime->FldCaption() ?></span></td>
+<?php if ($list_task->DBUSERNAME->Visible) { // DBUSERNAME ?>
+		<td><span id="elh_list_task_DBUSERNAME" class="list_task_DBUSERNAME"><?php echo $list_task->DBUSERNAME->FldCaption() ?></span></td>
 <?php } ?>
-<?php if ($listandstart_task->username->Visible) { // username ?>
-		<td><span id="elh_listandstart_task_username" class="listandstart_task_username"><?php echo $listandstart_task->username->FldCaption() ?></span></td>
+<?php if ($list_task->PASSWORD->Visible) { // PASSWORD ?>
+		<td><span id="elh_list_task_PASSWORD" class="list_task_PASSWORD"><?php echo $list_task->PASSWORD->FldCaption() ?></span></td>
 <?php } ?>
 	</tr>
 	</thead>
 	<tbody>
 <?php
-$listandstart_task_delete->RecCnt = 0;
+$list_task_delete->RecCnt = 0;
 $i = 0;
-while (!$listandstart_task_delete->Recordset->EOF) {
-	$listandstart_task_delete->RecCnt++;
-	$listandstart_task_delete->RowCnt++;
+while (!$list_task_delete->Recordset->EOF) {
+	$list_task_delete->RecCnt++;
+	$list_task_delete->RowCnt++;
 
 	// Set row properties
-	$listandstart_task->ResetAttrs();
-	$listandstart_task->RowType = EW_ROWTYPE_VIEW; // View
+	$list_task->ResetAttrs();
+	$list_task->RowType = EW_ROWTYPE_VIEW; // View
 
 	// Get the field contents
-	$listandstart_task_delete->LoadRowValues($listandstart_task_delete->Recordset);
+	$list_task_delete->LoadRowValues($list_task_delete->Recordset);
 
 	// Render row
-	$listandstart_task_delete->RenderRow();
+	$list_task_delete->RenderRow();
 ?>
-	<tr<?php echo $listandstart_task->RowAttributes() ?>>
-<?php if ($listandstart_task->id->Visible) { // id ?>
-		<td<?php echo $listandstart_task->id->CellAttributes() ?>>
-<span id="el<?php echo $listandstart_task_delete->RowCnt ?>_listandstart_task_id" class="control-group listandstart_task_id">
-<span<?php echo $listandstart_task->id->ViewAttributes() ?>>
-<?php echo $listandstart_task->id->ListViewValue() ?></span>
+	<tr<?php echo $list_task->RowAttributes() ?>>
+<?php if ($list_task->id->Visible) { // id ?>
+		<td<?php echo $list_task->id->CellAttributes() ?>>
+<span id="el<?php echo $list_task_delete->RowCnt ?>_list_task_id" class="control-group list_task_id">
+<span<?php echo $list_task->id->ViewAttributes() ?>>
+<?php echo $list_task->id->ListViewValue() ?></span>
 </span>
 </td>
 <?php } ?>
-<?php if ($listandstart_task->server_id_mysqladmin->Visible) { // server_id_mysqladmin ?>
-		<td<?php echo $listandstart_task->server_id_mysqladmin->CellAttributes() ?>>
-<span id="el<?php echo $listandstart_task_delete->RowCnt ?>_listandstart_task_server_id_mysqladmin" class="control-group listandstart_task_server_id_mysqladmin">
-<span<?php echo $listandstart_task->server_id_mysqladmin->ViewAttributes() ?>>
-<?php echo $listandstart_task->server_id_mysqladmin->ListViewValue() ?></span>
+<?php if ($list_task->username->Visible) { // username ?>
+		<td<?php echo $list_task->username->CellAttributes() ?>>
+<span id="el<?php echo $list_task_delete->RowCnt ?>_list_task_username" class="control-group list_task_username">
+<span<?php echo $list_task->username->ViewAttributes() ?>>
+<?php echo $list_task->username->ListViewValue() ?></span>
 </span>
 </td>
 <?php } ?>
-<?php if ($listandstart_task->HOSTNAME->Visible) { // HOSTNAME ?>
-		<td<?php echo $listandstart_task->HOSTNAME->CellAttributes() ?>>
-<span id="el<?php echo $listandstart_task_delete->RowCnt ?>_listandstart_task_HOSTNAME" class="control-group listandstart_task_HOSTNAME">
-<span<?php echo $listandstart_task->HOSTNAME->ViewAttributes() ?>>
-<?php echo $listandstart_task->HOSTNAME->ListViewValue() ?></span>
+<?php if ($list_task->datetime->Visible) { // datetime ?>
+		<td<?php echo $list_task->datetime->CellAttributes() ?>>
+<span id="el<?php echo $list_task_delete->RowCnt ?>_list_task_datetime" class="control-group list_task_datetime">
+<span<?php echo $list_task->datetime->ViewAttributes() ?>>
+<?php echo $list_task->datetime->ListViewValue() ?></span>
 </span>
 </td>
 <?php } ?>
-<?php if ($listandstart_task->PASSWORD->Visible) { // PASSWORD ?>
-		<td<?php echo $listandstart_task->PASSWORD->CellAttributes() ?>>
-<span id="el<?php echo $listandstart_task_delete->RowCnt ?>_listandstart_task_PASSWORD" class="control-group listandstart_task_PASSWORD">
-<span<?php echo $listandstart_task->PASSWORD->ViewAttributes() ?>>
-<?php echo $listandstart_task->PASSWORD->ListViewValue() ?></span>
+<?php if ($list_task->server_id_mysqladmin->Visible) { // server_id_mysqladmin ?>
+		<td<?php echo $list_task->server_id_mysqladmin->CellAttributes() ?>>
+<span id="el<?php echo $list_task_delete->RowCnt ?>_list_task_server_id_mysqladmin" class="control-group list_task_server_id_mysqladmin">
+<span<?php echo $list_task->server_id_mysqladmin->ViewAttributes() ?>>
+<?php echo $list_task->server_id_mysqladmin->ListViewValue() ?></span>
 </span>
 </td>
 <?php } ?>
-<?php if ($listandstart_task->DBUSERNAME->Visible) { // DBUSERNAME ?>
-		<td<?php echo $listandstart_task->DBUSERNAME->CellAttributes() ?>>
-<span id="el<?php echo $listandstart_task_delete->RowCnt ?>_listandstart_task_DBUSERNAME" class="control-group listandstart_task_DBUSERNAME">
-<span<?php echo $listandstart_task->DBUSERNAME->ViewAttributes() ?>>
-<?php echo $listandstart_task->DBUSERNAME->ListViewValue() ?></span>
+<?php if ($list_task->HOSTNAME->Visible) { // HOSTNAME ?>
+		<td<?php echo $list_task->HOSTNAME->CellAttributes() ?>>
+<span id="el<?php echo $list_task_delete->RowCnt ?>_list_task_HOSTNAME" class="control-group list_task_HOSTNAME">
+<span<?php echo $list_task->HOSTNAME->ViewAttributes() ?>>
+<?php echo $list_task->HOSTNAME->ListViewValue() ?></span>
 </span>
 </td>
 <?php } ?>
-<?php if ($listandstart_task->datetime->Visible) { // datetime ?>
-		<td<?php echo $listandstart_task->datetime->CellAttributes() ?>>
-<span id="el<?php echo $listandstart_task_delete->RowCnt ?>_listandstart_task_datetime" class="control-group listandstart_task_datetime">
-<span<?php echo $listandstart_task->datetime->ViewAttributes() ?>>
-<?php echo $listandstart_task->datetime->ListViewValue() ?></span>
+<?php if ($list_task->DBUSERNAME->Visible) { // DBUSERNAME ?>
+		<td<?php echo $list_task->DBUSERNAME->CellAttributes() ?>>
+<span id="el<?php echo $list_task_delete->RowCnt ?>_list_task_DBUSERNAME" class="control-group list_task_DBUSERNAME">
+<span<?php echo $list_task->DBUSERNAME->ViewAttributes() ?>>
+<?php echo $list_task->DBUSERNAME->ListViewValue() ?></span>
 </span>
 </td>
 <?php } ?>
-<?php if ($listandstart_task->username->Visible) { // username ?>
-		<td<?php echo $listandstart_task->username->CellAttributes() ?>>
-<span id="el<?php echo $listandstart_task_delete->RowCnt ?>_listandstart_task_username" class="control-group listandstart_task_username">
-<span<?php echo $listandstart_task->username->ViewAttributes() ?>>
-<?php echo $listandstart_task->username->ListViewValue() ?></span>
+<?php if ($list_task->PASSWORD->Visible) { // PASSWORD ?>
+		<td<?php echo $list_task->PASSWORD->CellAttributes() ?>>
+<span id="el<?php echo $list_task_delete->RowCnt ?>_list_task_PASSWORD" class="control-group list_task_PASSWORD">
+<span<?php echo $list_task->PASSWORD->ViewAttributes() ?>>
+<?php echo $list_task->PASSWORD->ListViewValue() ?></span>
 </span>
 </td>
 <?php } ?>
 	</tr>
 <?php
-	$listandstart_task_delete->Recordset->MoveNext();
+	$list_task_delete->Recordset->MoveNext();
 }
-$listandstart_task_delete->Recordset->Close();
+$list_task_delete->Recordset->Close();
 ?>
 </tbody>
 </table>
@@ -852,10 +852,10 @@ $listandstart_task_delete->Recordset->Close();
 </div>
 </form>
 <script type="text/javascript">
-flistandstart_taskdelete.Init();
+flist_taskdelete.Init();
 </script>
 <?php
-$listandstart_task_delete->ShowPageFooter();
+$list_task_delete->ShowPageFooter();
 if (EW_DEBUG_ENABLED)
 	echo ew_DebugMsg();
 ?>
@@ -867,5 +867,5 @@ if (EW_DEBUG_ENABLED)
 </script>
 <?php include_once "footer.php" ?>
 <?php
-$listandstart_task_delete->Page_Terminate();
+$list_task_delete->Page_Terminate();
 ?>

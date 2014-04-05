@@ -11,8 +11,8 @@ class clistandstart_task extends cTable {
 	var $server_id_mysqladmin;
 	var $HOSTNAME;
 	var $PASSWORD;
-	var $datetime;
 	var $DBUSERNAME;
+	var $datetime;
 	var $username;
 
 	//
@@ -56,13 +56,13 @@ class clistandstart_task extends cTable {
 		$this->PASSWORD = new cField('listandstart_task', 'listandstart_task', 'x_PASSWORD', 'PASSWORD', '`PASSWORD`', '`PASSWORD`', 200, -1, FALSE, '`PASSWORD`', FALSE, FALSE, FALSE, 'FORMATTED TEXT');
 		$this->fields['PASSWORD'] = &$this->PASSWORD;
 
-		// datetime
-		$this->datetime = new cField('listandstart_task', 'listandstart_task', 'x_datetime', 'datetime', '`datetime`', 'DATE_FORMAT(`datetime`, \'%d/%m/%Y %H:%i:%s\')', 135, -1, FALSE, '`datetime`', FALSE, FALSE, FALSE, 'FORMATTED TEXT');
-		$this->fields['datetime'] = &$this->datetime;
-
 		// DBUSERNAME
 		$this->DBUSERNAME = new cField('listandstart_task', 'listandstart_task', 'x_DBUSERNAME', 'DBUSERNAME', '`DBUSERNAME`', '`DBUSERNAME`', 200, -1, FALSE, '`DBUSERNAME`', FALSE, FALSE, FALSE, 'FORMATTED TEXT');
 		$this->fields['DBUSERNAME'] = &$this->DBUSERNAME;
+
+		// datetime
+		$this->datetime = new cField('listandstart_task', 'listandstart_task', 'x_datetime', 'datetime', '`datetime`', 'DATE_FORMAT(`datetime`, \'%d/%m/%Y %H:%i:%s\')', 135, -1, FALSE, '`datetime`', FALSE, FALSE, FALSE, 'FORMATTED TEXT');
+		$this->fields['datetime'] = &$this->datetime;
 
 		// username
 		$this->username = new cField('listandstart_task', 'listandstart_task', 'x_username', 'username', '`username`', '`username`', 200, -1, FALSE, '`username`', FALSE, FALSE, FALSE, 'FORMATTED TEXT');
@@ -489,8 +489,8 @@ class clistandstart_task extends cTable {
 		$this->server_id_mysqladmin->setDbValue($rs->fields('server_id_mysqladmin'));
 		$this->HOSTNAME->setDbValue($rs->fields('HOSTNAME'));
 		$this->PASSWORD->setDbValue($rs->fields('PASSWORD'));
-		$this->datetime->setDbValue($rs->fields('datetime'));
 		$this->DBUSERNAME->setDbValue($rs->fields('DBUSERNAME'));
+		$this->datetime->setDbValue($rs->fields('datetime'));
 		$this->username->setDbValue($rs->fields('username'));
 	}
 
@@ -506,8 +506,8 @@ class clistandstart_task extends cTable {
 		// server_id_mysqladmin
 		// HOSTNAME
 		// PASSWORD
-		// datetime
 		// DBUSERNAME
+		// datetime
 		// username
 		// id
 
@@ -541,7 +541,7 @@ class clistandstart_task extends cTable {
 		// HOSTNAME
 		if (strval($this->HOSTNAME->CurrentValue) <> "") {
 			$sFilterWrk = "`server_hostname`" . ew_SearchString("=", $this->HOSTNAME->CurrentValue, EW_DATATYPE_STRING);
-		$sSqlWrk = "SELECT `server_hostname`, `server_name` AS `DispFld`, '' AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld` FROM `server`";
+		$sSqlWrk = "SELECT `server_hostname`, `server_hostname` AS `DispFld`, '' AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld` FROM `server`";
 		$sWhereWrk = "";
 		if ($sFilterWrk <> "") {
 			ew_AddFilter($sWhereWrk, $sFilterWrk);
@@ -566,13 +566,13 @@ class clistandstart_task extends cTable {
 		$this->PASSWORD->ViewValue = "********";
 		$this->PASSWORD->ViewCustomAttributes = "";
 
-		// datetime
-		$this->datetime->ViewValue = $this->datetime->CurrentValue;
-		$this->datetime->ViewCustomAttributes = "";
-
 		// DBUSERNAME
 		$this->DBUSERNAME->ViewValue = $this->DBUSERNAME->CurrentValue;
 		$this->DBUSERNAME->ViewCustomAttributes = "";
+
+		// datetime
+		$this->datetime->ViewValue = $this->datetime->CurrentValue;
+		$this->datetime->ViewCustomAttributes = "";
 
 		// username
 		$this->username->ViewValue = $this->username->CurrentValue;
@@ -598,15 +598,15 @@ class clistandstart_task extends cTable {
 		$this->PASSWORD->HrefValue = "";
 		$this->PASSWORD->TooltipValue = "";
 
-		// datetime
-		$this->datetime->LinkCustomAttributes = "";
-		$this->datetime->HrefValue = "";
-		$this->datetime->TooltipValue = "";
-
 		// DBUSERNAME
 		$this->DBUSERNAME->LinkCustomAttributes = "";
 		$this->DBUSERNAME->HrefValue = "";
 		$this->DBUSERNAME->TooltipValue = "";
+
+		// datetime
+		$this->datetime->LinkCustomAttributes = "";
+		$this->datetime->HrefValue = "";
+		$this->datetime->TooltipValue = "";
 
 		// username
 		$this->username->LinkCustomAttributes = "";
@@ -639,16 +639,16 @@ class clistandstart_task extends cTable {
 				if ($this->server_id_mysqladmin->Exportable) $Doc->ExportCaption($this->server_id_mysqladmin);
 				if ($this->HOSTNAME->Exportable) $Doc->ExportCaption($this->HOSTNAME);
 				if ($this->PASSWORD->Exportable) $Doc->ExportCaption($this->PASSWORD);
-				if ($this->datetime->Exportable) $Doc->ExportCaption($this->datetime);
 				if ($this->DBUSERNAME->Exportable) $Doc->ExportCaption($this->DBUSERNAME);
+				if ($this->datetime->Exportable) $Doc->ExportCaption($this->datetime);
 				if ($this->username->Exportable) $Doc->ExportCaption($this->username);
 			} else {
 				if ($this->id->Exportable) $Doc->ExportCaption($this->id);
 				if ($this->server_id_mysqladmin->Exportable) $Doc->ExportCaption($this->server_id_mysqladmin);
 				if ($this->HOSTNAME->Exportable) $Doc->ExportCaption($this->HOSTNAME);
 				if ($this->PASSWORD->Exportable) $Doc->ExportCaption($this->PASSWORD);
-				if ($this->datetime->Exportable) $Doc->ExportCaption($this->datetime);
 				if ($this->DBUSERNAME->Exportable) $Doc->ExportCaption($this->DBUSERNAME);
+				if ($this->datetime->Exportable) $Doc->ExportCaption($this->datetime);
 				if ($this->username->Exportable) $Doc->ExportCaption($this->username);
 			}
 			$Doc->EndExportRow();
@@ -683,16 +683,16 @@ class clistandstart_task extends cTable {
 					if ($this->server_id_mysqladmin->Exportable) $Doc->ExportField($this->server_id_mysqladmin);
 					if ($this->HOSTNAME->Exportable) $Doc->ExportField($this->HOSTNAME);
 					if ($this->PASSWORD->Exportable) $Doc->ExportField($this->PASSWORD);
-					if ($this->datetime->Exportable) $Doc->ExportField($this->datetime);
 					if ($this->DBUSERNAME->Exportable) $Doc->ExportField($this->DBUSERNAME);
+					if ($this->datetime->Exportable) $Doc->ExportField($this->datetime);
 					if ($this->username->Exportable) $Doc->ExportField($this->username);
 				} else {
 					if ($this->id->Exportable) $Doc->ExportField($this->id);
 					if ($this->server_id_mysqladmin->Exportable) $Doc->ExportField($this->server_id_mysqladmin);
 					if ($this->HOSTNAME->Exportable) $Doc->ExportField($this->HOSTNAME);
 					if ($this->PASSWORD->Exportable) $Doc->ExportField($this->PASSWORD);
-					if ($this->datetime->Exportable) $Doc->ExportField($this->datetime);
 					if ($this->DBUSERNAME->Exportable) $Doc->ExportField($this->DBUSERNAME);
+					if ($this->datetime->Exportable) $Doc->ExportField($this->datetime);
 					if ($this->username->Exportable) $Doc->ExportField($this->username);
 				}
 				$Doc->EndExportRow();
@@ -754,14 +754,14 @@ class clistandstart_task extends cTable {
 	function Row_Inserted($rsold, &$rsnew) {
 
 		//echo "Row Inserted"       
-		$parameters = array(
+	 $parameters = array(
 	'server_id_mysqladmin'=>$rsnew["server_id_mysqladmin"],
 	'HOSTNAME'=>$rsnew["HOSTNAME"],
-	'USERNAME'=>$rsnew["USERNAME"],
+	'DBUSERNAME'=>$rsnew["DBUSERNAME"],
 	'PASSWORD'=>$rsnew["PASSWORD"],
 	);
 	add_cron_task("listandstart",$parameters);
-	}
+	}           
 
 	// Row Updating event
 	function Row_Updating($rsold, &$rsnew) {

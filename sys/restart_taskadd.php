@@ -545,15 +545,7 @@ class crestart_task_add extends crestart_task {
 			$this->server_id_mysqladmin->EditValue = $arwrk;
 
 			// username
-			$this->username->EditCustomAttributes = "";
-			$this->username->EditValue = ew_HtmlEncode($this->username->CurrentValue);
-			$this->username->PlaceHolder = ew_HtmlEncode(ew_RemoveHtml($this->username->FldCaption()));
-
 			// datetime
-			$this->datetime->EditCustomAttributes = "";
-			$this->datetime->EditValue = ew_HtmlEncode($this->datetime->CurrentValue);
-			$this->datetime->PlaceHolder = ew_HtmlEncode(ew_RemoveHtml($this->datetime->FldCaption()));
-
 			// Edit refer script
 			// server_id_mysqladmin
 
@@ -589,12 +581,6 @@ class crestart_task_add extends crestart_task {
 		if (!$this->server_id_mysqladmin->FldIsDetailKey && !is_null($this->server_id_mysqladmin->FormValue) && $this->server_id_mysqladmin->FormValue == "") {
 			ew_AddMessage($gsFormError, $Language->Phrase("EnterRequiredField") . " - " . $this->server_id_mysqladmin->FldCaption());
 		}
-		if (!$this->username->FldIsDetailKey && !is_null($this->username->FormValue) && $this->username->FormValue == "") {
-			ew_AddMessage($gsFormError, $Language->Phrase("EnterRequiredField") . " - " . $this->username->FldCaption());
-		}
-		if (!$this->datetime->FldIsDetailKey && !is_null($this->datetime->FormValue) && $this->datetime->FormValue == "") {
-			ew_AddMessage($gsFormError, $Language->Phrase("EnterRequiredField") . " - " . $this->datetime->FldCaption());
-		}
 
 		// Return validate result
 		$ValidateForm = ($gsFormError == "");
@@ -622,10 +608,12 @@ class crestart_task_add extends crestart_task {
 		$this->server_id_mysqladmin->SetDbValueDef($rsnew, $this->server_id_mysqladmin->CurrentValue, "", FALSE);
 
 		// username
-		$this->username->SetDbValueDef($rsnew, $this->username->CurrentValue, "", FALSE);
+		$this->username->SetDbValueDef($rsnew, CurrentUserName(), "");
+		$rsnew['username'] = &$this->username->DbValue;
 
 		// datetime
-		$this->datetime->SetDbValueDef($rsnew, $this->datetime->CurrentValue, ew_CurrentDate(), FALSE);
+		$this->datetime->SetDbValueDef($rsnew, ew_CurrentDateTime(), ew_CurrentDate());
+		$rsnew['datetime'] = &$this->datetime->DbValue;
 
 		// Call Row Inserting event
 		$rs = ($rsold == NULL) ? NULL : $rsold->fields;
@@ -789,12 +777,6 @@ frestart_taskadd.Validate = function() {
 			elm = this.GetElements("x" + infix + "_server_id_mysqladmin");
 			if (elm && !ew_HasValue(elm))
 				return this.OnError(elm, ewLanguage.Phrase("EnterRequiredField") + " - <?php echo ew_JsEncode2($restart_task->server_id_mysqladmin->FldCaption()) ?>");
-			elm = this.GetElements("x" + infix + "_username");
-			if (elm && !ew_HasValue(elm))
-				return this.OnError(elm, ewLanguage.Phrase("EnterRequiredField") + " - <?php echo ew_JsEncode2($restart_task->username->FldCaption()) ?>");
-			elm = this.GetElements("x" + infix + "_datetime");
-			if (elm && !ew_HasValue(elm))
-				return this.OnError(elm, ewLanguage.Phrase("EnterRequiredField") + " - <?php echo ew_JsEncode2($restart_task->datetime->FldCaption()) ?>");
 
 			// Set up row object
 			ew_ElementsToRow(fobj);
@@ -883,26 +865,6 @@ if ($sWhereWrk <> "") $sSqlWrk .= " WHERE " . $sWhereWrk;
 <input type="hidden" name="s_x_server_id_mysqladmin" id="s_x_server_id_mysqladmin" value="s=<?php echo ew_Encrypt($sSqlWrk) ?>&f0=<?php echo ew_Encrypt("`server_id` = {filter_value}"); ?>&t0=3">
 </span>
 <?php echo $restart_task->server_id_mysqladmin->CustomMsg ?></td>
-	</tr>
-<?php } ?>
-<?php if ($restart_task->username->Visible) { // username ?>
-	<tr id="r_username">
-		<td><span id="elh_restart_task_username"><?php echo $restart_task->username->FldCaption() ?><?php echo $Language->Phrase("FieldRequiredIndicator") ?></span></td>
-		<td<?php echo $restart_task->username->CellAttributes() ?>>
-<span id="el_restart_task_username" class="control-group">
-<input type="text" data-field="x_username" name="x_username" id="x_username" size="30" maxlength="255" placeholder="<?php echo $restart_task->username->PlaceHolder ?>" value="<?php echo $restart_task->username->EditValue ?>"<?php echo $restart_task->username->EditAttributes() ?>>
-</span>
-<?php echo $restart_task->username->CustomMsg ?></td>
-	</tr>
-<?php } ?>
-<?php if ($restart_task->datetime->Visible) { // datetime ?>
-	<tr id="r_datetime">
-		<td><span id="elh_restart_task_datetime"><?php echo $restart_task->datetime->FldCaption() ?><?php echo $Language->Phrase("FieldRequiredIndicator") ?></span></td>
-		<td<?php echo $restart_task->datetime->CellAttributes() ?>>
-<span id="el_restart_task_datetime" class="control-group">
-<input type="text" data-field="x_datetime" name="x_datetime" id="x_datetime" placeholder="<?php echo $restart_task->datetime->PlaceHolder ?>" value="<?php echo $restart_task->datetime->EditValue ?>"<?php echo $restart_task->datetime->EditAttributes() ?>>
-</span>
-<?php echo $restart_task->datetime->CustomMsg ?></td>
 	</tr>
 <?php } ?>
 </table>

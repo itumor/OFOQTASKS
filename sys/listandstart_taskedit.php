@@ -430,15 +430,8 @@ class clistandstart_task_edit extends clistandstart_task {
 		if (!$this->PASSWORD->FldIsDetailKey) {
 			$this->PASSWORD->setFormValue($objForm->GetValue("x_PASSWORD"));
 		}
-		if (!$this->datetime->FldIsDetailKey) {
-			$this->datetime->setFormValue($objForm->GetValue("x_datetime"));
-			$this->datetime->CurrentValue = ew_UnFormatDateTime($this->datetime->CurrentValue, 0);
-		}
 		if (!$this->DBUSERNAME->FldIsDetailKey) {
 			$this->DBUSERNAME->setFormValue($objForm->GetValue("x_DBUSERNAME"));
-		}
-		if (!$this->username->FldIsDetailKey) {
-			$this->username->setFormValue($objForm->GetValue("x_username"));
 		}
 	}
 
@@ -450,10 +443,7 @@ class clistandstart_task_edit extends clistandstart_task {
 		$this->server_id_mysqladmin->CurrentValue = $this->server_id_mysqladmin->FormValue;
 		$this->HOSTNAME->CurrentValue = $this->HOSTNAME->FormValue;
 		$this->PASSWORD->CurrentValue = $this->PASSWORD->FormValue;
-		$this->datetime->CurrentValue = $this->datetime->FormValue;
-		$this->datetime->CurrentValue = ew_UnFormatDateTime($this->datetime->CurrentValue, 0);
 		$this->DBUSERNAME->CurrentValue = $this->DBUSERNAME->FormValue;
-		$this->username->CurrentValue = $this->username->FormValue;
 	}
 
 	// Load recordset
@@ -509,8 +499,8 @@ class clistandstart_task_edit extends clistandstart_task {
 		$this->server_id_mysqladmin->setDbValue($rs->fields('server_id_mysqladmin'));
 		$this->HOSTNAME->setDbValue($rs->fields('HOSTNAME'));
 		$this->PASSWORD->setDbValue($rs->fields('PASSWORD'));
-		$this->datetime->setDbValue($rs->fields('datetime'));
 		$this->DBUSERNAME->setDbValue($rs->fields('DBUSERNAME'));
+		$this->datetime->setDbValue($rs->fields('datetime'));
 		$this->username->setDbValue($rs->fields('username'));
 	}
 
@@ -522,8 +512,8 @@ class clistandstart_task_edit extends clistandstart_task {
 		$this->server_id_mysqladmin->DbValue = $row['server_id_mysqladmin'];
 		$this->HOSTNAME->DbValue = $row['HOSTNAME'];
 		$this->PASSWORD->DbValue = $row['PASSWORD'];
-		$this->datetime->DbValue = $row['datetime'];
 		$this->DBUSERNAME->DbValue = $row['DBUSERNAME'];
+		$this->datetime->DbValue = $row['datetime'];
 		$this->username->DbValue = $row['username'];
 	}
 
@@ -542,8 +532,8 @@ class clistandstart_task_edit extends clistandstart_task {
 		// server_id_mysqladmin
 		// HOSTNAME
 		// PASSWORD
-		// datetime
 		// DBUSERNAME
+		// datetime
 		// username
 
 		if ($this->RowType == EW_ROWTYPE_VIEW) { // View row
@@ -579,7 +569,7 @@ class clistandstart_task_edit extends clistandstart_task {
 			// HOSTNAME
 			if (strval($this->HOSTNAME->CurrentValue) <> "") {
 				$sFilterWrk = "`server_hostname`" . ew_SearchString("=", $this->HOSTNAME->CurrentValue, EW_DATATYPE_STRING);
-			$sSqlWrk = "SELECT `server_hostname`, `server_name` AS `DispFld`, '' AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld` FROM `server`";
+			$sSqlWrk = "SELECT `server_hostname`, `server_hostname` AS `DispFld`, '' AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld` FROM `server`";
 			$sWhereWrk = "";
 			if ($sFilterWrk <> "") {
 				ew_AddFilter($sWhereWrk, $sFilterWrk);
@@ -604,13 +594,13 @@ class clistandstart_task_edit extends clistandstart_task {
 			$this->PASSWORD->ViewValue = "********";
 			$this->PASSWORD->ViewCustomAttributes = "";
 
-			// datetime
-			$this->datetime->ViewValue = $this->datetime->CurrentValue;
-			$this->datetime->ViewCustomAttributes = "";
-
 			// DBUSERNAME
 			$this->DBUSERNAME->ViewValue = $this->DBUSERNAME->CurrentValue;
 			$this->DBUSERNAME->ViewCustomAttributes = "";
+
+			// datetime
+			$this->datetime->ViewValue = $this->datetime->CurrentValue;
+			$this->datetime->ViewCustomAttributes = "";
 
 			// username
 			$this->username->ViewValue = $this->username->CurrentValue;
@@ -636,20 +626,10 @@ class clistandstart_task_edit extends clistandstart_task {
 			$this->PASSWORD->HrefValue = "";
 			$this->PASSWORD->TooltipValue = "";
 
-			// datetime
-			$this->datetime->LinkCustomAttributes = "";
-			$this->datetime->HrefValue = "";
-			$this->datetime->TooltipValue = "";
-
 			// DBUSERNAME
 			$this->DBUSERNAME->LinkCustomAttributes = "";
 			$this->DBUSERNAME->HrefValue = "";
 			$this->DBUSERNAME->TooltipValue = "";
-
-			// username
-			$this->username->LinkCustomAttributes = "";
-			$this->username->HrefValue = "";
-			$this->username->TooltipValue = "";
 		} elseif ($this->RowType == EW_ROWTYPE_EDIT) { // Edit row
 
 			// id
@@ -686,7 +666,7 @@ class clistandstart_task_edit extends clistandstart_task {
 			} else {
 				$sFilterWrk = "`server_hostname`" . ew_SearchString("=", $this->HOSTNAME->CurrentValue, EW_DATATYPE_STRING);
 			}
-			$sSqlWrk = "SELECT `server_hostname`, `server_name` AS `DispFld`, '' AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld`, '' AS `SelectFilterFld`, '' AS `SelectFilterFld2`, '' AS `SelectFilterFld3`, '' AS `SelectFilterFld4` FROM `server`";
+			$sSqlWrk = "SELECT `server_hostname`, `server_hostname` AS `DispFld`, '' AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld`, '' AS `SelectFilterFld`, '' AS `SelectFilterFld2`, '' AS `SelectFilterFld3`, '' AS `SelectFilterFld4` FROM `server`";
 			$sWhereWrk = "";
 			if ($sFilterWrk <> "") {
 				ew_AddFilter($sWhereWrk, $sFilterWrk);
@@ -705,20 +685,10 @@ class clistandstart_task_edit extends clistandstart_task {
 			$this->PASSWORD->EditCustomAttributes = "";
 			$this->PASSWORD->EditValue = ew_HtmlEncode($this->PASSWORD->CurrentValue);
 
-			// datetime
-			$this->datetime->EditCustomAttributes = "";
-			$this->datetime->EditValue = ew_HtmlEncode($this->datetime->CurrentValue);
-			$this->datetime->PlaceHolder = ew_HtmlEncode(ew_RemoveHtml($this->datetime->FldCaption()));
-
 			// DBUSERNAME
 			$this->DBUSERNAME->EditCustomAttributes = "";
 			$this->DBUSERNAME->EditValue = ew_HtmlEncode($this->DBUSERNAME->CurrentValue);
 			$this->DBUSERNAME->PlaceHolder = ew_HtmlEncode(ew_RemoveHtml($this->DBUSERNAME->FldCaption()));
-
-			// username
-			$this->username->EditCustomAttributes = "";
-			$this->username->EditValue = ew_HtmlEncode($this->username->CurrentValue);
-			$this->username->PlaceHolder = ew_HtmlEncode(ew_RemoveHtml($this->username->FldCaption()));
 
 			// Edit refer script
 			// id
@@ -734,14 +704,8 @@ class clistandstart_task_edit extends clistandstart_task {
 			// PASSWORD
 			$this->PASSWORD->HrefValue = "";
 
-			// datetime
-			$this->datetime->HrefValue = "";
-
 			// DBUSERNAME
 			$this->DBUSERNAME->HrefValue = "";
-
-			// username
-			$this->username->HrefValue = "";
 		}
 		if ($this->RowType == EW_ROWTYPE_ADD ||
 			$this->RowType == EW_ROWTYPE_EDIT ||
@@ -773,14 +737,8 @@ class clistandstart_task_edit extends clistandstart_task {
 		if (!$this->PASSWORD->FldIsDetailKey && !is_null($this->PASSWORD->FormValue) && $this->PASSWORD->FormValue == "") {
 			ew_AddMessage($gsFormError, $Language->Phrase("EnterRequiredField") . " - " . $this->PASSWORD->FldCaption());
 		}
-		if (!$this->datetime->FldIsDetailKey && !is_null($this->datetime->FormValue) && $this->datetime->FormValue == "") {
-			ew_AddMessage($gsFormError, $Language->Phrase("EnterRequiredField") . " - " . $this->datetime->FldCaption());
-		}
 		if (!$this->DBUSERNAME->FldIsDetailKey && !is_null($this->DBUSERNAME->FormValue) && $this->DBUSERNAME->FormValue == "") {
 			ew_AddMessage($gsFormError, $Language->Phrase("EnterRequiredField") . " - " . $this->DBUSERNAME->FldCaption());
-		}
-		if (!$this->username->FldIsDetailKey && !is_null($this->username->FormValue) && $this->username->FormValue == "") {
-			ew_AddMessage($gsFormError, $Language->Phrase("EnterRequiredField") . " - " . $this->username->FldCaption());
 		}
 
 		// Return validate result
@@ -824,14 +782,8 @@ class clistandstart_task_edit extends clistandstart_task {
 			// PASSWORD
 			$this->PASSWORD->SetDbValueDef($rsnew, $this->PASSWORD->CurrentValue, "", $this->PASSWORD->ReadOnly);
 
-			// datetime
-			$this->datetime->SetDbValueDef($rsnew, $this->datetime->CurrentValue, ew_CurrentDate(), $this->datetime->ReadOnly);
-
 			// DBUSERNAME
 			$this->DBUSERNAME->SetDbValueDef($rsnew, $this->DBUSERNAME->CurrentValue, "", $this->DBUSERNAME->ReadOnly);
-
-			// username
-			$this->username->SetDbValueDef($rsnew, $this->username->CurrentValue, "", $this->username->ReadOnly);
 
 			// Call Row Updating event
 			$bUpdateRow = $this->Row_Updating($rsold, $rsnew);
@@ -997,15 +949,9 @@ flistandstart_taskedit.Validate = function() {
 			elm = this.GetElements("x" + infix + "_PASSWORD");
 			if (elm && !ew_HasValue(elm))
 				return this.OnError(elm, ewLanguage.Phrase("EnterRequiredField") + " - <?php echo ew_JsEncode2($listandstart_task->PASSWORD->FldCaption()) ?>");
-			elm = this.GetElements("x" + infix + "_datetime");
-			if (elm && !ew_HasValue(elm))
-				return this.OnError(elm, ewLanguage.Phrase("EnterRequiredField") + " - <?php echo ew_JsEncode2($listandstart_task->datetime->FldCaption()) ?>");
 			elm = this.GetElements("x" + infix + "_DBUSERNAME");
 			if (elm && !ew_HasValue(elm))
 				return this.OnError(elm, ewLanguage.Phrase("EnterRequiredField") + " - <?php echo ew_JsEncode2($listandstart_task->DBUSERNAME->FldCaption()) ?>");
-			elm = this.GetElements("x" + infix + "_username");
-			if (elm && !ew_HasValue(elm))
-				return this.OnError(elm, ewLanguage.Phrase("EnterRequiredField") + " - <?php echo ew_JsEncode2($listandstart_task->username->FldCaption()) ?>");
 
 			// Set up row object
 			ew_ElementsToRow(fobj);
@@ -1043,7 +989,7 @@ flistandstart_taskedit.ValidateRequired = false;
 
 // Dynamic selection lists
 flistandstart_taskedit.Lists["x_server_id_mysqladmin"] = {"LinkField":"x_server_id","Ajax":true,"AutoFill":false,"DisplayFields":["x_server_name","","",""],"ParentFields":[],"FilterFields":[],"Options":[]};
-flistandstart_taskedit.Lists["x_HOSTNAME"] = {"LinkField":"x_server_hostname","Ajax":true,"AutoFill":false,"DisplayFields":["x_server_name","","",""],"ParentFields":[],"FilterFields":[],"Options":[]};
+flistandstart_taskedit.Lists["x_HOSTNAME"] = {"LinkField":"x_server_hostname","Ajax":true,"AutoFill":false,"DisplayFields":["x_server_hostname","","",""],"ParentFields":[],"FilterFields":[],"Options":[]};
 
 // Form object for search
 </script>
@@ -1164,7 +1110,7 @@ if (is_array($listandstart_task->HOSTNAME->EditValue)) {
 ?>
 </select>
 <?php
-$sSqlWrk = "SELECT `server_hostname`, `server_name` AS `DispFld`, '' AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld` FROM `server`";
+$sSqlWrk = "SELECT `server_hostname`, `server_hostname` AS `DispFld`, '' AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld` FROM `server`";
 $sWhereWrk = "";
 
 // Call Lookup selecting
@@ -1186,16 +1132,6 @@ if ($sWhereWrk <> "") $sSqlWrk .= " WHERE " . $sWhereWrk;
 <?php echo $listandstart_task->PASSWORD->CustomMsg ?></td>
 	</tr>
 <?php } ?>
-<?php if ($listandstart_task->datetime->Visible) { // datetime ?>
-	<tr id="r_datetime">
-		<td><span id="elh_listandstart_task_datetime"><?php echo $listandstart_task->datetime->FldCaption() ?><?php echo $Language->Phrase("FieldRequiredIndicator") ?></span></td>
-		<td<?php echo $listandstart_task->datetime->CellAttributes() ?>>
-<span id="el_listandstart_task_datetime" class="control-group">
-<input type="text" data-field="x_datetime" name="x_datetime" id="x_datetime" placeholder="<?php echo $listandstart_task->datetime->PlaceHolder ?>" value="<?php echo $listandstart_task->datetime->EditValue ?>"<?php echo $listandstart_task->datetime->EditAttributes() ?>>
-</span>
-<?php echo $listandstart_task->datetime->CustomMsg ?></td>
-	</tr>
-<?php } ?>
 <?php if ($listandstart_task->DBUSERNAME->Visible) { // DBUSERNAME ?>
 	<tr id="r_DBUSERNAME">
 		<td><span id="elh_listandstart_task_DBUSERNAME"><?php echo $listandstart_task->DBUSERNAME->FldCaption() ?><?php echo $Language->Phrase("FieldRequiredIndicator") ?></span></td>
@@ -1204,16 +1140,6 @@ if ($sWhereWrk <> "") $sSqlWrk .= " WHERE " . $sWhereWrk;
 <input type="text" data-field="x_DBUSERNAME" name="x_DBUSERNAME" id="x_DBUSERNAME" size="30" maxlength="255" placeholder="<?php echo $listandstart_task->DBUSERNAME->PlaceHolder ?>" value="<?php echo $listandstart_task->DBUSERNAME->EditValue ?>"<?php echo $listandstart_task->DBUSERNAME->EditAttributes() ?>>
 </span>
 <?php echo $listandstart_task->DBUSERNAME->CustomMsg ?></td>
-	</tr>
-<?php } ?>
-<?php if ($listandstart_task->username->Visible) { // username ?>
-	<tr id="r_username">
-		<td><span id="elh_listandstart_task_username"><?php echo $listandstart_task->username->FldCaption() ?><?php echo $Language->Phrase("FieldRequiredIndicator") ?></span></td>
-		<td<?php echo $listandstart_task->username->CellAttributes() ?>>
-<span id="el_listandstart_task_username" class="control-group">
-<input type="text" data-field="x_username" name="x_username" id="x_username" size="30" maxlength="255" placeholder="<?php echo $listandstart_task->username->PlaceHolder ?>" value="<?php echo $listandstart_task->username->EditValue ?>"<?php echo $listandstart_task->username->EditAttributes() ?>>
-</span>
-<?php echo $listandstart_task->username->CustomMsg ?></td>
 	</tr>
 <?php } ?>
 </table>

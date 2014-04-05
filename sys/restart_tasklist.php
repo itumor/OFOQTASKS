@@ -317,6 +317,8 @@ class crestart_task_list extends crestart_task {
 		// Setup export options
 		$this->SetupExportOptions();
 		$this->id->Visible = !$this->IsAdd() && !$this->IsCopy() && !$this->IsGridAdd();
+		$this->username->Visible = !$this->IsAddOrEdit();
+		$this->datetime->Visible = !$this->IsAddOrEdit();
 
 		// Global Page Loading event (in userfn*.php)
 		Page_Loading();

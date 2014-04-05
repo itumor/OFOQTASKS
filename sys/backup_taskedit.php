@@ -412,6 +412,16 @@ class cbackup_task_edit extends cbackup_task {
 		global $objForm;
 
 		// Get upload data
+		$this->FILEPATH->Upload->Index = $objForm->Index;
+		if ($this->FILEPATH->Upload->UploadFile()) {
+
+			// No action required
+		} else {
+			echo $this->FILEPATH->Upload->Message;
+			$this->Page_Terminate();
+			exit();
+		}
+		$this->FILEPATH->CurrentValue = $this->FILEPATH->Upload->FileName;
 	}
 
 	// Load form values
@@ -419,6 +429,7 @@ class cbackup_task_edit extends cbackup_task {
 
 		// Load from form
 		global $objForm;
+		$this->GetUploadFiles(); // Get upload files
 		if (!$this->id->FldIsDetailKey)
 			$this->id->setFormValue($objForm->GetValue("x_id"));
 		if (!$this->server_id_mysqladmin->FldIsDetailKey) {
@@ -432,9 +443,6 @@ class cbackup_task_edit extends cbackup_task {
 		}
 		if (!$this->DATABASE->FldIsDetailKey) {
 			$this->DATABASE->setFormValue($objForm->GetValue("x_DATABASE"));
-		}
-		if (!$this->FILEPATH->FldIsDetailKey) {
-			$this->FILEPATH->setFormValue($objForm->GetValue("x_FILEPATH"));
 		}
 		if (!$this->FILENAME->FldIsDetailKey) {
 			$this->FILENAME->setFormValue($objForm->GetValue("x_FILENAME"));
@@ -460,7 +468,6 @@ class cbackup_task_edit extends cbackup_task {
 		$this->HOSTNAME->CurrentValue = $this->HOSTNAME->FormValue;
 		$this->PASSWORD->CurrentValue = $this->PASSWORD->FormValue;
 		$this->DATABASE->CurrentValue = $this->DATABASE->FormValue;
-		$this->FILEPATH->CurrentValue = $this->FILEPATH->FormValue;
 		$this->FILENAME->CurrentValue = $this->FILENAME->FormValue;
 		$this->datetime->CurrentValue = $this->datetime->FormValue;
 		$this->datetime->CurrentValue = ew_UnFormatDateTime($this->datetime->CurrentValue, 0);
@@ -522,7 +529,7 @@ class cbackup_task_edit extends cbackup_task {
 		$this->HOSTNAME->setDbValue($rs->fields('HOSTNAME'));
 		$this->PASSWORD->setDbValue($rs->fields('PASSWORD'));
 		$this->DATABASE->setDbValue($rs->fields('DATABASE'));
-		$this->FILEPATH->setDbValue($rs->fields('FILEPATH'));
+		$this->FILEPATH->Upload->DbValue = $rs->fields('FILEPATH');
 		$this->FILENAME->setDbValue($rs->fields('FILENAME'));
 		$this->datetime->setDbValue($rs->fields('datetime'));
 		$this->DBUSERNAME->setDbValue($rs->fields('DBUSERNAME'));
@@ -538,7 +545,7 @@ class cbackup_task_edit extends cbackup_task {
 		$this->HOSTNAME->DbValue = $row['HOSTNAME'];
 		$this->PASSWORD->DbValue = $row['PASSWORD'];
 		$this->DATABASE->DbValue = $row['DATABASE'];
-		$this->FILEPATH->DbValue = $row['FILEPATH'];
+		$this->FILEPATH->Upload->DbValue = $row['FILEPATH'];
 		$this->FILENAME->DbValue = $row['FILENAME'];
 		$this->datetime->DbValue = $row['datetime'];
 		$this->DBUSERNAME->DbValue = $row['DBUSERNAME'];
@@ -574,11 +581,51 @@ class cbackup_task_edit extends cbackup_task {
 			$this->id->ViewCustomAttributes = "";
 
 			// server_id_mysqladmin
-			$this->server_id_mysqladmin->ViewValue = $this->server_id_mysqladmin->CurrentValue;
+			if (strval($this->server_id_mysqladmin->CurrentValue) <> "") {
+				$sFilterWrk = "`server_id`" . ew_SearchString("=", $this->server_id_mysqladmin->CurrentValue, EW_DATATYPE_NUMBER);
+			$sSqlWrk = "SELECT `server_id`, `server_name` AS `DispFld`, '' AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld` FROM `server`";
+			$sWhereWrk = "";
+			if ($sFilterWrk <> "") {
+				ew_AddFilter($sWhereWrk, $sFilterWrk);
+			}
+
+			// Call Lookup selecting
+			$this->Lookup_Selecting($this->server_id_mysqladmin, $sWhereWrk);
+			if ($sWhereWrk <> "") $sSqlWrk .= " WHERE " . $sWhereWrk;
+				$rswrk = $conn->Execute($sSqlWrk);
+				if ($rswrk && !$rswrk->EOF) { // Lookup values found
+					$this->server_id_mysqladmin->ViewValue = $rswrk->fields('DispFld');
+					$rswrk->Close();
+				} else {
+					$this->server_id_mysqladmin->ViewValue = $this->server_id_mysqladmin->CurrentValue;
+				}
+			} else {
+				$this->server_id_mysqladmin->ViewValue = NULL;
+			}
 			$this->server_id_mysqladmin->ViewCustomAttributes = "";
 
 			// HOSTNAME
-			$this->HOSTNAME->ViewValue = $this->HOSTNAME->CurrentValue;
+			if (strval($this->HOSTNAME->CurrentValue) <> "") {
+				$sFilterWrk = "`server_id`" . ew_SearchString("=", $this->HOSTNAME->CurrentValue, EW_DATATYPE_NUMBER);
+			$sSqlWrk = "SELECT `server_id`, `server_name` AS `DispFld`, '' AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld` FROM `server`";
+			$sWhereWrk = "";
+			if ($sFilterWrk <> "") {
+				ew_AddFilter($sWhereWrk, $sFilterWrk);
+			}
+
+			// Call Lookup selecting
+			$this->Lookup_Selecting($this->HOSTNAME, $sWhereWrk);
+			if ($sWhereWrk <> "") $sSqlWrk .= " WHERE " . $sWhereWrk;
+				$rswrk = $conn->Execute($sSqlWrk);
+				if ($rswrk && !$rswrk->EOF) { // Lookup values found
+					$this->HOSTNAME->ViewValue = $rswrk->fields('DispFld');
+					$rswrk->Close();
+				} else {
+					$this->HOSTNAME->ViewValue = $this->HOSTNAME->CurrentValue;
+				}
+			} else {
+				$this->HOSTNAME->ViewValue = NULL;
+			}
 			$this->HOSTNAME->ViewCustomAttributes = "";
 
 			// PASSWORD
@@ -590,7 +637,11 @@ class cbackup_task_edit extends cbackup_task {
 			$this->DATABASE->ViewCustomAttributes = "";
 
 			// FILEPATH
-			$this->FILEPATH->ViewValue = $this->FILEPATH->CurrentValue;
+			if (!ew_Empty($this->FILEPATH->Upload->DbValue)) {
+				$this->FILEPATH->ViewValue = $this->FILEPATH->Upload->DbValue;
+			} else {
+				$this->FILEPATH->ViewValue = "";
+			}
 			$this->FILEPATH->ViewCustomAttributes = "";
 
 			// FILENAME
@@ -637,6 +688,7 @@ class cbackup_task_edit extends cbackup_task {
 			// FILEPATH
 			$this->FILEPATH->LinkCustomAttributes = "";
 			$this->FILEPATH->HrefValue = "";
+			$this->FILEPATH->HrefValue2 = $this->FILEPATH->UploadPath . $this->FILEPATH->Upload->DbValue;
 			$this->FILEPATH->TooltipValue = "";
 
 			// FILENAME
@@ -667,13 +719,43 @@ class cbackup_task_edit extends cbackup_task {
 
 			// server_id_mysqladmin
 			$this->server_id_mysqladmin->EditCustomAttributes = "";
-			$this->server_id_mysqladmin->EditValue = ew_HtmlEncode($this->server_id_mysqladmin->CurrentValue);
-			$this->server_id_mysqladmin->PlaceHolder = ew_HtmlEncode(ew_RemoveHtml($this->server_id_mysqladmin->FldCaption()));
+			if (trim(strval($this->server_id_mysqladmin->CurrentValue)) == "") {
+				$sFilterWrk = "0=1";
+			} else {
+				$sFilterWrk = "`server_id`" . ew_SearchString("=", $this->server_id_mysqladmin->CurrentValue, EW_DATATYPE_NUMBER);
+			}
+			$sSqlWrk = "SELECT `server_id`, `server_name` AS `DispFld`, '' AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld`, '' AS `SelectFilterFld`, '' AS `SelectFilterFld2`, '' AS `SelectFilterFld3`, '' AS `SelectFilterFld4` FROM `server`";
+			$sWhereWrk = "";
+			if ($sFilterWrk <> "") {
+				ew_AddFilter($sWhereWrk, $sFilterWrk);
+			}
+
+			// Call Lookup selecting
+			$this->Lookup_Selecting($this->server_id_mysqladmin, $sWhereWrk);
+			if ($sWhereWrk <> "") $sSqlWrk .= " WHERE " . $sWhereWrk;
+			$rswrk = $conn->Execute($sSqlWrk);
+			$arwrk = ($rswrk) ? $rswrk->GetRows() : array();
+			if ($rswrk) $rswrk->Close();
+			array_unshift($arwrk, array("", $Language->Phrase("PleaseSelect"), "", "", "", "", "", "", ""));
+			$this->server_id_mysqladmin->EditValue = $arwrk;
 
 			// HOSTNAME
 			$this->HOSTNAME->EditCustomAttributes = "";
-			$this->HOSTNAME->EditValue = ew_HtmlEncode($this->HOSTNAME->CurrentValue);
-			$this->HOSTNAME->PlaceHolder = ew_HtmlEncode(ew_RemoveHtml($this->HOSTNAME->FldCaption()));
+			$sFilterWrk = "";
+			$sSqlWrk = "SELECT `server_id`, `server_name` AS `DispFld`, '' AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld`, '' AS `SelectFilterFld`, '' AS `SelectFilterFld2`, '' AS `SelectFilterFld3`, '' AS `SelectFilterFld4` FROM `server`";
+			$sWhereWrk = "";
+			if ($sFilterWrk <> "") {
+				ew_AddFilter($sWhereWrk, $sFilterWrk);
+			}
+
+			// Call Lookup selecting
+			$this->Lookup_Selecting($this->HOSTNAME, $sWhereWrk);
+			if ($sWhereWrk <> "") $sSqlWrk .= " WHERE " . $sWhereWrk;
+			$rswrk = $conn->Execute($sSqlWrk);
+			$arwrk = ($rswrk) ? $rswrk->GetRows() : array();
+			if ($rswrk) $rswrk->Close();
+			array_unshift($arwrk, array("", $Language->Phrase("PleaseSelect"), "", "", "", "", "", "", ""));
+			$this->HOSTNAME->EditValue = $arwrk;
 
 			// PASSWORD
 			$this->PASSWORD->EditCustomAttributes = "";
@@ -687,8 +769,12 @@ class cbackup_task_edit extends cbackup_task {
 
 			// FILEPATH
 			$this->FILEPATH->EditCustomAttributes = "";
-			$this->FILEPATH->EditValue = ew_HtmlEncode($this->FILEPATH->CurrentValue);
-			$this->FILEPATH->PlaceHolder = ew_HtmlEncode(ew_RemoveHtml($this->FILEPATH->FldCaption()));
+			if (!ew_Empty($this->FILEPATH->Upload->DbValue)) {
+				$this->FILEPATH->EditValue = $this->FILEPATH->Upload->DbValue;
+			} else {
+				$this->FILEPATH->EditValue = "";
+			}
+			if ($this->CurrentAction == "I" && !$this->EventCancelled) ew_RenderUploadField($this->FILEPATH);
 
 			// FILENAME
 			$this->FILENAME->EditCustomAttributes = "";
@@ -729,6 +815,7 @@ class cbackup_task_edit extends cbackup_task {
 
 			// FILEPATH
 			$this->FILEPATH->HrefValue = "";
+			$this->FILEPATH->HrefValue2 = $this->FILEPATH->UploadPath . $this->FILEPATH->Upload->DbValue;
 
 			// FILENAME
 			$this->FILENAME->HrefValue = "";
@@ -775,7 +862,7 @@ class cbackup_task_edit extends cbackup_task {
 		if (!$this->DATABASE->FldIsDetailKey && !is_null($this->DATABASE->FormValue) && $this->DATABASE->FormValue == "") {
 			ew_AddMessage($gsFormError, $Language->Phrase("EnterRequiredField") . " - " . $this->DATABASE->FldCaption());
 		}
-		if (!$this->FILEPATH->FldIsDetailKey && !is_null($this->FILEPATH->FormValue) && $this->FILEPATH->FormValue == "") {
+		if (is_null($this->FILEPATH->Upload->Value)) {
 			ew_AddMessage($gsFormError, $Language->Phrase("EnterRequiredField") . " - " . $this->FILEPATH->FldCaption());
 		}
 		if (!$this->FILENAME->FldIsDetailKey && !is_null($this->FILENAME->FormValue) && $this->FILENAME->FormValue == "") {
@@ -836,7 +923,14 @@ class cbackup_task_edit extends cbackup_task {
 			$this->DATABASE->SetDbValueDef($rsnew, $this->DATABASE->CurrentValue, "", $this->DATABASE->ReadOnly);
 
 			// FILEPATH
-			$this->FILEPATH->SetDbValueDef($rsnew, $this->FILEPATH->CurrentValue, "", $this->FILEPATH->ReadOnly);
+			if (!($this->FILEPATH->ReadOnly) && !$this->FILEPATH->Upload->KeepFile) {
+				$this->FILEPATH->Upload->DbValue = $rs->fields('FILEPATH'); // Get original value
+				if ($this->FILEPATH->Upload->FileName == "") {
+					$rsnew['FILEPATH'] = NULL;
+				} else {
+					$rsnew['FILEPATH'] = $this->FILEPATH->Upload->FileName;
+				}
+			}
 
 			// FILENAME
 			$this->FILENAME->SetDbValueDef($rsnew, $this->FILENAME->CurrentValue, "", $this->FILENAME->ReadOnly);
@@ -849,6 +943,15 @@ class cbackup_task_edit extends cbackup_task {
 
 			// username
 			$this->username->SetDbValueDef($rsnew, $this->username->CurrentValue, "", $this->username->ReadOnly);
+			if (!$this->FILEPATH->Upload->KeepFile) {
+				if (!ew_Empty($this->FILEPATH->Upload->Value)) {
+					if ($this->FILEPATH->Upload->FileName == $this->FILEPATH->Upload->DbValue) { // Overwrite if same file name
+						$this->FILEPATH->Upload->DbValue = ""; // No need to delete any more
+					} else {
+						$rsnew['FILEPATH'] = ew_UploadFileNameEx(ew_UploadPathEx(TRUE, $this->FILEPATH->UploadPath), $rsnew['FILEPATH']); // Get new file name
+					}
+				}
+			}
 
 			// Call Row Updating event
 			$bUpdateRow = $this->Row_Updating($rsold, $rsnew);
@@ -860,6 +963,13 @@ class cbackup_task_edit extends cbackup_task {
 					$EditRow = TRUE; // No field to update
 				$conn->raiseErrorFn = '';
 				if ($EditRow) {
+					if (!$this->FILEPATH->Upload->KeepFile) {
+						if (!ew_Empty($this->FILEPATH->Upload->Value)) {
+							$this->FILEPATH->Upload->SaveToFile($this->FILEPATH->UploadPath, $rsnew['FILEPATH'], TRUE);
+						}
+						if ($this->FILEPATH->Upload->DbValue <> "")
+							@unlink(ew_UploadPathEx(TRUE, $this->FILEPATH->OldUploadPath) . $this->FILEPATH->Upload->DbValue);
+					}
 				}
 			} else {
 				if ($this->getSuccessMessage() <> "" || $this->getFailureMessage() <> "") {
@@ -879,6 +989,9 @@ class cbackup_task_edit extends cbackup_task {
 		if ($EditRow)
 			$this->Row_Updated($rsold, $rsnew);
 		$rs->Close();
+
+		// FILEPATH
+		ew_CleanUploadTempPath($this->FILEPATH, $this->FILEPATH->Upload->Index);
 		return $EditRow;
 	}
 
@@ -1017,9 +1130,10 @@ fbackup_taskedit.Validate = function() {
 			elm = this.GetElements("x" + infix + "_DATABASE");
 			if (elm && !ew_HasValue(elm))
 				return this.OnError(elm, ewLanguage.Phrase("EnterRequiredField") + " - <?php echo ew_JsEncode2($backup_task->DATABASE->FldCaption()) ?>");
-			elm = this.GetElements("x" + infix + "_FILEPATH");
-			if (elm && !ew_HasValue(elm))
-				return this.OnError(elm, ewLanguage.Phrase("EnterRequiredField") + " - <?php echo ew_JsEncode2($backup_task->FILEPATH->FldCaption()) ?>");
+			felm = this.GetElements("x" + infix + "_FILEPATH");
+			elm = this.GetElements("fn_x" + infix + "_FILEPATH");
+			if (felm && elm && !ew_HasValue(elm))
+				return this.OnError(felm, ewLanguage.Phrase("EnterRequiredField") + " - <?php echo ew_JsEncode2($backup_task->FILEPATH->FldCaption()) ?>");
 			elm = this.GetElements("x" + infix + "_FILENAME");
 			if (elm && !ew_HasValue(elm))
 				return this.OnError(elm, ewLanguage.Phrase("EnterRequiredField") + " - <?php echo ew_JsEncode2($backup_task->FILENAME->FldCaption()) ?>");
@@ -1068,8 +1182,10 @@ fbackup_taskedit.ValidateRequired = false;
 <?php } ?>
 
 // Dynamic selection lists
-// Form object for search
+fbackup_taskedit.Lists["x_server_id_mysqladmin"] = {"LinkField":"x_server_id","Ajax":true,"AutoFill":false,"DisplayFields":["x_server_name","","",""],"ParentFields":[],"FilterFields":[],"Options":[]};
+fbackup_taskedit.Lists["x_HOSTNAME"] = {"LinkField":"x_server_id","Ajax":null,"AutoFill":false,"DisplayFields":["x_server_name","","",""],"ParentFields":[],"FilterFields":[],"Options":[]};
 
+// Form object for search
 </script>
 <script type="text/javascript">
 
@@ -1133,7 +1249,33 @@ $backup_task_edit->ShowMessage();
 		<td><span id="elh_backup_task_server_id_mysqladmin"><?php echo $backup_task->server_id_mysqladmin->FldCaption() ?><?php echo $Language->Phrase("FieldRequiredIndicator") ?></span></td>
 		<td<?php echo $backup_task->server_id_mysqladmin->CellAttributes() ?>>
 <span id="el_backup_task_server_id_mysqladmin" class="control-group">
-<input type="text" data-field="x_server_id_mysqladmin" name="x_server_id_mysqladmin" id="x_server_id_mysqladmin" size="30" maxlength="255" placeholder="<?php echo $backup_task->server_id_mysqladmin->PlaceHolder ?>" value="<?php echo $backup_task->server_id_mysqladmin->EditValue ?>"<?php echo $backup_task->server_id_mysqladmin->EditAttributes() ?>>
+<select data-field="x_server_id_mysqladmin" id="x_server_id_mysqladmin" name="x_server_id_mysqladmin"<?php echo $backup_task->server_id_mysqladmin->EditAttributes() ?>>
+<?php
+if (is_array($backup_task->server_id_mysqladmin->EditValue)) {
+	$arwrk = $backup_task->server_id_mysqladmin->EditValue;
+	$rowswrk = count($arwrk);
+	$emptywrk = TRUE;
+	for ($rowcntwrk = 0; $rowcntwrk < $rowswrk; $rowcntwrk++) {
+		$selwrk = (strval($backup_task->server_id_mysqladmin->CurrentValue) == strval($arwrk[$rowcntwrk][0])) ? " selected=\"selected\"" : "";
+		if ($selwrk <> "") $emptywrk = FALSE;
+?>
+<option value="<?php echo ew_HtmlEncode($arwrk[$rowcntwrk][0]) ?>"<?php echo $selwrk ?>>
+<?php echo $arwrk[$rowcntwrk][1] ?>
+</option>
+<?php
+	}
+}
+?>
+</select>
+<?php
+$sSqlWrk = "SELECT `server_id`, `server_name` AS `DispFld`, '' AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld` FROM `server`";
+$sWhereWrk = "";
+
+// Call Lookup selecting
+$backup_task->Lookup_Selecting($backup_task->server_id_mysqladmin, $sWhereWrk);
+if ($sWhereWrk <> "") $sSqlWrk .= " WHERE " . $sWhereWrk;
+?>
+<input type="hidden" name="s_x_server_id_mysqladmin" id="s_x_server_id_mysqladmin" value="s=<?php echo ew_Encrypt($sSqlWrk) ?>&f0=<?php echo ew_Encrypt("`server_id` = {filter_value}"); ?>&t0=3">
 </span>
 <?php echo $backup_task->server_id_mysqladmin->CustomMsg ?></td>
 	</tr>
@@ -1143,7 +1285,27 @@ $backup_task_edit->ShowMessage();
 		<td><span id="elh_backup_task_HOSTNAME"><?php echo $backup_task->HOSTNAME->FldCaption() ?><?php echo $Language->Phrase("FieldRequiredIndicator") ?></span></td>
 		<td<?php echo $backup_task->HOSTNAME->CellAttributes() ?>>
 <span id="el_backup_task_HOSTNAME" class="control-group">
-<input type="text" data-field="x_HOSTNAME" name="x_HOSTNAME" id="x_HOSTNAME" size="30" maxlength="255" placeholder="<?php echo $backup_task->HOSTNAME->PlaceHolder ?>" value="<?php echo $backup_task->HOSTNAME->EditValue ?>"<?php echo $backup_task->HOSTNAME->EditAttributes() ?>>
+<select data-field="x_HOSTNAME" id="x_HOSTNAME" name="x_HOSTNAME"<?php echo $backup_task->HOSTNAME->EditAttributes() ?>>
+<?php
+if (is_array($backup_task->HOSTNAME->EditValue)) {
+	$arwrk = $backup_task->HOSTNAME->EditValue;
+	$rowswrk = count($arwrk);
+	$emptywrk = TRUE;
+	for ($rowcntwrk = 0; $rowcntwrk < $rowswrk; $rowcntwrk++) {
+		$selwrk = (strval($backup_task->HOSTNAME->CurrentValue) == strval($arwrk[$rowcntwrk][0])) ? " selected=\"selected\"" : "";
+		if ($selwrk <> "") $emptywrk = FALSE;
+?>
+<option value="<?php echo ew_HtmlEncode($arwrk[$rowcntwrk][0]) ?>"<?php echo $selwrk ?>>
+<?php echo $arwrk[$rowcntwrk][1] ?>
+</option>
+<?php
+	}
+}
+?>
+</select>
+<script type="text/javascript">
+fbackup_taskedit.Lists["x_HOSTNAME"].Options = <?php echo (is_array($backup_task->HOSTNAME->EditValue)) ? ew_ArrayToJson($backup_task->HOSTNAME->EditValue, 1) : "[]" ?>;
+</script>
 </span>
 <?php echo $backup_task->HOSTNAME->CustomMsg ?></td>
 	</tr>
@@ -1173,7 +1335,20 @@ $backup_task_edit->ShowMessage();
 		<td><span id="elh_backup_task_FILEPATH"><?php echo $backup_task->FILEPATH->FldCaption() ?><?php echo $Language->Phrase("FieldRequiredIndicator") ?></span></td>
 		<td<?php echo $backup_task->FILEPATH->CellAttributes() ?>>
 <span id="el_backup_task_FILEPATH" class="control-group">
-<input type="text" data-field="x_FILEPATH" name="x_FILEPATH" id="x_FILEPATH" size="30" maxlength="255" placeholder="<?php echo $backup_task->FILEPATH->PlaceHolder ?>" value="<?php echo $backup_task->FILEPATH->EditValue ?>"<?php echo $backup_task->FILEPATH->EditAttributes() ?>>
+<span id="fd_x_FILEPATH">
+<span class="btn btn-small fileinput-button">
+	<span><?php echo $Language->Phrase("ChooseFile") ?></span>
+	<input type="file" data-field="x_FILEPATH" name="x_FILEPATH" id="x_FILEPATH">
+</span>
+<input type="hidden" name="fn_x_FILEPATH" id= "fn_x_FILEPATH" value="<?php echo $backup_task->FILEPATH->Upload->FileName ?>">
+<?php if (@$_POST["fa_x_FILEPATH"] == "0") { ?>
+<input type="hidden" name="fa_x_FILEPATH" id= "fa_x_FILEPATH" value="0">
+<?php } else { ?>
+<input type="hidden" name="fa_x_FILEPATH" id= "fa_x_FILEPATH" value="1">
+<?php } ?>
+<input type="hidden" name="fs_x_FILEPATH" id= "fs_x_FILEPATH" value="255">
+</span>
+<table id="ft_x_FILEPATH" class="table table-condensed pull-left ewUploadTable"><tbody class="files"></tbody></table>
 </span>
 <?php echo $backup_task->FILEPATH->CustomMsg ?></td>
 	</tr>

@@ -356,7 +356,7 @@ class cbackup_task_delete extends cbackup_task {
 		$this->HOSTNAME->setDbValue($rs->fields('HOSTNAME'));
 		$this->PASSWORD->setDbValue($rs->fields('PASSWORD'));
 		$this->DATABASE->setDbValue($rs->fields('DATABASE'));
-		$this->FILEPATH->setDbValue($rs->fields('FILEPATH'));
+		$this->FILEPATH->Upload->DbValue = $rs->fields('FILEPATH');
 		$this->FILENAME->setDbValue($rs->fields('FILENAME'));
 		$this->datetime->setDbValue($rs->fields('datetime'));
 		$this->DBUSERNAME->setDbValue($rs->fields('DBUSERNAME'));
@@ -372,7 +372,7 @@ class cbackup_task_delete extends cbackup_task {
 		$this->HOSTNAME->DbValue = $row['HOSTNAME'];
 		$this->PASSWORD->DbValue = $row['PASSWORD'];
 		$this->DATABASE->DbValue = $row['DATABASE'];
-		$this->FILEPATH->DbValue = $row['FILEPATH'];
+		$this->FILEPATH->Upload->DbValue = $row['FILEPATH'];
 		$this->FILENAME->DbValue = $row['FILENAME'];
 		$this->datetime->DbValue = $row['datetime'];
 		$this->DBUSERNAME->DbValue = $row['DBUSERNAME'];
@@ -408,11 +408,51 @@ class cbackup_task_delete extends cbackup_task {
 			$this->id->ViewCustomAttributes = "";
 
 			// server_id_mysqladmin
-			$this->server_id_mysqladmin->ViewValue = $this->server_id_mysqladmin->CurrentValue;
+			if (strval($this->server_id_mysqladmin->CurrentValue) <> "") {
+				$sFilterWrk = "`server_id`" . ew_SearchString("=", $this->server_id_mysqladmin->CurrentValue, EW_DATATYPE_NUMBER);
+			$sSqlWrk = "SELECT `server_id`, `server_name` AS `DispFld`, '' AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld` FROM `server`";
+			$sWhereWrk = "";
+			if ($sFilterWrk <> "") {
+				ew_AddFilter($sWhereWrk, $sFilterWrk);
+			}
+
+			// Call Lookup selecting
+			$this->Lookup_Selecting($this->server_id_mysqladmin, $sWhereWrk);
+			if ($sWhereWrk <> "") $sSqlWrk .= " WHERE " . $sWhereWrk;
+				$rswrk = $conn->Execute($sSqlWrk);
+				if ($rswrk && !$rswrk->EOF) { // Lookup values found
+					$this->server_id_mysqladmin->ViewValue = $rswrk->fields('DispFld');
+					$rswrk->Close();
+				} else {
+					$this->server_id_mysqladmin->ViewValue = $this->server_id_mysqladmin->CurrentValue;
+				}
+			} else {
+				$this->server_id_mysqladmin->ViewValue = NULL;
+			}
 			$this->server_id_mysqladmin->ViewCustomAttributes = "";
 
 			// HOSTNAME
-			$this->HOSTNAME->ViewValue = $this->HOSTNAME->CurrentValue;
+			if (strval($this->HOSTNAME->CurrentValue) <> "") {
+				$sFilterWrk = "`server_id`" . ew_SearchString("=", $this->HOSTNAME->CurrentValue, EW_DATATYPE_NUMBER);
+			$sSqlWrk = "SELECT `server_id`, `server_name` AS `DispFld`, '' AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld` FROM `server`";
+			$sWhereWrk = "";
+			if ($sFilterWrk <> "") {
+				ew_AddFilter($sWhereWrk, $sFilterWrk);
+			}
+
+			// Call Lookup selecting
+			$this->Lookup_Selecting($this->HOSTNAME, $sWhereWrk);
+			if ($sWhereWrk <> "") $sSqlWrk .= " WHERE " . $sWhereWrk;
+				$rswrk = $conn->Execute($sSqlWrk);
+				if ($rswrk && !$rswrk->EOF) { // Lookup values found
+					$this->HOSTNAME->ViewValue = $rswrk->fields('DispFld');
+					$rswrk->Close();
+				} else {
+					$this->HOSTNAME->ViewValue = $this->HOSTNAME->CurrentValue;
+				}
+			} else {
+				$this->HOSTNAME->ViewValue = NULL;
+			}
 			$this->HOSTNAME->ViewCustomAttributes = "";
 
 			// PASSWORD
@@ -424,7 +464,11 @@ class cbackup_task_delete extends cbackup_task {
 			$this->DATABASE->ViewCustomAttributes = "";
 
 			// FILEPATH
-			$this->FILEPATH->ViewValue = $this->FILEPATH->CurrentValue;
+			if (!ew_Empty($this->FILEPATH->Upload->DbValue)) {
+				$this->FILEPATH->ViewValue = $this->FILEPATH->Upload->DbValue;
+			} else {
+				$this->FILEPATH->ViewValue = "";
+			}
 			$this->FILEPATH->ViewCustomAttributes = "";
 
 			// FILENAME
@@ -471,6 +515,7 @@ class cbackup_task_delete extends cbackup_task {
 			// FILEPATH
 			$this->FILEPATH->LinkCustomAttributes = "";
 			$this->FILEPATH->HrefValue = "";
+			$this->FILEPATH->HrefValue2 = $this->FILEPATH->UploadPath . $this->FILEPATH->Upload->DbValue;
 			$this->FILEPATH->TooltipValue = "";
 
 			// FILENAME
@@ -545,6 +590,7 @@ class cbackup_task_delete extends cbackup_task {
 				if ($sThisKey <> "") $sThisKey .= $GLOBALS["EW_COMPOSITE_KEY_SEPARATOR"];
 				$sThisKey .= $row['id'];
 				$this->LoadDbValues($row);
+				@unlink(ew_UploadPathEx(TRUE, $this->FILEPATH->OldUploadPath) . $row['FILEPATH']);
 				$conn->raiseErrorFn = 'ew_ErrorFn';
 				$DeleteRows = $this->Delete($row); // Delete
 				$conn->raiseErrorFn = '';
@@ -697,8 +743,10 @@ fbackup_taskdelete.ValidateRequired = false;
 <?php } ?>
 
 // Dynamic selection lists
-// Form object for search
+fbackup_taskdelete.Lists["x_server_id_mysqladmin"] = {"LinkField":"x_server_id","Ajax":true,"AutoFill":false,"DisplayFields":["x_server_name","","",""],"ParentFields":[],"FilterFields":[],"Options":[]};
+fbackup_taskdelete.Lists["x_HOSTNAME"] = {"LinkField":"x_server_id","Ajax":null,"AutoFill":false,"DisplayFields":["x_server_name","","",""],"ParentFields":[],"FilterFields":[],"Options":[]};
 
+// Form object for search
 </script>
 <script type="text/javascript">
 
@@ -828,7 +876,20 @@ while (!$backup_task_delete->Recordset->EOF) {
 		<td<?php echo $backup_task->FILEPATH->CellAttributes() ?>>
 <span id="el<?php echo $backup_task_delete->RowCnt ?>_backup_task_FILEPATH" class="control-group backup_task_FILEPATH">
 <span<?php echo $backup_task->FILEPATH->ViewAttributes() ?>>
-<?php echo $backup_task->FILEPATH->ListViewValue() ?></span>
+<?php if ($backup_task->FILEPATH->LinkAttributes() <> "") { ?>
+<?php if (!empty($backup_task->FILEPATH->Upload->DbValue)) { ?>
+<?php echo $backup_task->FILEPATH->ListViewValue() ?>
+<?php } elseif (!in_array($backup_task->CurrentAction, array("I", "edit", "gridedit"))) { ?>	
+&nbsp;
+<?php } ?>
+<?php } else { ?>
+<?php if (!empty($backup_task->FILEPATH->Upload->DbValue)) { ?>
+<?php echo $backup_task->FILEPATH->ListViewValue() ?>
+<?php } elseif (!in_array($backup_task->CurrentAction, array("I", "edit", "gridedit"))) { ?>	
+&nbsp;
+<?php } ?>
+<?php } ?>
+</span>
 </span>
 </td>
 <?php } ?>

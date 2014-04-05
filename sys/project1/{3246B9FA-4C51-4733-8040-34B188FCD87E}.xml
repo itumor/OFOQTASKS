@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0"?>
-<configuration date="2014/04/03" author="e.World Technology Ltd.">
-<project id="{3246B9FA-4C51-4733-8040-34B188FCD87E}" file="E:\ofoq_tasks\OFOQTASKS\project1.pmp" name="project1" product="PHPMaker" version="10.0" datetime="2014/04/03 20:52:42" languagefolder="phplang" userlevel="0,&quot;Default&quot;,0">
+<configuration date="2014/04/05" author="e.World Technology Ltd.">
+<project id="{3246B9FA-4C51-4733-8040-34B188FCD87E}" file="E:\ofoq_tasks\OFOQTASKS\project1.pmp" name="project1" product="PHPMaker" version="10.0" datetime="2014/04/05 22:31:43" languagefolder="phplang" userlevel="0,&quot;Default&quot;,0">
 <table id="command" name="command" caption="command" userlevel="0,&quot;Default&quot;,0" priv="1"/>
 <table id="function_group" name="function_group" caption="function group" userlevel="0,&quot;Default&quot;,0" priv="1"/>
 <table id="function_group_relation" name="function_group_relation" caption="function group relation" userlevel="0,&quot;Default&quot;,0" priv="1"/>
@@ -26,4 +26,5 @@
 <table id="stop_task" name="stop_task" caption="stop task" userlevel="0,&quot;Default&quot;,0" priv="1"/>
 <table id="update_task" name="update_task" caption="update task" userlevel="0,&quot;Default&quot;,0" priv="1"/>
 <table id="script_function_parameter_relation" name="script_function_parameter_relation" caption="script function parameter relation" userlevel="0,&quot;Default&quot;,0" priv="1"/>
+<table id="list_task" name="list_task" caption="list task" userlevel="0,&quot;Default&quot;,0" priv="1"/>
 </project></configuration>

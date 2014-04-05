@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" standalone="yes"?>
-<ew-language date="2014/4/3" version="10.0.1" id="en" name="English" desc="English" author="e.World Technology Ltd.">
+<ew-language date="2014/4/5" version="10.0.1" id="en" name="English" desc="English" author="e.World Technology Ltd.">
 	<locale>
 		<phrase id="locale" value=""/><!-- *** system locale for this language -->
 		<phrase id="use_system_locale" value="1"/><!-- *** change to "0" to disable system locale and use the following settings *** -->
@@ -373,6 +373,8 @@
 	</global>
 	<project><phrase id="bodytitle" value="System Automation"/>
 <phrase id="footertext" value="&amp;copy;2014 UnitedOFOQ System Automation . All rights reserved."/>
+<menu id="75"><phrase id="menutext" value="list task"/>
+</menu>
 <menu id="15"><phrase id="menutext" value="Daily Transaction Menu"/>
 </menu>
 <menu id="41"><phrase id="menutext" value="start task"/>
@@ -704,9 +706,9 @@
 </field>
 <field id="password"><phrase id="fldcaption" value="PASSWORD"/>
 </field>
-<field id="datetime"><phrase id="fldcaption" value="datetime"/>
-</field>
 <field id="dbusername"><phrase id="fldcaption" value="DBUSERNAME"/>
+</field>
+<field id="datetime"><phrase id="fldcaption" value="datetime"/>
 </field>
 <field id="username"><phrase id="fldcaption" value="username"/>
 </field>
@@ -829,6 +831,22 @@
 <field id="parameter_id"><phrase id="fldcaption" value="parameter id"/>
 </field>
 <field id="script_function_id"><phrase id="fldcaption" value="script function id"/>
+</field>
+</table>
+<table id="list_task"><phrase id="tblcaption" value="list task"/>
+<field id="id"><phrase id="fldcaption" value="id"/>
+</field>
+<field id="username"><phrase id="fldcaption" value="username"/>
+</field>
+<field id="datetime"><phrase id="fldcaption" value="datetime"/>
+</field>
+<field id="server_id_mysqladmin"><phrase id="fldcaption" value="server id mysqladmin"/>
+</field>
+<field id="hostname"><phrase id="fldcaption" value="HOSTNAME"/>
+</field>
+<field id="dbusername"><phrase id="fldcaption" value="DBUSERNAME"/>
+</field>
+<field id="password"><phrase id="fldcaption" value="PASSWORD"/>
 </field>
 </table>
 </project>
