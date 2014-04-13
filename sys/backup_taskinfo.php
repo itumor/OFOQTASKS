@@ -64,7 +64,7 @@ class cbackup_task extends cTable {
 		$this->fields['DATABASE'] = &$this->DATABASE;
 
 		// FILEPATH
-		$this->FILEPATH = new cField('backup_task', 'backup_task', 'x_FILEPATH', 'FILEPATH', '`FILEPATH`', '`FILEPATH`', 200, -1, TRUE, '`FILEPATH`', FALSE, FALSE, FALSE, 'FORMATTED TEXT');
+		$this->FILEPATH = new cField('backup_task', 'backup_task', 'x_FILEPATH', 'FILEPATH', '`FILEPATH`', '`FILEPATH`', 200, -1, FALSE, '`FILEPATH`', FALSE, FALSE, FALSE, 'FORMATTED TEXT');
 		$this->fields['FILEPATH'] = &$this->FILEPATH;
 
 		// FILENAME
@@ -505,7 +505,7 @@ class cbackup_task extends cTable {
 		$this->HOSTNAME->setDbValue($rs->fields('HOSTNAME'));
 		$this->PASSWORD->setDbValue($rs->fields('PASSWORD'));
 		$this->DATABASE->setDbValue($rs->fields('DATABASE'));
-		$this->FILEPATH->Upload->DbValue = $rs->fields('FILEPATH');
+		$this->FILEPATH->setDbValue($rs->fields('FILEPATH'));
 		$this->FILENAME->setDbValue($rs->fields('FILENAME'));
 		$this->datetime->setDbValue($rs->fields('datetime'));
 		$this->DBUSERNAME->setDbValue($rs->fields('DBUSERNAME'));
@@ -561,8 +561,8 @@ class cbackup_task extends cTable {
 
 		// HOSTNAME
 		if (strval($this->HOSTNAME->CurrentValue) <> "") {
-			$sFilterWrk = "`server_id`" . ew_SearchString("=", $this->HOSTNAME->CurrentValue, EW_DATATYPE_NUMBER);
-		$sSqlWrk = "SELECT `server_id`, `server_name` AS `DispFld`, '' AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld` FROM `server`";
+			$sFilterWrk = "`server_hostname`" . ew_SearchString("=", $this->HOSTNAME->CurrentValue, EW_DATATYPE_STRING);
+		$sSqlWrk = "SELECT `server_hostname`, `server_name` AS `DispFld`, '' AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld` FROM `server`";
 		$sWhereWrk = "";
 		if ($sFilterWrk <> "") {
 			ew_AddFilter($sWhereWrk, $sFilterWrk);
@@ -592,11 +592,7 @@ class cbackup_task extends cTable {
 		$this->DATABASE->ViewCustomAttributes = "";
 
 		// FILEPATH
-		if (!ew_Empty($this->FILEPATH->Upload->DbValue)) {
-			$this->FILEPATH->ViewValue = $this->FILEPATH->Upload->DbValue;
-		} else {
-			$this->FILEPATH->ViewValue = "";
-		}
+		$this->FILEPATH->ViewValue = $this->FILEPATH->CurrentValue;
 		$this->FILEPATH->ViewCustomAttributes = "";
 
 		// FILENAME
@@ -643,7 +639,6 @@ class cbackup_task extends cTable {
 		// FILEPATH
 		$this->FILEPATH->LinkCustomAttributes = "";
 		$this->FILEPATH->HrefValue = "";
-		$this->FILEPATH->HrefValue2 = $this->FILEPATH->UploadPath . $this->FILEPATH->Upload->DbValue;
 		$this->FILEPATH->TooltipValue = "";
 
 		// FILENAME
@@ -818,7 +813,17 @@ class cbackup_task extends cTable {
 	// Row Inserted event
 	function Row_Inserted($rsold, &$rsnew) {
 
-		//echo "Row Inserted"
+		//echo "Row Inserted"     
+		$parameters = array(
+	'server_id_mysqladmin'=>$rsnew["server_id_mysqladmin"],
+	'HOSTNAME'=>$rsnew["HOSTNAME"],
+	'DBUSERNAME'=>$rsnew["DBUSERNAME"],
+	'PASSWORD'=>$rsnew["PASSWORD"],
+	'DATABASE'=>$rsnew["DATABASE"],
+	'FILEPATH'=>$rsnew["FILEPATH"],
+	'FILENAME'=>$rsnew["FILENAME"],
+	);
+	add_cron_task("backup",$parameters);
 	}
 
 	// Row Updating event

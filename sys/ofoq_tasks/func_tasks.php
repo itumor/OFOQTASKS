@@ -37,18 +37,19 @@ function add_cron_task($task_name,$parameters) {
             //echo $server_id;die;
             foreach( $function_group_relation->script_function_id->script_id->parameter() AS $parameter ){
                if ($parameter['parameter_name'] != $server_id ){
-                //print_r($parameter['parameter_name']);die;
+               // print_r($parameter['parameter_name']);die;
 
- 
+                if (array_key_exists($parameter['parameter_name'], $parameters)) {
                 $parameter_str .= '"' . $parameters[$parameter['parameter_name']] . '" ';
-              
-                  //$parameter_str .=  '"" ';
-               
+                }else{
+                  $parameter_str .=  '"" ';
+                }
                }else{
                // print_r($parameters);die;
                 $server_id = $parameters[$server_id];
 
                }
+
            }
            $command_data['command_input'] = "$script_path $script_function_name $parameter_str";
            $command_data['command_status'] = 'pending';

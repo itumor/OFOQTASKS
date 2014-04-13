@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" standalone="yes"?>
-<ew-language date="2014/4/5" version="10.0.1" id="en" name="English" desc="English" author="e.World Technology Ltd.">
+<ew-language date="2014/4/13" version="10.0.1" id="en" name="English" desc="English" author="e.World Technology Ltd.">
 	<locale>
 		<phrase id="locale" value=""/><!-- *** system locale for this language -->
 		<phrase id="use_system_locale" value="1"/><!-- *** change to "0" to disable system locale and use the following settings *** -->
@@ -373,7 +373,7 @@
 	</global>
 	<project><phrase id="bodytitle" value="System Automation"/>
 <phrase id="footertext" value="&amp;copy;2014 UnitedOFOQ System Automation . All rights reserved."/>
-<menu id="75"><phrase id="menutext" value="list task"/>
+<menu id="79"><phrase id="menutext" value="send task"/>
 </menu>
 <menu id="15"><phrase id="menutext" value="Daily Transaction Menu"/>
 </menu>
@@ -398,6 +398,14 @@
 <menu id="66"><phrase id="menutext" value="restart task"/>
 </menu>
 <menu id="67"><phrase id="menutext" value="listandstart task"/>
+</menu>
+<menu id="75"><phrase id="menutext" value="list task"/>
+</menu>
+<menu id="78"><phrase id="menutext" value="stop glassfish task"/>
+</menu>
+<menu id="77"><phrase id="menutext" value="start glassfish task"/>
+</menu>
+<menu id="76"><phrase id="menutext" value="restart glassfish task"/>
 </menu>
 <menu id="37"><phrase id="menutext" value="Generator Report Menu "/>
 </menu>
@@ -847,6 +855,60 @@
 <field id="dbusername"><phrase id="fldcaption" value="DBUSERNAME"/>
 </field>
 <field id="password"><phrase id="fldcaption" value="PASSWORD"/>
+</field>
+</table>
+<table id="restart_glassfish_task"><phrase id="tblcaption" value="restart glassfish task"/>
+<field id="id"><phrase id="fldcaption" value="id"/>
+</field>
+<field id="username"><phrase id="fldcaption" value="username"/>
+</field>
+<field id="datetime"><phrase id="fldcaption" value="datetime"/>
+</field>
+<field id="server_id_mysqladmin"><phrase id="fldcaption" value="server id mysqladmin"/>
+</field>
+</table>
+<table id="start_glassfish_task"><phrase id="tblcaption" value="start glassfish task"/>
+<field id="id"><phrase id="fldcaption" value="id"/>
+</field>
+<field id="username"><phrase id="fldcaption" value="username"/>
+</field>
+<field id="datetime"><phrase id="fldcaption" value="datetime"/>
+</field>
+<field id="server_id_mysqladmin"><phrase id="fldcaption" value="server id mysqladmin"/>
+</field>
+</table>
+<table id="stop_glassfish_task"><phrase id="tblcaption" value="stop glassfish task"/>
+<field id="id"><phrase id="fldcaption" value="id"/>
+</field>
+<field id="username"><phrase id="fldcaption" value="username"/>
+</field>
+<field id="datetime"><phrase id="fldcaption" value="datetime"/>
+</field>
+<field id="server_id_asadmin"><phrase id="fldcaption" value="server id mysqladmin"/>
+</field>
+</table>
+<table id="send_task"><phrase id="tblcaption" value="send task"/>
+<field id="id"><phrase id="fldcaption" value="id"/>
+</field>
+<field id="username"><phrase id="fldcaption" value="username"/>
+</field>
+<field id="datetime"><phrase id="fldcaption" value="datetime"/>
+</field>
+<field id="server_id_sendreceive"><phrase id="fldcaption" value="server id mysqladmin"/>
+</field>
+<field id="target_filename"><phrase id="fldcaption" value="TARGET FILENAME"/>
+</field>
+<field id="local_path"><phrase id="fldcaption" value="LOCAL PATH"/>
+</field>
+<field id="remote_ipand1stlvl"><phrase id="fldcaption" value="REMOTE IPAND1STLVL"/>
+</field>
+<field id="remote_remain_path"><phrase id="fldcaption" value="REMOTE REMAIN PATH"/>
+</field>
+<field id="remote_username"><phrase id="fldcaption" value="REMOTE USERNAME"/>
+</field>
+<field id="remote_password"><phrase id="fldcaption" value="REMOTE PASSWORD"/>
+</field>
+<field id="remote_domain"><phrase id="fldcaption" value="REMOTE DOMAIN"/>
 </field>
 </table>
 </project>

@@ -522,11 +522,51 @@ class cdrop_task extends cTable {
 		$this->id->ViewCustomAttributes = "";
 
 		// server_id_mysqladmin
-		$this->server_id_mysqladmin->ViewValue = $this->server_id_mysqladmin->CurrentValue;
+		if (strval($this->server_id_mysqladmin->CurrentValue) <> "") {
+			$sFilterWrk = "`server_id`" . ew_SearchString("=", $this->server_id_mysqladmin->CurrentValue, EW_DATATYPE_NUMBER);
+		$sSqlWrk = "SELECT `server_id`, `server_name` AS `DispFld`, '' AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld` FROM `server`";
+		$sWhereWrk = "";
+		if ($sFilterWrk <> "") {
+			ew_AddFilter($sWhereWrk, $sFilterWrk);
+		}
+
+		// Call Lookup selecting
+		$this->Lookup_Selecting($this->server_id_mysqladmin, $sWhereWrk);
+		if ($sWhereWrk <> "") $sSqlWrk .= " WHERE " . $sWhereWrk;
+			$rswrk = $conn->Execute($sSqlWrk);
+			if ($rswrk && !$rswrk->EOF) { // Lookup values found
+				$this->server_id_mysqladmin->ViewValue = $rswrk->fields('DispFld');
+				$rswrk->Close();
+			} else {
+				$this->server_id_mysqladmin->ViewValue = $this->server_id_mysqladmin->CurrentValue;
+			}
+		} else {
+			$this->server_id_mysqladmin->ViewValue = NULL;
+		}
 		$this->server_id_mysqladmin->ViewCustomAttributes = "";
 
 		// HOSTNAME
-		$this->HOSTNAME->ViewValue = $this->HOSTNAME->CurrentValue;
+		if (strval($this->HOSTNAME->CurrentValue) <> "") {
+			$sFilterWrk = "`server_hostname`" . ew_SearchString("=", $this->HOSTNAME->CurrentValue, EW_DATATYPE_STRING);
+		$sSqlWrk = "SELECT `server_hostname`, `server_name` AS `DispFld`, '' AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld` FROM `server`";
+		$sWhereWrk = "";
+		if ($sFilterWrk <> "") {
+			ew_AddFilter($sWhereWrk, $sFilterWrk);
+		}
+
+		// Call Lookup selecting
+		$this->Lookup_Selecting($this->HOSTNAME, $sWhereWrk);
+		if ($sWhereWrk <> "") $sSqlWrk .= " WHERE " . $sWhereWrk;
+			$rswrk = $conn->Execute($sSqlWrk);
+			if ($rswrk && !$rswrk->EOF) { // Lookup values found
+				$this->HOSTNAME->ViewValue = $rswrk->fields('DispFld');
+				$rswrk->Close();
+			} else {
+				$this->HOSTNAME->ViewValue = $this->HOSTNAME->CurrentValue;
+			}
+		} else {
+			$this->HOSTNAME->ViewValue = NULL;
+		}
 		$this->HOSTNAME->ViewCustomAttributes = "";
 
 		// PASSWORD
@@ -733,8 +773,16 @@ class cdrop_task extends cTable {
 	// Row Inserted event
 	function Row_Inserted($rsold, &$rsnew) {
 
-		//echo "Row Inserted"
-	}
+		//echo "Row Inserted"  
+		$parameters = array(
+	'server_id_mysqladmin'=>$rsnew["server_id_mysqladmin"],
+	'HOSTNAME'=>$rsnew["HOSTNAME"],
+	'DBUSERNAME'=>$rsnew["DBUSERNAME"],
+	'PASSWORD'=>$rsnew["PASSWORD"],
+	'DATABASE'=>$rsnew["DATABASE"],
+	);
+	add_cron_task("drop",$parameters);
+	}                            
 
 	// Row Updating event
 	function Row_Updating($rsold, &$rsnew) {

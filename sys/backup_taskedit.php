@@ -412,16 +412,6 @@ class cbackup_task_edit extends cbackup_task {
 		global $objForm;
 
 		// Get upload data
-		$this->FILEPATH->Upload->Index = $objForm->Index;
-		if ($this->FILEPATH->Upload->UploadFile()) {
-
-			// No action required
-		} else {
-			echo $this->FILEPATH->Upload->Message;
-			$this->Page_Terminate();
-			exit();
-		}
-		$this->FILEPATH->CurrentValue = $this->FILEPATH->Upload->FileName;
 	}
 
 	// Load form values
@@ -429,7 +419,6 @@ class cbackup_task_edit extends cbackup_task {
 
 		// Load from form
 		global $objForm;
-		$this->GetUploadFiles(); // Get upload files
 		if (!$this->id->FldIsDetailKey)
 			$this->id->setFormValue($objForm->GetValue("x_id"));
 		if (!$this->server_id_mysqladmin->FldIsDetailKey) {
@@ -443,6 +432,9 @@ class cbackup_task_edit extends cbackup_task {
 		}
 		if (!$this->DATABASE->FldIsDetailKey) {
 			$this->DATABASE->setFormValue($objForm->GetValue("x_DATABASE"));
+		}
+		if (!$this->FILEPATH->FldIsDetailKey) {
+			$this->FILEPATH->setFormValue($objForm->GetValue("x_FILEPATH"));
 		}
 		if (!$this->FILENAME->FldIsDetailKey) {
 			$this->FILENAME->setFormValue($objForm->GetValue("x_FILENAME"));
@@ -468,6 +460,7 @@ class cbackup_task_edit extends cbackup_task {
 		$this->HOSTNAME->CurrentValue = $this->HOSTNAME->FormValue;
 		$this->PASSWORD->CurrentValue = $this->PASSWORD->FormValue;
 		$this->DATABASE->CurrentValue = $this->DATABASE->FormValue;
+		$this->FILEPATH->CurrentValue = $this->FILEPATH->FormValue;
 		$this->FILENAME->CurrentValue = $this->FILENAME->FormValue;
 		$this->datetime->CurrentValue = $this->datetime->FormValue;
 		$this->datetime->CurrentValue = ew_UnFormatDateTime($this->datetime->CurrentValue, 0);
@@ -529,7 +522,7 @@ class cbackup_task_edit extends cbackup_task {
 		$this->HOSTNAME->setDbValue($rs->fields('HOSTNAME'));
 		$this->PASSWORD->setDbValue($rs->fields('PASSWORD'));
 		$this->DATABASE->setDbValue($rs->fields('DATABASE'));
-		$this->FILEPATH->Upload->DbValue = $rs->fields('FILEPATH');
+		$this->FILEPATH->setDbValue($rs->fields('FILEPATH'));
 		$this->FILENAME->setDbValue($rs->fields('FILENAME'));
 		$this->datetime->setDbValue($rs->fields('datetime'));
 		$this->DBUSERNAME->setDbValue($rs->fields('DBUSERNAME'));
@@ -545,7 +538,7 @@ class cbackup_task_edit extends cbackup_task {
 		$this->HOSTNAME->DbValue = $row['HOSTNAME'];
 		$this->PASSWORD->DbValue = $row['PASSWORD'];
 		$this->DATABASE->DbValue = $row['DATABASE'];
-		$this->FILEPATH->Upload->DbValue = $row['FILEPATH'];
+		$this->FILEPATH->DbValue = $row['FILEPATH'];
 		$this->FILENAME->DbValue = $row['FILENAME'];
 		$this->datetime->DbValue = $row['datetime'];
 		$this->DBUSERNAME->DbValue = $row['DBUSERNAME'];
@@ -606,8 +599,8 @@ class cbackup_task_edit extends cbackup_task {
 
 			// HOSTNAME
 			if (strval($this->HOSTNAME->CurrentValue) <> "") {
-				$sFilterWrk = "`server_id`" . ew_SearchString("=", $this->HOSTNAME->CurrentValue, EW_DATATYPE_NUMBER);
-			$sSqlWrk = "SELECT `server_id`, `server_name` AS `DispFld`, '' AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld` FROM `server`";
+				$sFilterWrk = "`server_hostname`" . ew_SearchString("=", $this->HOSTNAME->CurrentValue, EW_DATATYPE_STRING);
+			$sSqlWrk = "SELECT `server_hostname`, `server_name` AS `DispFld`, '' AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld` FROM `server`";
 			$sWhereWrk = "";
 			if ($sFilterWrk <> "") {
 				ew_AddFilter($sWhereWrk, $sFilterWrk);
@@ -637,11 +630,7 @@ class cbackup_task_edit extends cbackup_task {
 			$this->DATABASE->ViewCustomAttributes = "";
 
 			// FILEPATH
-			if (!ew_Empty($this->FILEPATH->Upload->DbValue)) {
-				$this->FILEPATH->ViewValue = $this->FILEPATH->Upload->DbValue;
-			} else {
-				$this->FILEPATH->ViewValue = "";
-			}
+			$this->FILEPATH->ViewValue = $this->FILEPATH->CurrentValue;
 			$this->FILEPATH->ViewCustomAttributes = "";
 
 			// FILENAME
@@ -688,7 +677,6 @@ class cbackup_task_edit extends cbackup_task {
 			// FILEPATH
 			$this->FILEPATH->LinkCustomAttributes = "";
 			$this->FILEPATH->HrefValue = "";
-			$this->FILEPATH->HrefValue2 = $this->FILEPATH->UploadPath . $this->FILEPATH->Upload->DbValue;
 			$this->FILEPATH->TooltipValue = "";
 
 			// FILENAME
@@ -742,7 +730,7 @@ class cbackup_task_edit extends cbackup_task {
 			// HOSTNAME
 			$this->HOSTNAME->EditCustomAttributes = "";
 			$sFilterWrk = "";
-			$sSqlWrk = "SELECT `server_id`, `server_name` AS `DispFld`, '' AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld`, '' AS `SelectFilterFld`, '' AS `SelectFilterFld2`, '' AS `SelectFilterFld3`, '' AS `SelectFilterFld4` FROM `server`";
+			$sSqlWrk = "SELECT `server_hostname`, `server_name` AS `DispFld`, '' AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld`, '' AS `SelectFilterFld`, '' AS `SelectFilterFld2`, '' AS `SelectFilterFld3`, '' AS `SelectFilterFld4` FROM `server`";
 			$sWhereWrk = "";
 			if ($sFilterWrk <> "") {
 				ew_AddFilter($sWhereWrk, $sFilterWrk);
@@ -769,12 +757,8 @@ class cbackup_task_edit extends cbackup_task {
 
 			// FILEPATH
 			$this->FILEPATH->EditCustomAttributes = "";
-			if (!ew_Empty($this->FILEPATH->Upload->DbValue)) {
-				$this->FILEPATH->EditValue = $this->FILEPATH->Upload->DbValue;
-			} else {
-				$this->FILEPATH->EditValue = "";
-			}
-			if ($this->CurrentAction == "I" && !$this->EventCancelled) ew_RenderUploadField($this->FILEPATH);
+			$this->FILEPATH->EditValue = ew_HtmlEncode($this->FILEPATH->CurrentValue);
+			$this->FILEPATH->PlaceHolder = ew_HtmlEncode(ew_RemoveHtml($this->FILEPATH->FldCaption()));
 
 			// FILENAME
 			$this->FILENAME->EditCustomAttributes = "";
@@ -782,20 +766,13 @@ class cbackup_task_edit extends cbackup_task {
 			$this->FILENAME->PlaceHolder = ew_HtmlEncode(ew_RemoveHtml($this->FILENAME->FldCaption()));
 
 			// datetime
-			$this->datetime->EditCustomAttributes = "";
-			$this->datetime->EditValue = ew_HtmlEncode($this->datetime->CurrentValue);
-			$this->datetime->PlaceHolder = ew_HtmlEncode(ew_RemoveHtml($this->datetime->FldCaption()));
-
 			// DBUSERNAME
+
 			$this->DBUSERNAME->EditCustomAttributes = "";
 			$this->DBUSERNAME->EditValue = ew_HtmlEncode($this->DBUSERNAME->CurrentValue);
 			$this->DBUSERNAME->PlaceHolder = ew_HtmlEncode(ew_RemoveHtml($this->DBUSERNAME->FldCaption()));
 
 			// username
-			$this->username->EditCustomAttributes = "";
-			$this->username->EditValue = ew_HtmlEncode($this->username->CurrentValue);
-			$this->username->PlaceHolder = ew_HtmlEncode(ew_RemoveHtml($this->username->FldCaption()));
-
 			// Edit refer script
 			// id
 
@@ -815,7 +792,6 @@ class cbackup_task_edit extends cbackup_task {
 
 			// FILEPATH
 			$this->FILEPATH->HrefValue = "";
-			$this->FILEPATH->HrefValue2 = $this->FILEPATH->UploadPath . $this->FILEPATH->Upload->DbValue;
 
 			// FILENAME
 			$this->FILENAME->HrefValue = "";
@@ -862,20 +838,14 @@ class cbackup_task_edit extends cbackup_task {
 		if (!$this->DATABASE->FldIsDetailKey && !is_null($this->DATABASE->FormValue) && $this->DATABASE->FormValue == "") {
 			ew_AddMessage($gsFormError, $Language->Phrase("EnterRequiredField") . " - " . $this->DATABASE->FldCaption());
 		}
-		if (is_null($this->FILEPATH->Upload->Value)) {
+		if (!$this->FILEPATH->FldIsDetailKey && !is_null($this->FILEPATH->FormValue) && $this->FILEPATH->FormValue == "") {
 			ew_AddMessage($gsFormError, $Language->Phrase("EnterRequiredField") . " - " . $this->FILEPATH->FldCaption());
 		}
 		if (!$this->FILENAME->FldIsDetailKey && !is_null($this->FILENAME->FormValue) && $this->FILENAME->FormValue == "") {
 			ew_AddMessage($gsFormError, $Language->Phrase("EnterRequiredField") . " - " . $this->FILENAME->FldCaption());
 		}
-		if (!$this->datetime->FldIsDetailKey && !is_null($this->datetime->FormValue) && $this->datetime->FormValue == "") {
-			ew_AddMessage($gsFormError, $Language->Phrase("EnterRequiredField") . " - " . $this->datetime->FldCaption());
-		}
 		if (!$this->DBUSERNAME->FldIsDetailKey && !is_null($this->DBUSERNAME->FormValue) && $this->DBUSERNAME->FormValue == "") {
 			ew_AddMessage($gsFormError, $Language->Phrase("EnterRequiredField") . " - " . $this->DBUSERNAME->FldCaption());
-		}
-		if (!$this->username->FldIsDetailKey && !is_null($this->username->FormValue) && $this->username->FormValue == "") {
-			ew_AddMessage($gsFormError, $Language->Phrase("EnterRequiredField") . " - " . $this->username->FldCaption());
 		}
 
 		// Return validate result
@@ -923,35 +893,21 @@ class cbackup_task_edit extends cbackup_task {
 			$this->DATABASE->SetDbValueDef($rsnew, $this->DATABASE->CurrentValue, "", $this->DATABASE->ReadOnly);
 
 			// FILEPATH
-			if (!($this->FILEPATH->ReadOnly) && !$this->FILEPATH->Upload->KeepFile) {
-				$this->FILEPATH->Upload->DbValue = $rs->fields('FILEPATH'); // Get original value
-				if ($this->FILEPATH->Upload->FileName == "") {
-					$rsnew['FILEPATH'] = NULL;
-				} else {
-					$rsnew['FILEPATH'] = $this->FILEPATH->Upload->FileName;
-				}
-			}
+			$this->FILEPATH->SetDbValueDef($rsnew, $this->FILEPATH->CurrentValue, "", $this->FILEPATH->ReadOnly);
 
 			// FILENAME
 			$this->FILENAME->SetDbValueDef($rsnew, $this->FILENAME->CurrentValue, "", $this->FILENAME->ReadOnly);
 
 			// datetime
-			$this->datetime->SetDbValueDef($rsnew, $this->datetime->CurrentValue, ew_CurrentDate(), $this->datetime->ReadOnly);
+			$this->datetime->SetDbValueDef($rsnew, ew_CurrentDateTime(), ew_CurrentDate());
+			$rsnew['datetime'] = &$this->datetime->DbValue;
 
 			// DBUSERNAME
 			$this->DBUSERNAME->SetDbValueDef($rsnew, $this->DBUSERNAME->CurrentValue, "", $this->DBUSERNAME->ReadOnly);
 
 			// username
-			$this->username->SetDbValueDef($rsnew, $this->username->CurrentValue, "", $this->username->ReadOnly);
-			if (!$this->FILEPATH->Upload->KeepFile) {
-				if (!ew_Empty($this->FILEPATH->Upload->Value)) {
-					if ($this->FILEPATH->Upload->FileName == $this->FILEPATH->Upload->DbValue) { // Overwrite if same file name
-						$this->FILEPATH->Upload->DbValue = ""; // No need to delete any more
-					} else {
-						$rsnew['FILEPATH'] = ew_UploadFileNameEx(ew_UploadPathEx(TRUE, $this->FILEPATH->UploadPath), $rsnew['FILEPATH']); // Get new file name
-					}
-				}
-			}
+			$this->username->SetDbValueDef($rsnew, CurrentUserName(), "");
+			$rsnew['username'] = &$this->username->DbValue;
 
 			// Call Row Updating event
 			$bUpdateRow = $this->Row_Updating($rsold, $rsnew);
@@ -963,13 +919,6 @@ class cbackup_task_edit extends cbackup_task {
 					$EditRow = TRUE; // No field to update
 				$conn->raiseErrorFn = '';
 				if ($EditRow) {
-					if (!$this->FILEPATH->Upload->KeepFile) {
-						if (!ew_Empty($this->FILEPATH->Upload->Value)) {
-							$this->FILEPATH->Upload->SaveToFile($this->FILEPATH->UploadPath, $rsnew['FILEPATH'], TRUE);
-						}
-						if ($this->FILEPATH->Upload->DbValue <> "")
-							@unlink(ew_UploadPathEx(TRUE, $this->FILEPATH->OldUploadPath) . $this->FILEPATH->Upload->DbValue);
-					}
 				}
 			} else {
 				if ($this->getSuccessMessage() <> "" || $this->getFailureMessage() <> "") {
@@ -989,9 +938,6 @@ class cbackup_task_edit extends cbackup_task {
 		if ($EditRow)
 			$this->Row_Updated($rsold, $rsnew);
 		$rs->Close();
-
-		// FILEPATH
-		ew_CleanUploadTempPath($this->FILEPATH, $this->FILEPATH->Upload->Index);
 		return $EditRow;
 	}
 
@@ -1130,22 +1076,15 @@ fbackup_taskedit.Validate = function() {
 			elm = this.GetElements("x" + infix + "_DATABASE");
 			if (elm && !ew_HasValue(elm))
 				return this.OnError(elm, ewLanguage.Phrase("EnterRequiredField") + " - <?php echo ew_JsEncode2($backup_task->DATABASE->FldCaption()) ?>");
-			felm = this.GetElements("x" + infix + "_FILEPATH");
-			elm = this.GetElements("fn_x" + infix + "_FILEPATH");
-			if (felm && elm && !ew_HasValue(elm))
-				return this.OnError(felm, ewLanguage.Phrase("EnterRequiredField") + " - <?php echo ew_JsEncode2($backup_task->FILEPATH->FldCaption()) ?>");
+			elm = this.GetElements("x" + infix + "_FILEPATH");
+			if (elm && !ew_HasValue(elm))
+				return this.OnError(elm, ewLanguage.Phrase("EnterRequiredField") + " - <?php echo ew_JsEncode2($backup_task->FILEPATH->FldCaption()) ?>");
 			elm = this.GetElements("x" + infix + "_FILENAME");
 			if (elm && !ew_HasValue(elm))
 				return this.OnError(elm, ewLanguage.Phrase("EnterRequiredField") + " - <?php echo ew_JsEncode2($backup_task->FILENAME->FldCaption()) ?>");
-			elm = this.GetElements("x" + infix + "_datetime");
-			if (elm && !ew_HasValue(elm))
-				return this.OnError(elm, ewLanguage.Phrase("EnterRequiredField") + " - <?php echo ew_JsEncode2($backup_task->datetime->FldCaption()) ?>");
 			elm = this.GetElements("x" + infix + "_DBUSERNAME");
 			if (elm && !ew_HasValue(elm))
 				return this.OnError(elm, ewLanguage.Phrase("EnterRequiredField") + " - <?php echo ew_JsEncode2($backup_task->DBUSERNAME->FldCaption()) ?>");
-			elm = this.GetElements("x" + infix + "_username");
-			if (elm && !ew_HasValue(elm))
-				return this.OnError(elm, ewLanguage.Phrase("EnterRequiredField") + " - <?php echo ew_JsEncode2($backup_task->username->FldCaption()) ?>");
 
 			// Set up row object
 			ew_ElementsToRow(fobj);
@@ -1183,7 +1122,7 @@ fbackup_taskedit.ValidateRequired = false;
 
 // Dynamic selection lists
 fbackup_taskedit.Lists["x_server_id_mysqladmin"] = {"LinkField":"x_server_id","Ajax":true,"AutoFill":false,"DisplayFields":["x_server_name","","",""],"ParentFields":[],"FilterFields":[],"Options":[]};
-fbackup_taskedit.Lists["x_HOSTNAME"] = {"LinkField":"x_server_id","Ajax":null,"AutoFill":false,"DisplayFields":["x_server_name","","",""],"ParentFields":[],"FilterFields":[],"Options":[]};
+fbackup_taskedit.Lists["x_HOSTNAME"] = {"LinkField":"x_server_hostname","Ajax":null,"AutoFill":false,"DisplayFields":["x_server_name","","",""],"ParentFields":[],"FilterFields":[],"Options":[]};
 
 // Form object for search
 </script>
@@ -1335,20 +1274,7 @@ fbackup_taskedit.Lists["x_HOSTNAME"].Options = <?php echo (is_array($backup_task
 		<td><span id="elh_backup_task_FILEPATH"><?php echo $backup_task->FILEPATH->FldCaption() ?><?php echo $Language->Phrase("FieldRequiredIndicator") ?></span></td>
 		<td<?php echo $backup_task->FILEPATH->CellAttributes() ?>>
 <span id="el_backup_task_FILEPATH" class="control-group">
-<span id="fd_x_FILEPATH">
-<span class="btn btn-small fileinput-button">
-	<span><?php echo $Language->Phrase("ChooseFile") ?></span>
-	<input type="file" data-field="x_FILEPATH" name="x_FILEPATH" id="x_FILEPATH">
-</span>
-<input type="hidden" name="fn_x_FILEPATH" id= "fn_x_FILEPATH" value="<?php echo $backup_task->FILEPATH->Upload->FileName ?>">
-<?php if (@$_POST["fa_x_FILEPATH"] == "0") { ?>
-<input type="hidden" name="fa_x_FILEPATH" id= "fa_x_FILEPATH" value="0">
-<?php } else { ?>
-<input type="hidden" name="fa_x_FILEPATH" id= "fa_x_FILEPATH" value="1">
-<?php } ?>
-<input type="hidden" name="fs_x_FILEPATH" id= "fs_x_FILEPATH" value="255">
-</span>
-<table id="ft_x_FILEPATH" class="table table-condensed pull-left ewUploadTable"><tbody class="files"></tbody></table>
+<input type="text" data-field="x_FILEPATH" name="x_FILEPATH" id="x_FILEPATH" size="30" maxlength="255" placeholder="<?php echo $backup_task->FILEPATH->PlaceHolder ?>" value="<?php echo $backup_task->FILEPATH->EditValue ?>"<?php echo $backup_task->FILEPATH->EditAttributes() ?>>
 </span>
 <?php echo $backup_task->FILEPATH->CustomMsg ?></td>
 	</tr>
@@ -1363,16 +1289,6 @@ fbackup_taskedit.Lists["x_HOSTNAME"].Options = <?php echo (is_array($backup_task
 <?php echo $backup_task->FILENAME->CustomMsg ?></td>
 	</tr>
 <?php } ?>
-<?php if ($backup_task->datetime->Visible) { // datetime ?>
-	<tr id="r_datetime">
-		<td><span id="elh_backup_task_datetime"><?php echo $backup_task->datetime->FldCaption() ?><?php echo $Language->Phrase("FieldRequiredIndicator") ?></span></td>
-		<td<?php echo $backup_task->datetime->CellAttributes() ?>>
-<span id="el_backup_task_datetime" class="control-group">
-<input type="text" data-field="x_datetime" name="x_datetime" id="x_datetime" placeholder="<?php echo $backup_task->datetime->PlaceHolder ?>" value="<?php echo $backup_task->datetime->EditValue ?>"<?php echo $backup_task->datetime->EditAttributes() ?>>
-</span>
-<?php echo $backup_task->datetime->CustomMsg ?></td>
-	</tr>
-<?php } ?>
 <?php if ($backup_task->DBUSERNAME->Visible) { // DBUSERNAME ?>
 	<tr id="r_DBUSERNAME">
 		<td><span id="elh_backup_task_DBUSERNAME"><?php echo $backup_task->DBUSERNAME->FldCaption() ?><?php echo $Language->Phrase("FieldRequiredIndicator") ?></span></td>
@@ -1381,16 +1297,6 @@ fbackup_taskedit.Lists["x_HOSTNAME"].Options = <?php echo (is_array($backup_task
 <input type="text" data-field="x_DBUSERNAME" name="x_DBUSERNAME" id="x_DBUSERNAME" size="30" maxlength="255" placeholder="<?php echo $backup_task->DBUSERNAME->PlaceHolder ?>" value="<?php echo $backup_task->DBUSERNAME->EditValue ?>"<?php echo $backup_task->DBUSERNAME->EditAttributes() ?>>
 </span>
 <?php echo $backup_task->DBUSERNAME->CustomMsg ?></td>
-	</tr>
-<?php } ?>
-<?php if ($backup_task->username->Visible) { // username ?>
-	<tr id="r_username">
-		<td><span id="elh_backup_task_username"><?php echo $backup_task->username->FldCaption() ?><?php echo $Language->Phrase("FieldRequiredIndicator") ?></span></td>
-		<td<?php echo $backup_task->username->CellAttributes() ?>>
-<span id="el_backup_task_username" class="control-group">
-<input type="text" data-field="x_username" name="x_username" id="x_username" size="30" maxlength="255" placeholder="<?php echo $backup_task->username->PlaceHolder ?>" value="<?php echo $backup_task->username->EditValue ?>"<?php echo $backup_task->username->EditAttributes() ?>>
-</span>
-<?php echo $backup_task->username->CustomMsg ?></td>
 	</tr>
 <?php } ?>
 </table>

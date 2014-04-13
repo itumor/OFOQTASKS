@@ -245,6 +245,14 @@ class cdefault {
 			$this->Page_Terminate("script_function_parameter_relationlist.php");
 		if ($Security->AllowList(CurrentProjectID() . 'list_task'))
 			$this->Page_Terminate("list_tasklist.php");
+		if ($Security->AllowList(CurrentProjectID() . 'restart_glassfish_task'))
+			$this->Page_Terminate("restart_glassfish_tasklist.php");
+		if ($Security->AllowList(CurrentProjectID() . 'start_glassfish_task'))
+			$this->Page_Terminate("start_glassfish_tasklist.php");
+		if ($Security->AllowList(CurrentProjectID() . 'stop_glassfish_task'))
+			$this->Page_Terminate("stop_glassfish_tasklist.php");
+		if ($Security->AllowList(CurrentProjectID() . 'send_task'))
+			$this->Page_Terminate("send_tasklist.php");
 		if ($Security->IsLoggedIn()) {
 			$this->setFailureMessage($Language->Phrase("NoPermission") . "<br><br><a href=\"logout.php\">" . $Language->Phrase("BackToLogin") . "</a>");
 		} else {

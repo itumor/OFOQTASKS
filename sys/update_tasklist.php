@@ -317,6 +317,8 @@ class cupdate_task_list extends cupdate_task {
 		// Setup export options
 		$this->SetupExportOptions();
 		$this->id->Visible = !$this->IsAdd() && !$this->IsCopy() && !$this->IsGridAdd();
+		$this->datetime->Visible = !$this->IsAddOrEdit();
+		$this->username->Visible = !$this->IsAddOrEdit();
 
 		// Global Page Loading event (in userfn*.php)
 		Page_Loading();
@@ -1027,8 +1029,8 @@ class cupdate_task_list extends cupdate_task {
 		$this->HOSTNAME->setDbValue($rs->fields('HOSTNAME'));
 		$this->PASSWORD->setDbValue($rs->fields('PASSWORD'));
 		$this->DATABASE->setDbValue($rs->fields('DATABASE'));
-		$this->FILEPATH->setDbValue($rs->fields('FILEPATH'));
-		$this->FILENAME->setDbValue($rs->fields('FILENAME'));
+		$this->FILEPATH->Upload->DbValue = $rs->fields('FILEPATH');
+		$this->FILENAME->Upload->DbValue = $rs->fields('FILENAME');
 		$this->datetime->setDbValue($rs->fields('datetime'));
 		$this->DBUSERNAME->setDbValue($rs->fields('DBUSERNAME'));
 		$this->username->setDbValue($rs->fields('username'));
@@ -1043,8 +1045,8 @@ class cupdate_task_list extends cupdate_task {
 		$this->HOSTNAME->DbValue = $row['HOSTNAME'];
 		$this->PASSWORD->DbValue = $row['PASSWORD'];
 		$this->DATABASE->DbValue = $row['DATABASE'];
-		$this->FILEPATH->DbValue = $row['FILEPATH'];
-		$this->FILENAME->DbValue = $row['FILENAME'];
+		$this->FILEPATH->Upload->DbValue = $row['FILEPATH'];
+		$this->FILENAME->Upload->DbValue = $row['FILENAME'];
 		$this->datetime->DbValue = $row['datetime'];
 		$this->DBUSERNAME->DbValue = $row['DBUSERNAME'];
 		$this->username->DbValue = $row['username'];
@@ -1107,11 +1109,51 @@ class cupdate_task_list extends cupdate_task {
 			$this->id->ViewCustomAttributes = "";
 
 			// server_id_mysqladmin
-			$this->server_id_mysqladmin->ViewValue = $this->server_id_mysqladmin->CurrentValue;
+			if (strval($this->server_id_mysqladmin->CurrentValue) <> "") {
+				$sFilterWrk = "`server_id`" . ew_SearchString("=", $this->server_id_mysqladmin->CurrentValue, EW_DATATYPE_NUMBER);
+			$sSqlWrk = "SELECT `server_id`, `server_name` AS `DispFld`, '' AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld` FROM `server`";
+			$sWhereWrk = "";
+			if ($sFilterWrk <> "") {
+				ew_AddFilter($sWhereWrk, $sFilterWrk);
+			}
+
+			// Call Lookup selecting
+			$this->Lookup_Selecting($this->server_id_mysqladmin, $sWhereWrk);
+			if ($sWhereWrk <> "") $sSqlWrk .= " WHERE " . $sWhereWrk;
+				$rswrk = $conn->Execute($sSqlWrk);
+				if ($rswrk && !$rswrk->EOF) { // Lookup values found
+					$this->server_id_mysqladmin->ViewValue = $rswrk->fields('DispFld');
+					$rswrk->Close();
+				} else {
+					$this->server_id_mysqladmin->ViewValue = $this->server_id_mysqladmin->CurrentValue;
+				}
+			} else {
+				$this->server_id_mysqladmin->ViewValue = NULL;
+			}
 			$this->server_id_mysqladmin->ViewCustomAttributes = "";
 
 			// HOSTNAME
-			$this->HOSTNAME->ViewValue = $this->HOSTNAME->CurrentValue;
+			if (strval($this->HOSTNAME->CurrentValue) <> "") {
+				$sFilterWrk = "`server_hostname`" . ew_SearchString("=", $this->HOSTNAME->CurrentValue, EW_DATATYPE_STRING);
+			$sSqlWrk = "SELECT `server_hostname`, `server_name` AS `DispFld`, '' AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld` FROM `server`";
+			$sWhereWrk = "";
+			if ($sFilterWrk <> "") {
+				ew_AddFilter($sWhereWrk, $sFilterWrk);
+			}
+
+			// Call Lookup selecting
+			$this->Lookup_Selecting($this->HOSTNAME, $sWhereWrk);
+			if ($sWhereWrk <> "") $sSqlWrk .= " WHERE " . $sWhereWrk;
+				$rswrk = $conn->Execute($sSqlWrk);
+				if ($rswrk && !$rswrk->EOF) { // Lookup values found
+					$this->HOSTNAME->ViewValue = $rswrk->fields('DispFld');
+					$rswrk->Close();
+				} else {
+					$this->HOSTNAME->ViewValue = $this->HOSTNAME->CurrentValue;
+				}
+			} else {
+				$this->HOSTNAME->ViewValue = NULL;
+			}
 			$this->HOSTNAME->ViewCustomAttributes = "";
 
 			// PASSWORD
@@ -1123,11 +1165,19 @@ class cupdate_task_list extends cupdate_task {
 			$this->DATABASE->ViewCustomAttributes = "";
 
 			// FILEPATH
-			$this->FILEPATH->ViewValue = $this->FILEPATH->CurrentValue;
+			if (!ew_Empty($this->FILEPATH->Upload->DbValue)) {
+				$this->FILEPATH->ViewValue = $this->FILEPATH->Upload->DbValue;
+			} else {
+				$this->FILEPATH->ViewValue = "";
+			}
 			$this->FILEPATH->ViewCustomAttributes = "";
 
 			// FILENAME
-			$this->FILENAME->ViewValue = $this->FILENAME->CurrentValue;
+			if (!ew_Empty($this->FILENAME->Upload->DbValue)) {
+				$this->FILENAME->ViewValue = $this->FILENAME->Upload->DbValue;
+			} else {
+				$this->FILENAME->ViewValue = "";
+			}
 			$this->FILENAME->ViewCustomAttributes = "";
 
 			// datetime
@@ -1170,11 +1220,13 @@ class cupdate_task_list extends cupdate_task {
 			// FILEPATH
 			$this->FILEPATH->LinkCustomAttributes = "";
 			$this->FILEPATH->HrefValue = "";
+			$this->FILEPATH->HrefValue2 = $this->FILEPATH->UploadPath . $this->FILEPATH->Upload->DbValue;
 			$this->FILEPATH->TooltipValue = "";
 
 			// FILENAME
 			$this->FILENAME->LinkCustomAttributes = "";
 			$this->FILENAME->HrefValue = "";
+			$this->FILENAME->HrefValue2 = $this->FILENAME->UploadPath . $this->FILENAME->Upload->DbValue;
 			$this->FILENAME->TooltipValue = "";
 
 			// datetime
@@ -1600,8 +1652,10 @@ fupdate_tasklist.ValidateRequired = false;
 <?php } ?>
 
 // Dynamic selection lists
-// Form object for search
+fupdate_tasklist.Lists["x_server_id_mysqladmin"] = {"LinkField":"x_server_id","Ajax":true,"AutoFill":false,"DisplayFields":["x_server_name","","",""],"ParentFields":[],"FilterFields":[],"Options":[]};
+fupdate_tasklist.Lists["x_HOSTNAME"] = {"LinkField":"x_server_hostname","Ajax":true,"AutoFill":false,"DisplayFields":["x_server_name","","",""],"ParentFields":[],"FilterFields":[],"Options":[]};
 
+// Form object for search
 var fupdate_tasklistsrch = new ew_Form("fupdate_tasklistsrch");
 
 // Init search panel as collapsed
@@ -1778,7 +1832,7 @@ $update_task_list->ListOptions->Render("header", "left");
 		<td><div id="elh_update_task_server_id_mysqladmin" class="update_task_server_id_mysqladmin"><div class="ewTableHeaderCaption"><?php echo $update_task->server_id_mysqladmin->FldCaption() ?></div></div></td>
 	<?php } else { ?>
 		<td><div class="ewPointer" onclick="ew_Sort(event,'<?php echo $update_task->SortUrl($update_task->server_id_mysqladmin) ?>',1);"><div id="elh_update_task_server_id_mysqladmin" class="update_task_server_id_mysqladmin">
-			<div class="ewTableHeaderBtn"><span class="ewTableHeaderCaption"><?php echo $update_task->server_id_mysqladmin->FldCaption() ?><?php echo $Language->Phrase("SrchLegend") ?></span><span class="ewTableHeaderSort"><?php if ($update_task->server_id_mysqladmin->getSort() == "ASC") { ?><span class="caret ewSortUp"></span><?php } elseif ($update_task->server_id_mysqladmin->getSort() == "DESC") { ?><span class="caret"></span><?php } ?></span></div>
+			<div class="ewTableHeaderBtn"><span class="ewTableHeaderCaption"><?php echo $update_task->server_id_mysqladmin->FldCaption() ?></span><span class="ewTableHeaderSort"><?php if ($update_task->server_id_mysqladmin->getSort() == "ASC") { ?><span class="caret ewSortUp"></span><?php } elseif ($update_task->server_id_mysqladmin->getSort() == "DESC") { ?><span class="caret"></span><?php } ?></span></div>
         </div></div></td>
 	<?php } ?>
 <?php } ?>		
@@ -1787,7 +1841,7 @@ $update_task_list->ListOptions->Render("header", "left");
 		<td><div id="elh_update_task_HOSTNAME" class="update_task_HOSTNAME"><div class="ewTableHeaderCaption"><?php echo $update_task->HOSTNAME->FldCaption() ?></div></div></td>
 	<?php } else { ?>
 		<td><div class="ewPointer" onclick="ew_Sort(event,'<?php echo $update_task->SortUrl($update_task->HOSTNAME) ?>',1);"><div id="elh_update_task_HOSTNAME" class="update_task_HOSTNAME">
-			<div class="ewTableHeaderBtn"><span class="ewTableHeaderCaption"><?php echo $update_task->HOSTNAME->FldCaption() ?><?php echo $Language->Phrase("SrchLegend") ?></span><span class="ewTableHeaderSort"><?php if ($update_task->HOSTNAME->getSort() == "ASC") { ?><span class="caret ewSortUp"></span><?php } elseif ($update_task->HOSTNAME->getSort() == "DESC") { ?><span class="caret"></span><?php } ?></span></div>
+			<div class="ewTableHeaderBtn"><span class="ewTableHeaderCaption"><?php echo $update_task->HOSTNAME->FldCaption() ?></span><span class="ewTableHeaderSort"><?php if ($update_task->HOSTNAME->getSort() == "ASC") { ?><span class="caret ewSortUp"></span><?php } elseif ($update_task->HOSTNAME->getSort() == "DESC") { ?><span class="caret"></span><?php } ?></span></div>
         </div></div></td>
 	<?php } ?>
 <?php } ?>		
@@ -1951,13 +2005,39 @@ $update_task_list->ListOptions->Render("body", "left", $update_task_list->RowCnt
 	<?php if ($update_task->FILEPATH->Visible) { // FILEPATH ?>
 		<td<?php echo $update_task->FILEPATH->CellAttributes() ?>>
 <span<?php echo $update_task->FILEPATH->ViewAttributes() ?>>
-<?php echo $update_task->FILEPATH->ListViewValue() ?></span>
+<?php if ($update_task->FILEPATH->LinkAttributes() <> "") { ?>
+<?php if (!empty($update_task->FILEPATH->Upload->DbValue)) { ?>
+<?php echo $update_task->FILEPATH->ListViewValue() ?>
+<?php } elseif (!in_array($update_task->CurrentAction, array("I", "edit", "gridedit"))) { ?>	
+&nbsp;
+<?php } ?>
+<?php } else { ?>
+<?php if (!empty($update_task->FILEPATH->Upload->DbValue)) { ?>
+<?php echo $update_task->FILEPATH->ListViewValue() ?>
+<?php } elseif (!in_array($update_task->CurrentAction, array("I", "edit", "gridedit"))) { ?>	
+&nbsp;
+<?php } ?>
+<?php } ?>
+</span>
 <a id="<?php echo $update_task_list->PageObjName . "_row_" . $update_task_list->RowCnt ?>"></a></td>
 	<?php } ?>
 	<?php if ($update_task->FILENAME->Visible) { // FILENAME ?>
 		<td<?php echo $update_task->FILENAME->CellAttributes() ?>>
 <span<?php echo $update_task->FILENAME->ViewAttributes() ?>>
-<?php echo $update_task->FILENAME->ListViewValue() ?></span>
+<?php if ($update_task->FILENAME->LinkAttributes() <> "") { ?>
+<?php if (!empty($update_task->FILENAME->Upload->DbValue)) { ?>
+<?php echo $update_task->FILENAME->ListViewValue() ?>
+<?php } elseif (!in_array($update_task->CurrentAction, array("I", "edit", "gridedit"))) { ?>	
+&nbsp;
+<?php } ?>
+<?php } else { ?>
+<?php if (!empty($update_task->FILENAME->Upload->DbValue)) { ?>
+<?php echo $update_task->FILENAME->ListViewValue() ?>
+<?php } elseif (!in_array($update_task->CurrentAction, array("I", "edit", "gridedit"))) { ?>	
+&nbsp;
+<?php } ?>
+<?php } ?>
+</span>
 <a id="<?php echo $update_task_list->PageObjName . "_row_" . $update_task_list->RowCnt ?>"></a></td>
 	<?php } ?>
 	<?php if ($update_task->datetime->Visible) { // datetime ?>

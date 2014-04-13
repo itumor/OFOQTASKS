@@ -5,7 +5,7 @@
 
 // Generate all menu items
 $RootMenu->IsRoot = TRUE;
-$RootMenu->AddMenuItem(75, $Language->MenuPhrase("75", "MenuText"), "list_tasklist.php", -1, "", AllowListMenu('{3246B9FA-4C51-4733-8040-34B188FCD87E}list_task'), FALSE);
+$RootMenu->AddMenuItem(79, $Language->MenuPhrase("79", "MenuText"), "send_tasklist.php", -1, "", AllowListMenu('{3246B9FA-4C51-4733-8040-34B188FCD87E}send_task'), FALSE);
 $RootMenu->AddMenuItem(15, $Language->MenuPhrase("15", "MenuText"), "", -1, "", IsLoggedIn(), FALSE, TRUE);
 $RootMenu->AddMenuItem(41, $Language->MenuPhrase("41", "MenuText"), "start_tasklist.php", 15, "", AllowListMenu('{3246B9FA-4C51-4733-8040-34B188FCD87E}start_task'), FALSE);
 $RootMenu->AddMenuItem(7, $Language->MenuPhrase("7", "MenuText"), "serverlist.php", 15, "", AllowListMenu('{3246B9FA-4C51-4733-8040-34B188FCD87E}server'), FALSE);
@@ -18,6 +18,10 @@ $RootMenu->AddMenuItem(69, $Language->MenuPhrase("69", "MenuText"), "create_task
 $RootMenu->AddMenuItem(68, $Language->MenuPhrase("68", "MenuText"), "backup_tasklist.php", 15, "", AllowListMenu('{3246B9FA-4C51-4733-8040-34B188FCD87E}backup_task'), FALSE);
 $RootMenu->AddMenuItem(66, $Language->MenuPhrase("66", "MenuText"), "restart_tasklist.php", 15, "", AllowListMenu('{3246B9FA-4C51-4733-8040-34B188FCD87E}restart_task'), FALSE);
 $RootMenu->AddMenuItem(67, $Language->MenuPhrase("67", "MenuText"), "listandstart_tasklist.php", 15, "", AllowListMenu('{3246B9FA-4C51-4733-8040-34B188FCD87E}listandstart_task'), FALSE);
+$RootMenu->AddMenuItem(75, $Language->MenuPhrase("75", "MenuText"), "list_tasklist.php", 15, "", AllowListMenu('{3246B9FA-4C51-4733-8040-34B188FCD87E}list_task'), FALSE);
+$RootMenu->AddMenuItem(78, $Language->MenuPhrase("78", "MenuText"), "stop_glassfish_tasklist.php", 15, "", AllowListMenu('{3246B9FA-4C51-4733-8040-34B188FCD87E}stop_glassfish_task'), FALSE);
+$RootMenu->AddMenuItem(77, $Language->MenuPhrase("77", "MenuText"), "start_glassfish_tasklist.php", 15, "", AllowListMenu('{3246B9FA-4C51-4733-8040-34B188FCD87E}start_glassfish_task'), FALSE);
+$RootMenu->AddMenuItem(76, $Language->MenuPhrase("76", "MenuText"), "restart_glassfish_tasklist.php", 15, "", AllowListMenu('{3246B9FA-4C51-4733-8040-34B188FCD87E}restart_glassfish_task'), FALSE);
 $RootMenu->AddMenuItem(37, $Language->MenuPhrase("37", "MenuText"), "", -1, "", IsLoggedIn(), FALSE, TRUE);
 $RootMenu->AddMenuItem(18, $Language->MenuPhrase("18", "MenuText"), "generator_reportlist.php", 37, "", AllowListMenu('{3246B9FA-4C51-4733-8040-34B188FCD87E}generator report'), FALSE);
 $RootMenu->AddMenuItem(19, $Language->MenuPhrase("19", "MenuText"), "Report_Grouping_by_Taskreport.php", 37, "", AllowListMenu('{3246B9FA-4C51-4733-8040-34B188FCD87E}Report Grouping by Task'), FALSE);

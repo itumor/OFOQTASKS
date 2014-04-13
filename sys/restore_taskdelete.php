@@ -357,7 +357,7 @@ class crestore_task_delete extends crestore_task {
 		$this->PASSWORD->setDbValue($rs->fields('PASSWORD'));
 		$this->DATABASE->setDbValue($rs->fields('DATABASE'));
 		$this->FILEPATH->setDbValue($rs->fields('FILEPATH'));
-		$this->FILENAME->setDbValue($rs->fields('FILENAME'));
+		$this->FILENAME->Upload->DbValue = $rs->fields('FILENAME');
 		$this->datetime->setDbValue($rs->fields('datetime'));
 		$this->DBUSERNAME->setDbValue($rs->fields('DBUSERNAME'));
 		$this->username->setDbValue($rs->fields('username'));
@@ -373,7 +373,7 @@ class crestore_task_delete extends crestore_task {
 		$this->PASSWORD->DbValue = $row['PASSWORD'];
 		$this->DATABASE->DbValue = $row['DATABASE'];
 		$this->FILEPATH->DbValue = $row['FILEPATH'];
-		$this->FILENAME->DbValue = $row['FILENAME'];
+		$this->FILENAME->Upload->DbValue = $row['FILENAME'];
 		$this->datetime->DbValue = $row['datetime'];
 		$this->DBUSERNAME->DbValue = $row['DBUSERNAME'];
 		$this->username->DbValue = $row['username'];
@@ -408,11 +408,51 @@ class crestore_task_delete extends crestore_task {
 			$this->id->ViewCustomAttributes = "";
 
 			// server_id_mysqladmin
-			$this->server_id_mysqladmin->ViewValue = $this->server_id_mysqladmin->CurrentValue;
+			if (strval($this->server_id_mysqladmin->CurrentValue) <> "") {
+				$sFilterWrk = "`server_id`" . ew_SearchString("=", $this->server_id_mysqladmin->CurrentValue, EW_DATATYPE_NUMBER);
+			$sSqlWrk = "SELECT `server_id`, `server_name` AS `DispFld`, '' AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld` FROM `server`";
+			$sWhereWrk = "";
+			if ($sFilterWrk <> "") {
+				ew_AddFilter($sWhereWrk, $sFilterWrk);
+			}
+
+			// Call Lookup selecting
+			$this->Lookup_Selecting($this->server_id_mysqladmin, $sWhereWrk);
+			if ($sWhereWrk <> "") $sSqlWrk .= " WHERE " . $sWhereWrk;
+				$rswrk = $conn->Execute($sSqlWrk);
+				if ($rswrk && !$rswrk->EOF) { // Lookup values found
+					$this->server_id_mysqladmin->ViewValue = $rswrk->fields('DispFld');
+					$rswrk->Close();
+				} else {
+					$this->server_id_mysqladmin->ViewValue = $this->server_id_mysqladmin->CurrentValue;
+				}
+			} else {
+				$this->server_id_mysqladmin->ViewValue = NULL;
+			}
 			$this->server_id_mysqladmin->ViewCustomAttributes = "";
 
 			// HOSTNAME
-			$this->HOSTNAME->ViewValue = $this->HOSTNAME->CurrentValue;
+			if (strval($this->HOSTNAME->CurrentValue) <> "") {
+				$sFilterWrk = "`server_hostname`" . ew_SearchString("=", $this->HOSTNAME->CurrentValue, EW_DATATYPE_STRING);
+			$sSqlWrk = "SELECT `server_hostname`, `server_name` AS `DispFld`, '' AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld` FROM `server`";
+			$sWhereWrk = "";
+			if ($sFilterWrk <> "") {
+				ew_AddFilter($sWhereWrk, $sFilterWrk);
+			}
+
+			// Call Lookup selecting
+			$this->Lookup_Selecting($this->HOSTNAME, $sWhereWrk);
+			if ($sWhereWrk <> "") $sSqlWrk .= " WHERE " . $sWhereWrk;
+				$rswrk = $conn->Execute($sSqlWrk);
+				if ($rswrk && !$rswrk->EOF) { // Lookup values found
+					$this->HOSTNAME->ViewValue = $rswrk->fields('DispFld');
+					$rswrk->Close();
+				} else {
+					$this->HOSTNAME->ViewValue = $this->HOSTNAME->CurrentValue;
+				}
+			} else {
+				$this->HOSTNAME->ViewValue = NULL;
+			}
 			$this->HOSTNAME->ViewCustomAttributes = "";
 
 			// PASSWORD
@@ -428,7 +468,11 @@ class crestore_task_delete extends crestore_task {
 			$this->FILEPATH->ViewCustomAttributes = "";
 
 			// FILENAME
-			$this->FILENAME->ViewValue = $this->FILENAME->CurrentValue;
+			if (!ew_Empty($this->FILENAME->Upload->DbValue)) {
+				$this->FILENAME->ViewValue = $this->FILENAME->Upload->DbValue;
+			} else {
+				$this->FILENAME->ViewValue = "";
+			}
 			$this->FILENAME->ViewCustomAttributes = "";
 
 			// datetime
@@ -476,6 +520,7 @@ class crestore_task_delete extends crestore_task {
 			// FILENAME
 			$this->FILENAME->LinkCustomAttributes = "";
 			$this->FILENAME->HrefValue = "";
+			$this->FILENAME->HrefValue2 = $this->FILENAME->UploadPath . $this->FILENAME->Upload->DbValue;
 			$this->FILENAME->TooltipValue = "";
 
 			// datetime
@@ -545,6 +590,7 @@ class crestore_task_delete extends crestore_task {
 				if ($sThisKey <> "") $sThisKey .= $GLOBALS["EW_COMPOSITE_KEY_SEPARATOR"];
 				$sThisKey .= $row['id'];
 				$this->LoadDbValues($row);
+				@unlink(ew_UploadPathEx(TRUE, $this->FILENAME->OldUploadPath) . $row['FILENAME']);
 				$conn->raiseErrorFn = 'ew_ErrorFn';
 				$DeleteRows = $this->Delete($row); // Delete
 				$conn->raiseErrorFn = '';
@@ -697,8 +743,10 @@ frestore_taskdelete.ValidateRequired = false;
 <?php } ?>
 
 // Dynamic selection lists
-// Form object for search
+frestore_taskdelete.Lists["x_server_id_mysqladmin"] = {"LinkField":"x_server_id","Ajax":true,"AutoFill":false,"DisplayFields":["x_server_name","","",""],"ParentFields":[],"FilterFields":[],"Options":[]};
+frestore_taskdelete.Lists["x_HOSTNAME"] = {"LinkField":"x_server_hostname","Ajax":true,"AutoFill":false,"DisplayFields":["x_server_name","","",""],"ParentFields":[],"FilterFields":[],"Options":[]};
 
+// Form object for search
 </script>
 <script type="text/javascript">
 
@@ -836,7 +884,20 @@ while (!$restore_task_delete->Recordset->EOF) {
 		<td<?php echo $restore_task->FILENAME->CellAttributes() ?>>
 <span id="el<?php echo $restore_task_delete->RowCnt ?>_restore_task_FILENAME" class="control-group restore_task_FILENAME">
 <span<?php echo $restore_task->FILENAME->ViewAttributes() ?>>
-<?php echo $restore_task->FILENAME->ListViewValue() ?></span>
+<?php if ($restore_task->FILENAME->LinkAttributes() <> "") { ?>
+<?php if (!empty($restore_task->FILENAME->Upload->DbValue)) { ?>
+<?php echo $restore_task->FILENAME->ListViewValue() ?>
+<?php } elseif (!in_array($restore_task->CurrentAction, array("I", "edit", "gridedit"))) { ?>	
+&nbsp;
+<?php } ?>
+<?php } else { ?>
+<?php if (!empty($restore_task->FILENAME->Upload->DbValue)) { ?>
+<?php echo $restore_task->FILENAME->ListViewValue() ?>
+<?php } elseif (!in_array($restore_task->CurrentAction, array("I", "edit", "gridedit"))) { ?>	
+&nbsp;
+<?php } ?>
+<?php } ?>
+</span>
 </span>
 </td>
 <?php } ?>

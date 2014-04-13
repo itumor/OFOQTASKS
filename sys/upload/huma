@@ -1,0 +1,112 @@
+-- MySQL dump 10.13  Distrib 5.5.34, for debian-linux-gnu (x86_64)
+--
+-- Host: 1.1.1.189    Database: fabscent
+-- ------------------------------------------------------
+-- Server version	5.5.34-0ubuntu0.13.04.1
+
+/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
+/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
+/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
+/*!40101 SET NAMES utf8 */;
+/*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;
+/*!40103 SET TIME_ZONE='+00:00' */;
+/*!40014 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0 */;
+/*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
+/*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
+/*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
+
+--
+-- Table structure for table `ocentraluser`
+--
+
+DROP TABLE IF EXISTS `ocentraluser`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `ocentraluser` (
+  `ID` int(10) NOT NULL,
+  `ACTIVE` smallint(5) NOT NULL DEFAULT '0',
+  `LOGINNAME` varchar(255) COLLATE utf8_bin NOT NULL,
+  `TENANT_ID` int(10) NOT NULL,
+  PRIMARY KEY (`ID`),
+  UNIQUE KEY `SQL110104121212400` (`ID`),
+  KEY `USER_TENANT` (`TENANT_ID`),
+  CONSTRAINT `FK_OCENTRALUSER_TENANT_ID` FOREIGN KEY (`TENANT_ID`) REFERENCES `otenant` (`ID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `ocentraluser`
+--
+
+LOCK TABLES `ocentraluser` WRITE;
+/*!40000 ALTER TABLE `ocentraluser` DISABLE KEYS */;
+INSERT INTO `ocentraluser` VALUES (1,1,'test',1),(2,1,'SYSTEM',1),(3,1,'ahmed',1),(4,1,'azza',1),(5,1,'azzaadel',1),(6,1,'belal',6),(7,1,'mostafa',1),(8,1,'nada',1),(9,1,'zeyad',1),(10,1,'ali',1),(11,1,'aezzat',1),(12,1,'mmohamed',1),(13,1,'mibrahim',1),(14,1,'arezk',1),(15,1,'htawab',12),(16,1,'melsayed',1),(17,1,'nkhalil',1),(18,1,'mohammed',3),(19,1,'bassem',1),(20,1,'perryhan',1),(21,1,'sameh',1),(22,1,'test3',1),(23,1,'tamer',1),(24,1,'nairouz',1),(25,1,'ewilliams',1),(26,1,'msmith',1),(27,1,'ohruser',1),(28,1,'nermeen',1),(29,1,'test2',1),(30,1,'test4',1),(31,1,'shahinaz',1),(32,1,'ibrahim',1),(33,1,'dalia',1),(34,1,'hsaid',4),(35,1,'eds',1),(36,1,'islam',1),(37,1,'abayomy',1),(38,1,'hesham',1),(39,1,'hamada',6),(40,1,'bassem1',1),(41,1,'aezzat',11),(42,1,'adham',1),(43,1,'essam',1),(44,1,'demo',1),(45,1,'eali',1),(46,1,'testldap11',1),(47,1,'app2',1),(48,1,'madel2',1),(49,1,'asd33333333',1),(50,1,'app5',1),(51,1,'app8',1),(52,1,'app9',1),(53,1,'app10',1),(54,1,'ebtsam',1),(55,1,'khaled',1),(56,1,'LoubnaAhmed',1),(57,1,'pharma',1),(58,1,'amgad',1),(59,1,'ofoq',1),(60,1,'eees',1),(61,1,'softlock',1),(62,1,'network',1),(63,1,'fabs',1),(64,1,'app11',1),(65,1,'app12',1),(66,1,'app13',1),(67,1,'mohamedA',1),(68,1,'app14',1),(69,1,'app15',1),(70,1,'app16',1),(71,1,'app17',1),(72,1,'app20',1),(73,1,'app21',1),(74,1,'app22',1),(75,1,'app23',1),(76,1,'app24',1),(77,1,'app25',1),(78,1,'app1',1),(79,1,'app30',1),(80,1,'app31',1),(81,1,'app32',1),(82,1,'app33',1),(83,1,'app34',1),(84,1,'app35',1),(85,1,'app37',1),(86,1,'app38',1),(87,1,'app39',1),(88,1,'app40',1),(89,1,'app41',1),(90,1,'app42',1),(91,1,'app43',1),(92,1,'app44',1),(93,1,'app45',1),(94,1,'app46',1),(95,1,'app47',1),(96,1,'app48',1),(97,1,'app49',1),(98,1,'app51',1),(99,1,'app52',1),(100,1,'app53',1),(101,1,'app54',1),(102,1,'app55',1),(103,1,'app56',1),(104,1,'app57',1),(105,1,'app58',1),(106,1,'app59',1),(107,1,'app60',1),(108,1,'app61',1),(109,1,'app62',1),(110,1,'app63',1),(111,1,'app64',1),(112,1,'app65',1),(113,1,'app66',1),(114,1,'app67',1),(115,1,'app68',1),(116,1,'app69',1),(117,1,'app70',1),(118,1,'app71',1),(119,1,'app72',1),(120,1,'newapp1234',1),(121,1,'newapp12',1),(122,1,'newapp14',1),(123,1,'newapp15',1),(124,1,'newapp16',1),(125,1,'newapp17',1),(126,1,'newapp18',1),(127,1,'melkady',1),(128,1,'newapp20',1),(129,1,'newapp21',1),(130,1,'newapp23',1),(131,1,'newapp24',1),(132,1,'newapp25',1),(133,1,'newapp26',1),(134,1,'newapp28',1),(135,1,'newapp29',1),(136,1,'newapp31',1),(137,1,'newappl11',1),(138,1,'newappl112',1),(139,1,'newappl1123',1),(140,1,'newappl11236',1),(141,1,'newappl11239999',1),(142,1,'lahmed1234578',1),(143,1,'lahmed45678',1),(144,1,'lahmedaaaaaaaa',1),(145,1,'aliaa',1),(146,1,'app723',1),(147,1,'app725',1),(148,1,'app726',1),(149,1,'app727',1),(150,1,'388416',1),(151,1,'app729',1),(152,1,'vcmanager',1),(153,1,'app73',1),(154,1,'app74',1),(155,1,'app75',1),(156,1,'app76',1),(157,1,'app77',1),(158,1,'app78',1),(159,1,'app79',1),(160,1,'app80',1),(161,1,'app81',1),(162,1,'app82',1),(163,1,'app83',1),(164,1,'app84',1),(165,1,'app85',1),(166,1,'app86',1),(167,1,'app87',1),(168,1,'app88',1),(169,1,'app89',1),(170,1,'app91',1),(171,1,'vcmanager',1),(172,1,'app92',1),(173,1,'app93',1),(174,1,'app96',1),(175,1,'app99',1),(176,1,'app100',1),(177,1,'app101',1),(178,1,'app102',1),(179,1,'app103',1),(180,1,'app104',1),(181,1,'app105',1),(182,1,'app106',1),(183,1,'app107',1),(184,1,'app108',1),(185,1,'app109',1),(186,1,'app110',1),(187,1,'app111',1),(188,1,'app112',1),(189,1,'app113',1),(190,1,'app114',1),(191,1,'app115',1),(192,1,'app116',1),(193,1,'app117',1),(194,1,'app118',1),(195,1,'app119',1),(196,1,'app120',1),(197,1,'testpriv',1),(198,1,'newapp11111',1),(199,1,'k a n d i l',1),(200,1,'kandil',1),(201,1,'lamis',1),(202,1,'arezk-app',1),(203,1,'app121',1),(204,1,'app122',1),(205,1,'app123',1),(206,1,'app124',1),(207,1,'app125',1),(208,1,'arezk-app1',1),(209,1,'app126',1),(210,1,'arezk-app3',1),(211,1,'arezk-app4',1),(212,1,'app127',1),(213,1,'mynewapplicant1',1),(214,1,'app001111',1),(215,1,'app0011112',1),(216,1,'app0011113',1),(217,1,'app0011114',1),(218,1,'app0011115',1),(219,1,'app001111222',1),(220,1,'app0011112224',1),(221,1,'app00111123',1),(222,1,'newap01zxc',1),(223,1,'ap00009',1),(224,1,'ap000010',1),(225,1,'ap000011',1),(226,1,'ap000012',1),(227,1,'ap000013',1),(228,1,'ap000017',1),(229,1,'ap000018',1),(230,1,'ap000019',1),(231,1,'ap000022',1),(232,1,'ap000023',1),(233,1,'ap000024',1),(234,1,'ap000025',1),(235,1,'ap000026',1),(236,1,'ap000027',1),(237,1,'ap000029',1),(238,1,'ap000030',1),(239,1,'ap000031',1),(240,1,'ap000032',1),(241,1,'ap000033',1),(242,1,'ap000034',1),(243,1,'ap000036',1),(244,1,'ap000037',1),(245,1,'ap000038',1),(246,1,'ap000039',1),(247,1,'ap000040',1),(248,1,'ap000043',1),(249,1,'ap000047',1),(250,1,'ap000050',1),(251,1,'ap000051',1),(252,1,'ap000052',1),(253,1,'ap00005555',1),(254,1,'ap0000457',1),(255,1,'ap0077777',1),(256,1,'ap0000111',1),(257,1,'ap00001051',1),(258,1,'ap00001091',1),(259,1,'ap000010888',1),(260,1,'applicant101',1),(261,1,'applicant102',1),(262,1,'applicant104',1),(263,1,'app131',1),(264,1,'app201',1),(265,1,'msayed01',1),(266,1,'msayed02',1),(267,1,'msayed03',1),(268,1,'app202',1),(269,1,'app204',1),(270,1,'app205',1),(271,1,'Salma',1),(272,1,'app206',1),(273,1,'app207',1),(274,1,'app208',1),(275,1,'app209',1),(276,1,'app210',1),(277,1,'aadel',1),(278,1,'rashdan',1),(279,1,'HRadmin',1),(280,1,'testsn',1),(281,1,'testsn2',1),(282,1,'testldap6',1),(283,1,'testldap2',1),(284,1,'role1user1_1',1),(285,1,'testme2',1),(286,1,'testtest2',1),(287,1,'testtest3',1),(288,1,'newtestcomp_admin',1),(289,1,'azza',1),(290,1,'newtestcomp2_admin',1),(291,1,'newtestcomp3_admin',1),(292,1,'newtestcomp444_admin',1),(293,1,'newtestcomp4447654_admin',1),(294,1,'yonitedofok_admin',1),(295,1,'newc_admin',1),(296,1,'newhadmin',1),(297,1,'newsadmin',1),(298,1,'testfilteradmin',1),(299,1,'UserForPay',1),(300,1,'yuiadmin',1),(301,1,'asdasdadmin',1),(302,1,'asdfgrereadmin',1),(303,1,'testtesttestadmin',1),(304,1,'test67asadmin',1),(305,1,'barwaadmin',1),(306,1,'sd',1),(307,1,'sdadsa',1),(308,1,'aasf',1),(309,1,'aad333',1),(310,1,'e',1),(311,1,'rrrrrrr',1),(312,1,'errertfgf',1),(313,1,'iiiii',1),(314,1,'hghghjk',1),(315,1,'fgdgfdfgh',1),(316,1,'hbm',7),(317,1,'hbm2',4),(318,1,'hbm3',5),(319,1,'hbm4',5),(320,1,'tttttttttt',1),(321,1,'xdfdx',1),(322,1,'bggg',1),(323,1,'asdfhkljkhjrewq33admin',1),(324,1,'3eadmin',1),(325,1,'yyyyyadmin',1),(326,1,'44rrradmin',1),(327,1,'4r4rdddadmin',1),(328,1,'rftreteryadmin',1),(329,1,'dsf4342radmin',1),(330,1,'r55555555555444admin',1),(331,1,'oioioioadmin',1),(332,1,'123sdfasdfw34qadmin',1),(333,1,'accountant1',1),(334,1,'accountant2',1),(335,1,'hrmanager',1),(336,1,'rashidaly',1),(337,1,'edsuser',1),(338,1,'asdasdqweqwe33admin',1),(339,1,'szdxfcgvbnmadmin',1),(340,1,'fabsdemo',1),(341,1,'eeerrrradmin',1),(342,1,'uioasd33admin',1),(343,1,'asdfghj44admin',1),(344,1,'rrre34r3admin',1),(345,1,'sdfghjkadmin',1),(346,1,'asertyuadmin',1),(347,1,'sdfasdf44ee3admin',1),(348,1,'ertyuytr444admin',1),(349,1,'r4r4rrrr43wwadmin',1),(350,1,'jzza',1),(351,1,'aaa',1),(352,1,'ayhaga',1),(353,1,'aaaa',1),(354,1,'marwa',1),(355,1,'eibrahim',1),(356,1,'testnesadmin',1),(357,1,'yatadmin',1),(358,1,'Nesrin',1),(359,1,'emy',1),(360,1,'emy',1),(361,1,'emy',1),(362,1,'emy',1),(363,1,'emy',1),(364,1,'emy',1),(365,1,'emy',1),(366,1,'emy',1),(367,1,'emy',1),(368,1,'emy',1),(500,1,'user',1),(501,1,'akamal',1),(502,1,'azzauser',1),(1044,1,'lahmed',1),(1045,1,'erine',1),(1046,1,'mtork',1),(1048,1,'nairoz',1),(1077,1,'aatef',1),(1078,1,'applicant',1),(1079,1,'n123551123',1),(1080,1,'arabicnesma',1),(9999,1,'testldap5',1),(12212,1,'madel',1);
+/*!40000 ALTER TABLE `ocentraluser` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `otenant`
+--
+
+DROP TABLE IF EXISTS `otenant`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `otenant` (
+  `ID` int(10) NOT NULL,
+  `ACTIVE` smallint(5) NOT NULL DEFAULT '0',
+  `NAME` varchar(255) COLLATE utf8_bin NOT NULL,
+  `CONNURL` varchar(255) COLLATE utf8_bin NOT NULL,
+  `CONNPASSWORD` varchar(255) COLLATE utf8_bin NOT NULL,
+  `CONNUSER` varchar(255) COLLATE utf8_bin NOT NULL,
+  `CONNDRIVER` varchar(255) COLLATE utf8_bin NOT NULL,
+  `PERSISTENCEUNITNAME` varchar(255) COLLATE utf8_bin NOT NULL,
+  PRIMARY KEY (`ID`),
+  UNIQUE KEY `SQL110104120909150` (`ID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `otenant`
+--
+
+LOCK TABLES `otenant` WRITE;
+/*!40000 ALTER TABLE `otenant` DISABLE KEYS */;
+INSERT INTO `otenant` VALUES (1,1,'Tenant 1','jdbc:mysql://1.1.1.152:3306/otms1point6','root','root','com.mysql.jdbc.Driver','Tenant01'),(2,1,'Tenant 2','jdbc:mysql://1.1.1.152:3306/otms1point6','password','db2admin','com.ibm.db2.jcc.DB2Driver','Tenant02'),(3,1,'Tenant 3','jdbc:mysql://1.1.1.152:3306/otms1point6','password','db2admin','com.ibm.db2.jcc.DB2Driver','Tenant03'),(4,1,'Tenant 4','jdbc:db2://1.1.1.193:50000/HFABS','password','db2admin','com.ibm.db2.jcc.DB2Driver','Tenant04'),(5,1,'Tenant 5','jdbc:db2://1.1.1.193:50000/FABS02','password','db2admin','com.ibm.db2.jcc.DB2Driver','Tenant05'),(6,1,'HBM Tenant','jdbc:db2://1.1.1.193:50000/HBM','password','db2admin','com.ibm.db2.jcc.DB2Driver','Tenant06'),(7,1,'Tenant 7','jdbc:db2://1.1.1.193:50000/FABS','password','db2admin','com.ibm.db2.jcc.DB2Driver','Tenant07'),(8,1,'Tenant 8','jdbc:db2://1.1.1.193:50000/FABS','password','db2admin','com.ibm.db2.jcc.DB2Driver','Tenant08'),(9,1,'Tenant 9','jdbc:db2://1.1.1.193:50000/FABS','password','db2admin','com.ibm.db2.jcc.DB2Driver','Tenant09'),(10,1,'Tenant 9','jdbc:db2://1.1.1.193:50000/FABS','password','db2admin','com.ibm.db2.jcc.DB2Driver','Tenant10'),(11,1,'Tenant 11','jdbc:db2://1.1.1.194:50000/FABSTEST','password','db2admin','com.ibm.db2.jcc.DB2Driver','Tenant11'),(12,1,'HBM Tenant','jdbc:db2://1.1.1.194:50000/HAMADA_FABS','root','root','com.ibm.db2.jcc.DB2Driver','Tenant12');
+/*!40000 ALTER TABLE `otenant` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `sequence`
+--
+
+DROP TABLE IF EXISTS `sequence`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `sequence` (
+  `SEQ_NAME` varchar(50) COLLATE utf8_bin NOT NULL,
+  `SEQ_COUNT` decimal(15,0) DEFAULT NULL,
+  PRIMARY KEY (`SEQ_NAME`),
+  UNIQUE KEY `SQL110213144922040` (`SEQ_NAME`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `sequence`
+--
+
+LOCK TABLES `sequence` WRITE;
+/*!40000 ALTER TABLE `sequence` DISABLE KEYS */;
+INSERT INTO `sequence` VALUES ('SEQ_GEN',0);
+/*!40000 ALTER TABLE `sequence` ENABLE KEYS */;
+UNLOCK TABLES;
+/*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
+
+/*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
+/*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
+/*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;
+/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
+/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
+/*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
+
+-- Dump completed on 2014-04-05 22:53:11

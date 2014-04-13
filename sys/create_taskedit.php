@@ -560,11 +560,51 @@ class ccreate_task_edit extends ccreate_task {
 			$this->id->ViewCustomAttributes = "";
 
 			// server_id_mysqladmin
-			$this->server_id_mysqladmin->ViewValue = $this->server_id_mysqladmin->CurrentValue;
+			if (strval($this->server_id_mysqladmin->CurrentValue) <> "") {
+				$sFilterWrk = "`server_id`" . ew_SearchString("=", $this->server_id_mysqladmin->CurrentValue, EW_DATATYPE_NUMBER);
+			$sSqlWrk = "SELECT `server_id`, `server_name` AS `DispFld`, '' AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld` FROM `server`";
+			$sWhereWrk = "";
+			if ($sFilterWrk <> "") {
+				ew_AddFilter($sWhereWrk, $sFilterWrk);
+			}
+
+			// Call Lookup selecting
+			$this->Lookup_Selecting($this->server_id_mysqladmin, $sWhereWrk);
+			if ($sWhereWrk <> "") $sSqlWrk .= " WHERE " . $sWhereWrk;
+				$rswrk = $conn->Execute($sSqlWrk);
+				if ($rswrk && !$rswrk->EOF) { // Lookup values found
+					$this->server_id_mysqladmin->ViewValue = $rswrk->fields('DispFld');
+					$rswrk->Close();
+				} else {
+					$this->server_id_mysqladmin->ViewValue = $this->server_id_mysqladmin->CurrentValue;
+				}
+			} else {
+				$this->server_id_mysqladmin->ViewValue = NULL;
+			}
 			$this->server_id_mysqladmin->ViewCustomAttributes = "";
 
 			// HOSTNAME
-			$this->HOSTNAME->ViewValue = $this->HOSTNAME->CurrentValue;
+			if (strval($this->HOSTNAME->CurrentValue) <> "") {
+				$sFilterWrk = "`server_hostname`" . ew_SearchString("=", $this->HOSTNAME->CurrentValue, EW_DATATYPE_STRING);
+			$sSqlWrk = "SELECT `server_hostname`, `server_name` AS `DispFld`, '' AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld` FROM `server`";
+			$sWhereWrk = "";
+			if ($sFilterWrk <> "") {
+				ew_AddFilter($sWhereWrk, $sFilterWrk);
+			}
+
+			// Call Lookup selecting
+			$this->Lookup_Selecting($this->HOSTNAME, $sWhereWrk);
+			if ($sWhereWrk <> "") $sSqlWrk .= " WHERE " . $sWhereWrk;
+				$rswrk = $conn->Execute($sSqlWrk);
+				if ($rswrk && !$rswrk->EOF) { // Lookup values found
+					$this->HOSTNAME->ViewValue = $rswrk->fields('DispFld');
+					$rswrk->Close();
+				} else {
+					$this->HOSTNAME->ViewValue = $this->HOSTNAME->CurrentValue;
+				}
+			} else {
+				$this->HOSTNAME->ViewValue = NULL;
+			}
 			$this->HOSTNAME->ViewCustomAttributes = "";
 
 			// PASSWORD
@@ -635,13 +675,47 @@ class ccreate_task_edit extends ccreate_task {
 
 			// server_id_mysqladmin
 			$this->server_id_mysqladmin->EditCustomAttributes = "";
-			$this->server_id_mysqladmin->EditValue = ew_HtmlEncode($this->server_id_mysqladmin->CurrentValue);
-			$this->server_id_mysqladmin->PlaceHolder = ew_HtmlEncode(ew_RemoveHtml($this->server_id_mysqladmin->FldCaption()));
+			if (trim(strval($this->server_id_mysqladmin->CurrentValue)) == "") {
+				$sFilterWrk = "0=1";
+			} else {
+				$sFilterWrk = "`server_id`" . ew_SearchString("=", $this->server_id_mysqladmin->CurrentValue, EW_DATATYPE_NUMBER);
+			}
+			$sSqlWrk = "SELECT `server_id`, `server_name` AS `DispFld`, '' AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld`, '' AS `SelectFilterFld`, '' AS `SelectFilterFld2`, '' AS `SelectFilterFld3`, '' AS `SelectFilterFld4` FROM `server`";
+			$sWhereWrk = "";
+			if ($sFilterWrk <> "") {
+				ew_AddFilter($sWhereWrk, $sFilterWrk);
+			}
+
+			// Call Lookup selecting
+			$this->Lookup_Selecting($this->server_id_mysqladmin, $sWhereWrk);
+			if ($sWhereWrk <> "") $sSqlWrk .= " WHERE " . $sWhereWrk;
+			$rswrk = $conn->Execute($sSqlWrk);
+			$arwrk = ($rswrk) ? $rswrk->GetRows() : array();
+			if ($rswrk) $rswrk->Close();
+			array_unshift($arwrk, array("", $Language->Phrase("PleaseSelect"), "", "", "", "", "", "", ""));
+			$this->server_id_mysqladmin->EditValue = $arwrk;
 
 			// HOSTNAME
 			$this->HOSTNAME->EditCustomAttributes = "";
-			$this->HOSTNAME->EditValue = ew_HtmlEncode($this->HOSTNAME->CurrentValue);
-			$this->HOSTNAME->PlaceHolder = ew_HtmlEncode(ew_RemoveHtml($this->HOSTNAME->FldCaption()));
+			if (trim(strval($this->HOSTNAME->CurrentValue)) == "") {
+				$sFilterWrk = "0=1";
+			} else {
+				$sFilterWrk = "`server_hostname`" . ew_SearchString("=", $this->HOSTNAME->CurrentValue, EW_DATATYPE_STRING);
+			}
+			$sSqlWrk = "SELECT `server_hostname`, `server_name` AS `DispFld`, '' AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld`, '' AS `SelectFilterFld`, '' AS `SelectFilterFld2`, '' AS `SelectFilterFld3`, '' AS `SelectFilterFld4` FROM `server`";
+			$sWhereWrk = "";
+			if ($sFilterWrk <> "") {
+				ew_AddFilter($sWhereWrk, $sFilterWrk);
+			}
+
+			// Call Lookup selecting
+			$this->Lookup_Selecting($this->HOSTNAME, $sWhereWrk);
+			if ($sWhereWrk <> "") $sSqlWrk .= " WHERE " . $sWhereWrk;
+			$rswrk = $conn->Execute($sSqlWrk);
+			$arwrk = ($rswrk) ? $rswrk->GetRows() : array();
+			if ($rswrk) $rswrk->Close();
+			array_unshift($arwrk, array("", $Language->Phrase("PleaseSelect"), "", "", "", "", "", "", ""));
+			$this->HOSTNAME->EditValue = $arwrk;
 
 			// PASSWORD
 			$this->PASSWORD->EditCustomAttributes = "";
@@ -654,20 +728,13 @@ class ccreate_task_edit extends ccreate_task {
 			$this->DATABASE->PlaceHolder = ew_HtmlEncode(ew_RemoveHtml($this->DATABASE->FldCaption()));
 
 			// datetime
-			$this->datetime->EditCustomAttributes = "";
-			$this->datetime->EditValue = ew_HtmlEncode($this->datetime->CurrentValue);
-			$this->datetime->PlaceHolder = ew_HtmlEncode(ew_RemoveHtml($this->datetime->FldCaption()));
-
 			// DBUSERNAME
+
 			$this->DBUSERNAME->EditCustomAttributes = "";
 			$this->DBUSERNAME->EditValue = ew_HtmlEncode($this->DBUSERNAME->CurrentValue);
 			$this->DBUSERNAME->PlaceHolder = ew_HtmlEncode(ew_RemoveHtml($this->DBUSERNAME->FldCaption()));
 
 			// username
-			$this->username->EditCustomAttributes = "";
-			$this->username->EditValue = ew_HtmlEncode($this->username->CurrentValue);
-			$this->username->PlaceHolder = ew_HtmlEncode(ew_RemoveHtml($this->username->FldCaption()));
-
 			// Edit refer script
 			// id
 
@@ -727,14 +794,8 @@ class ccreate_task_edit extends ccreate_task {
 		if (!$this->DATABASE->FldIsDetailKey && !is_null($this->DATABASE->FormValue) && $this->DATABASE->FormValue == "") {
 			ew_AddMessage($gsFormError, $Language->Phrase("EnterRequiredField") . " - " . $this->DATABASE->FldCaption());
 		}
-		if (!$this->datetime->FldIsDetailKey && !is_null($this->datetime->FormValue) && $this->datetime->FormValue == "") {
-			ew_AddMessage($gsFormError, $Language->Phrase("EnterRequiredField") . " - " . $this->datetime->FldCaption());
-		}
 		if (!$this->DBUSERNAME->FldIsDetailKey && !is_null($this->DBUSERNAME->FormValue) && $this->DBUSERNAME->FormValue == "") {
 			ew_AddMessage($gsFormError, $Language->Phrase("EnterRequiredField") . " - " . $this->DBUSERNAME->FldCaption());
-		}
-		if (!$this->username->FldIsDetailKey && !is_null($this->username->FormValue) && $this->username->FormValue == "") {
-			ew_AddMessage($gsFormError, $Language->Phrase("EnterRequiredField") . " - " . $this->username->FldCaption());
 		}
 
 		// Return validate result
@@ -782,13 +843,15 @@ class ccreate_task_edit extends ccreate_task {
 			$this->DATABASE->SetDbValueDef($rsnew, $this->DATABASE->CurrentValue, "", $this->DATABASE->ReadOnly);
 
 			// datetime
-			$this->datetime->SetDbValueDef($rsnew, $this->datetime->CurrentValue, ew_CurrentDate(), $this->datetime->ReadOnly);
+			$this->datetime->SetDbValueDef($rsnew, ew_CurrentDateTime(), ew_CurrentDate());
+			$rsnew['datetime'] = &$this->datetime->DbValue;
 
 			// DBUSERNAME
 			$this->DBUSERNAME->SetDbValueDef($rsnew, $this->DBUSERNAME->CurrentValue, "", $this->DBUSERNAME->ReadOnly);
 
 			// username
-			$this->username->SetDbValueDef($rsnew, $this->username->CurrentValue, "", $this->username->ReadOnly);
+			$this->username->SetDbValueDef($rsnew, CurrentUserName(), "");
+			$rsnew['username'] = &$this->username->DbValue;
 
 			// Call Row Updating event
 			$bUpdateRow = $this->Row_Updating($rsold, $rsnew);
@@ -957,15 +1020,9 @@ fcreate_taskedit.Validate = function() {
 			elm = this.GetElements("x" + infix + "_DATABASE");
 			if (elm && !ew_HasValue(elm))
 				return this.OnError(elm, ewLanguage.Phrase("EnterRequiredField") + " - <?php echo ew_JsEncode2($create_task->DATABASE->FldCaption()) ?>");
-			elm = this.GetElements("x" + infix + "_datetime");
-			if (elm && !ew_HasValue(elm))
-				return this.OnError(elm, ewLanguage.Phrase("EnterRequiredField") + " - <?php echo ew_JsEncode2($create_task->datetime->FldCaption()) ?>");
 			elm = this.GetElements("x" + infix + "_DBUSERNAME");
 			if (elm && !ew_HasValue(elm))
 				return this.OnError(elm, ewLanguage.Phrase("EnterRequiredField") + " - <?php echo ew_JsEncode2($create_task->DBUSERNAME->FldCaption()) ?>");
-			elm = this.GetElements("x" + infix + "_username");
-			if (elm && !ew_HasValue(elm))
-				return this.OnError(elm, ewLanguage.Phrase("EnterRequiredField") + " - <?php echo ew_JsEncode2($create_task->username->FldCaption()) ?>");
 
 			// Set up row object
 			ew_ElementsToRow(fobj);
@@ -1002,8 +1059,10 @@ fcreate_taskedit.ValidateRequired = false;
 <?php } ?>
 
 // Dynamic selection lists
-// Form object for search
+fcreate_taskedit.Lists["x_server_id_mysqladmin"] = {"LinkField":"x_server_id","Ajax":true,"AutoFill":false,"DisplayFields":["x_server_name","","",""],"ParentFields":[],"FilterFields":[],"Options":[]};
+fcreate_taskedit.Lists["x_HOSTNAME"] = {"LinkField":"x_server_hostname","Ajax":true,"AutoFill":false,"DisplayFields":["x_server_name","","",""],"ParentFields":[],"FilterFields":[],"Options":[]};
 
+// Form object for search
 </script>
 <script type="text/javascript">
 
@@ -1067,7 +1126,33 @@ $create_task_edit->ShowMessage();
 		<td><span id="elh_create_task_server_id_mysqladmin"><?php echo $create_task->server_id_mysqladmin->FldCaption() ?><?php echo $Language->Phrase("FieldRequiredIndicator") ?></span></td>
 		<td<?php echo $create_task->server_id_mysqladmin->CellAttributes() ?>>
 <span id="el_create_task_server_id_mysqladmin" class="control-group">
-<input type="text" data-field="x_server_id_mysqladmin" name="x_server_id_mysqladmin" id="x_server_id_mysqladmin" size="30" maxlength="255" placeholder="<?php echo $create_task->server_id_mysqladmin->PlaceHolder ?>" value="<?php echo $create_task->server_id_mysqladmin->EditValue ?>"<?php echo $create_task->server_id_mysqladmin->EditAttributes() ?>>
+<select data-field="x_server_id_mysqladmin" id="x_server_id_mysqladmin" name="x_server_id_mysqladmin"<?php echo $create_task->server_id_mysqladmin->EditAttributes() ?>>
+<?php
+if (is_array($create_task->server_id_mysqladmin->EditValue)) {
+	$arwrk = $create_task->server_id_mysqladmin->EditValue;
+	$rowswrk = count($arwrk);
+	$emptywrk = TRUE;
+	for ($rowcntwrk = 0; $rowcntwrk < $rowswrk; $rowcntwrk++) {
+		$selwrk = (strval($create_task->server_id_mysqladmin->CurrentValue) == strval($arwrk[$rowcntwrk][0])) ? " selected=\"selected\"" : "";
+		if ($selwrk <> "") $emptywrk = FALSE;
+?>
+<option value="<?php echo ew_HtmlEncode($arwrk[$rowcntwrk][0]) ?>"<?php echo $selwrk ?>>
+<?php echo $arwrk[$rowcntwrk][1] ?>
+</option>
+<?php
+	}
+}
+?>
+</select>
+<?php
+$sSqlWrk = "SELECT `server_id`, `server_name` AS `DispFld`, '' AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld` FROM `server`";
+$sWhereWrk = "";
+
+// Call Lookup selecting
+$create_task->Lookup_Selecting($create_task->server_id_mysqladmin, $sWhereWrk);
+if ($sWhereWrk <> "") $sSqlWrk .= " WHERE " . $sWhereWrk;
+?>
+<input type="hidden" name="s_x_server_id_mysqladmin" id="s_x_server_id_mysqladmin" value="s=<?php echo ew_Encrypt($sSqlWrk) ?>&f0=<?php echo ew_Encrypt("`server_id` = {filter_value}"); ?>&t0=3">
 </span>
 <?php echo $create_task->server_id_mysqladmin->CustomMsg ?></td>
 	</tr>
@@ -1077,7 +1162,33 @@ $create_task_edit->ShowMessage();
 		<td><span id="elh_create_task_HOSTNAME"><?php echo $create_task->HOSTNAME->FldCaption() ?><?php echo $Language->Phrase("FieldRequiredIndicator") ?></span></td>
 		<td<?php echo $create_task->HOSTNAME->CellAttributes() ?>>
 <span id="el_create_task_HOSTNAME" class="control-group">
-<input type="text" data-field="x_HOSTNAME" name="x_HOSTNAME" id="x_HOSTNAME" size="30" maxlength="255" placeholder="<?php echo $create_task->HOSTNAME->PlaceHolder ?>" value="<?php echo $create_task->HOSTNAME->EditValue ?>"<?php echo $create_task->HOSTNAME->EditAttributes() ?>>
+<select data-field="x_HOSTNAME" id="x_HOSTNAME" name="x_HOSTNAME"<?php echo $create_task->HOSTNAME->EditAttributes() ?>>
+<?php
+if (is_array($create_task->HOSTNAME->EditValue)) {
+	$arwrk = $create_task->HOSTNAME->EditValue;
+	$rowswrk = count($arwrk);
+	$emptywrk = TRUE;
+	for ($rowcntwrk = 0; $rowcntwrk < $rowswrk; $rowcntwrk++) {
+		$selwrk = (strval($create_task->HOSTNAME->CurrentValue) == strval($arwrk[$rowcntwrk][0])) ? " selected=\"selected\"" : "";
+		if ($selwrk <> "") $emptywrk = FALSE;
+?>
+<option value="<?php echo ew_HtmlEncode($arwrk[$rowcntwrk][0]) ?>"<?php echo $selwrk ?>>
+<?php echo $arwrk[$rowcntwrk][1] ?>
+</option>
+<?php
+	}
+}
+?>
+</select>
+<?php
+$sSqlWrk = "SELECT `server_hostname`, `server_name` AS `DispFld`, '' AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld` FROM `server`";
+$sWhereWrk = "";
+
+// Call Lookup selecting
+$create_task->Lookup_Selecting($create_task->HOSTNAME, $sWhereWrk);
+if ($sWhereWrk <> "") $sSqlWrk .= " WHERE " . $sWhereWrk;
+?>
+<input type="hidden" name="s_x_HOSTNAME" id="s_x_HOSTNAME" value="s=<?php echo ew_Encrypt($sSqlWrk) ?>&f0=<?php echo ew_Encrypt("`server_hostname` = {filter_value}"); ?>&t0=201">
 </span>
 <?php echo $create_task->HOSTNAME->CustomMsg ?></td>
 	</tr>
@@ -1102,16 +1213,6 @@ $create_task_edit->ShowMessage();
 <?php echo $create_task->DATABASE->CustomMsg ?></td>
 	</tr>
 <?php } ?>
-<?php if ($create_task->datetime->Visible) { // datetime ?>
-	<tr id="r_datetime">
-		<td><span id="elh_create_task_datetime"><?php echo $create_task->datetime->FldCaption() ?><?php echo $Language->Phrase("FieldRequiredIndicator") ?></span></td>
-		<td<?php echo $create_task->datetime->CellAttributes() ?>>
-<span id="el_create_task_datetime" class="control-group">
-<input type="text" data-field="x_datetime" name="x_datetime" id="x_datetime" placeholder="<?php echo $create_task->datetime->PlaceHolder ?>" value="<?php echo $create_task->datetime->EditValue ?>"<?php echo $create_task->datetime->EditAttributes() ?>>
-</span>
-<?php echo $create_task->datetime->CustomMsg ?></td>
-	</tr>
-<?php } ?>
 <?php if ($create_task->DBUSERNAME->Visible) { // DBUSERNAME ?>
 	<tr id="r_DBUSERNAME">
 		<td><span id="elh_create_task_DBUSERNAME"><?php echo $create_task->DBUSERNAME->FldCaption() ?><?php echo $Language->Phrase("FieldRequiredIndicator") ?></span></td>
@@ -1120,16 +1221,6 @@ $create_task_edit->ShowMessage();
 <input type="text" data-field="x_DBUSERNAME" name="x_DBUSERNAME" id="x_DBUSERNAME" size="30" maxlength="255" placeholder="<?php echo $create_task->DBUSERNAME->PlaceHolder ?>" value="<?php echo $create_task->DBUSERNAME->EditValue ?>"<?php echo $create_task->DBUSERNAME->EditAttributes() ?>>
 </span>
 <?php echo $create_task->DBUSERNAME->CustomMsg ?></td>
-	</tr>
-<?php } ?>
-<?php if ($create_task->username->Visible) { // username ?>
-	<tr id="r_username">
-		<td><span id="elh_create_task_username"><?php echo $create_task->username->FldCaption() ?><?php echo $Language->Phrase("FieldRequiredIndicator") ?></span></td>
-		<td<?php echo $create_task->username->CellAttributes() ?>>
-<span id="el_create_task_username" class="control-group">
-<input type="text" data-field="x_username" name="x_username" id="x_username" size="30" maxlength="255" placeholder="<?php echo $create_task->username->PlaceHolder ?>" value="<?php echo $create_task->username->EditValue ?>"<?php echo $create_task->username->EditAttributes() ?>>
-</span>
-<?php echo $create_task->username->CustomMsg ?></td>
 	</tr>
 <?php } ?>
 </table>

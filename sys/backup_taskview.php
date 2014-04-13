@@ -556,7 +556,7 @@ class cbackup_task_view extends cbackup_task {
 		$this->HOSTNAME->setDbValue($rs->fields('HOSTNAME'));
 		$this->PASSWORD->setDbValue($rs->fields('PASSWORD'));
 		$this->DATABASE->setDbValue($rs->fields('DATABASE'));
-		$this->FILEPATH->Upload->DbValue = $rs->fields('FILEPATH');
+		$this->FILEPATH->setDbValue($rs->fields('FILEPATH'));
 		$this->FILENAME->setDbValue($rs->fields('FILENAME'));
 		$this->datetime->setDbValue($rs->fields('datetime'));
 		$this->DBUSERNAME->setDbValue($rs->fields('DBUSERNAME'));
@@ -572,7 +572,7 @@ class cbackup_task_view extends cbackup_task {
 		$this->HOSTNAME->DbValue = $row['HOSTNAME'];
 		$this->PASSWORD->DbValue = $row['PASSWORD'];
 		$this->DATABASE->DbValue = $row['DATABASE'];
-		$this->FILEPATH->Upload->DbValue = $row['FILEPATH'];
+		$this->FILEPATH->DbValue = $row['FILEPATH'];
 		$this->FILENAME->DbValue = $row['FILENAME'];
 		$this->datetime->DbValue = $row['datetime'];
 		$this->DBUSERNAME->DbValue = $row['DBUSERNAME'];
@@ -639,8 +639,8 @@ class cbackup_task_view extends cbackup_task {
 
 			// HOSTNAME
 			if (strval($this->HOSTNAME->CurrentValue) <> "") {
-				$sFilterWrk = "`server_id`" . ew_SearchString("=", $this->HOSTNAME->CurrentValue, EW_DATATYPE_NUMBER);
-			$sSqlWrk = "SELECT `server_id`, `server_name` AS `DispFld`, '' AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld` FROM `server`";
+				$sFilterWrk = "`server_hostname`" . ew_SearchString("=", $this->HOSTNAME->CurrentValue, EW_DATATYPE_STRING);
+			$sSqlWrk = "SELECT `server_hostname`, `server_name` AS `DispFld`, '' AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld` FROM `server`";
 			$sWhereWrk = "";
 			if ($sFilterWrk <> "") {
 				ew_AddFilter($sWhereWrk, $sFilterWrk);
@@ -670,11 +670,7 @@ class cbackup_task_view extends cbackup_task {
 			$this->DATABASE->ViewCustomAttributes = "";
 
 			// FILEPATH
-			if (!ew_Empty($this->FILEPATH->Upload->DbValue)) {
-				$this->FILEPATH->ViewValue = $this->FILEPATH->Upload->DbValue;
-			} else {
-				$this->FILEPATH->ViewValue = "";
-			}
+			$this->FILEPATH->ViewValue = $this->FILEPATH->CurrentValue;
 			$this->FILEPATH->ViewCustomAttributes = "";
 
 			// FILENAME
@@ -721,7 +717,6 @@ class cbackup_task_view extends cbackup_task {
 			// FILEPATH
 			$this->FILEPATH->LinkCustomAttributes = "";
 			$this->FILEPATH->HrefValue = "";
-			$this->FILEPATH->HrefValue2 = $this->FILEPATH->UploadPath . $this->FILEPATH->Upload->DbValue;
 			$this->FILEPATH->TooltipValue = "";
 
 			// FILENAME
@@ -1092,7 +1087,7 @@ fbackup_taskview.ValidateRequired = false;
 
 // Dynamic selection lists
 fbackup_taskview.Lists["x_server_id_mysqladmin"] = {"LinkField":"x_server_id","Ajax":true,"AutoFill":false,"DisplayFields":["x_server_name","","",""],"ParentFields":[],"FilterFields":[],"Options":[]};
-fbackup_taskview.Lists["x_HOSTNAME"] = {"LinkField":"x_server_id","Ajax":null,"AutoFill":false,"DisplayFields":["x_server_name","","",""],"ParentFields":[],"FilterFields":[],"Options":[]};
+fbackup_taskview.Lists["x_HOSTNAME"] = {"LinkField":"x_server_hostname","Ajax":null,"AutoFill":false,"DisplayFields":["x_server_name","","",""],"ParentFields":[],"FilterFields":[],"Options":[]};
 
 // Form object for search
 </script>
@@ -1219,20 +1214,7 @@ $backup_task_view->ShowMessage();
 		<td<?php echo $backup_task->FILEPATH->CellAttributes() ?>>
 <span id="el_backup_task_FILEPATH" class="control-group">
 <span<?php echo $backup_task->FILEPATH->ViewAttributes() ?>>
-<?php if ($backup_task->FILEPATH->LinkAttributes() <> "") { ?>
-<?php if (!empty($backup_task->FILEPATH->Upload->DbValue)) { ?>
-<?php echo $backup_task->FILEPATH->ViewValue ?>
-<?php } elseif (!in_array($backup_task->CurrentAction, array("I", "edit", "gridedit"))) { ?>	
-&nbsp;
-<?php } ?>
-<?php } else { ?>
-<?php if (!empty($backup_task->FILEPATH->Upload->DbValue)) { ?>
-<?php echo $backup_task->FILEPATH->ViewValue ?>
-<?php } elseif (!in_array($backup_task->CurrentAction, array("I", "edit", "gridedit"))) { ?>	
-&nbsp;
-<?php } ?>
-<?php } ?>
-</span>
+<?php echo $backup_task->FILEPATH->ViewValue ?></span>
 </span>
 </td>
 	</tr>

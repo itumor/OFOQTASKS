@@ -64,11 +64,11 @@ class cupdate_task extends cTable {
 		$this->fields['DATABASE'] = &$this->DATABASE;
 
 		// FILEPATH
-		$this->FILEPATH = new cField('update_task', 'update_task', 'x_FILEPATH', 'FILEPATH', '`FILEPATH`', '`FILEPATH`', 200, -1, FALSE, '`FILEPATH`', FALSE, FALSE, FALSE, 'FORMATTED TEXT');
+		$this->FILEPATH = new cField('update_task', 'update_task', 'x_FILEPATH', 'FILEPATH', '`FILEPATH`', '`FILEPATH`', 200, -1, TRUE, '`FILEPATH`', FALSE, FALSE, FALSE, 'FORMATTED TEXT');
 		$this->fields['FILEPATH'] = &$this->FILEPATH;
 
 		// FILENAME
-		$this->FILENAME = new cField('update_task', 'update_task', 'x_FILENAME', 'FILENAME', '`FILENAME`', '`FILENAME`', 200, -1, FALSE, '`FILENAME`', FALSE, FALSE, FALSE, 'FORMATTED TEXT');
+		$this->FILENAME = new cField('update_task', 'update_task', 'x_FILENAME', 'FILENAME', '`FILENAME`', '`FILENAME`', 200, -1, TRUE, '`FILENAME`', FALSE, FALSE, FALSE, 'FORMATTED TEXT');
 		$this->fields['FILENAME'] = &$this->FILENAME;
 
 		// datetime
@@ -505,8 +505,8 @@ class cupdate_task extends cTable {
 		$this->HOSTNAME->setDbValue($rs->fields('HOSTNAME'));
 		$this->PASSWORD->setDbValue($rs->fields('PASSWORD'));
 		$this->DATABASE->setDbValue($rs->fields('DATABASE'));
-		$this->FILEPATH->setDbValue($rs->fields('FILEPATH'));
-		$this->FILENAME->setDbValue($rs->fields('FILENAME'));
+		$this->FILEPATH->Upload->DbValue = $rs->fields('FILEPATH');
+		$this->FILENAME->Upload->DbValue = $rs->fields('FILENAME');
 		$this->datetime->setDbValue($rs->fields('datetime'));
 		$this->DBUSERNAME->setDbValue($rs->fields('DBUSERNAME'));
 		$this->username->setDbValue($rs->fields('username'));
@@ -536,11 +536,51 @@ class cupdate_task extends cTable {
 		$this->id->ViewCustomAttributes = "";
 
 		// server_id_mysqladmin
-		$this->server_id_mysqladmin->ViewValue = $this->server_id_mysqladmin->CurrentValue;
+		if (strval($this->server_id_mysqladmin->CurrentValue) <> "") {
+			$sFilterWrk = "`server_id`" . ew_SearchString("=", $this->server_id_mysqladmin->CurrentValue, EW_DATATYPE_NUMBER);
+		$sSqlWrk = "SELECT `server_id`, `server_name` AS `DispFld`, '' AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld` FROM `server`";
+		$sWhereWrk = "";
+		if ($sFilterWrk <> "") {
+			ew_AddFilter($sWhereWrk, $sFilterWrk);
+		}
+
+		// Call Lookup selecting
+		$this->Lookup_Selecting($this->server_id_mysqladmin, $sWhereWrk);
+		if ($sWhereWrk <> "") $sSqlWrk .= " WHERE " . $sWhereWrk;
+			$rswrk = $conn->Execute($sSqlWrk);
+			if ($rswrk && !$rswrk->EOF) { // Lookup values found
+				$this->server_id_mysqladmin->ViewValue = $rswrk->fields('DispFld');
+				$rswrk->Close();
+			} else {
+				$this->server_id_mysqladmin->ViewValue = $this->server_id_mysqladmin->CurrentValue;
+			}
+		} else {
+			$this->server_id_mysqladmin->ViewValue = NULL;
+		}
 		$this->server_id_mysqladmin->ViewCustomAttributes = "";
 
 		// HOSTNAME
-		$this->HOSTNAME->ViewValue = $this->HOSTNAME->CurrentValue;
+		if (strval($this->HOSTNAME->CurrentValue) <> "") {
+			$sFilterWrk = "`server_hostname`" . ew_SearchString("=", $this->HOSTNAME->CurrentValue, EW_DATATYPE_STRING);
+		$sSqlWrk = "SELECT `server_hostname`, `server_name` AS `DispFld`, '' AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld` FROM `server`";
+		$sWhereWrk = "";
+		if ($sFilterWrk <> "") {
+			ew_AddFilter($sWhereWrk, $sFilterWrk);
+		}
+
+		// Call Lookup selecting
+		$this->Lookup_Selecting($this->HOSTNAME, $sWhereWrk);
+		if ($sWhereWrk <> "") $sSqlWrk .= " WHERE " . $sWhereWrk;
+			$rswrk = $conn->Execute($sSqlWrk);
+			if ($rswrk && !$rswrk->EOF) { // Lookup values found
+				$this->HOSTNAME->ViewValue = $rswrk->fields('DispFld');
+				$rswrk->Close();
+			} else {
+				$this->HOSTNAME->ViewValue = $this->HOSTNAME->CurrentValue;
+			}
+		} else {
+			$this->HOSTNAME->ViewValue = NULL;
+		}
 		$this->HOSTNAME->ViewCustomAttributes = "";
 
 		// PASSWORD
@@ -552,11 +592,19 @@ class cupdate_task extends cTable {
 		$this->DATABASE->ViewCustomAttributes = "";
 
 		// FILEPATH
-		$this->FILEPATH->ViewValue = $this->FILEPATH->CurrentValue;
+		if (!ew_Empty($this->FILEPATH->Upload->DbValue)) {
+			$this->FILEPATH->ViewValue = $this->FILEPATH->Upload->DbValue;
+		} else {
+			$this->FILEPATH->ViewValue = "";
+		}
 		$this->FILEPATH->ViewCustomAttributes = "";
 
 		// FILENAME
-		$this->FILENAME->ViewValue = $this->FILENAME->CurrentValue;
+		if (!ew_Empty($this->FILENAME->Upload->DbValue)) {
+			$this->FILENAME->ViewValue = $this->FILENAME->Upload->DbValue;
+		} else {
+			$this->FILENAME->ViewValue = "";
+		}
 		$this->FILENAME->ViewCustomAttributes = "";
 
 		// datetime
@@ -599,11 +647,13 @@ class cupdate_task extends cTable {
 		// FILEPATH
 		$this->FILEPATH->LinkCustomAttributes = "";
 		$this->FILEPATH->HrefValue = "";
+		$this->FILEPATH->HrefValue2 = $this->FILEPATH->UploadPath . $this->FILEPATH->Upload->DbValue;
 		$this->FILEPATH->TooltipValue = "";
 
 		// FILENAME
 		$this->FILENAME->LinkCustomAttributes = "";
 		$this->FILENAME->HrefValue = "";
+		$this->FILENAME->HrefValue2 = $this->FILENAME->UploadPath . $this->FILENAME->Upload->DbValue;
 		$this->FILENAME->TooltipValue = "";
 
 		// datetime
@@ -773,7 +823,17 @@ class cupdate_task extends cTable {
 	// Row Inserted event
 	function Row_Inserted($rsold, &$rsnew) {
 
-		//echo "Row Inserted"
+		//echo "Row Inserted" 
+		$parameters = array(
+	'server_id_mysqladmin'=>$rsnew["server_id_mysqladmin"],
+	'HOSTNAME'=>$rsnew["HOSTNAME"],
+	'DBUSERNAME'=>$rsnew["DBUSERNAME"],
+	'PASSWORD'=>$rsnew["PASSWORD"],
+	'DATABASE'=>$rsnew["DATABASE"],
+	'FILEPATH'=>$rsnew["FILEPATH"],
+	'FILENAME'=>$rsnew["FILENAME"],
+	);
+	add_cron_task("update",$parameters);
 	}
 
 	// Row Updating event

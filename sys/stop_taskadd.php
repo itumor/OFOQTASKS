@@ -475,7 +475,27 @@ class cstop_task_add extends cstop_task {
 			$this->id->ViewCustomAttributes = "";
 
 			// server_id_mysqladmin
-			$this->server_id_mysqladmin->ViewValue = $this->server_id_mysqladmin->CurrentValue;
+			if (strval($this->server_id_mysqladmin->CurrentValue) <> "") {
+				$sFilterWrk = "`server_id`" . ew_SearchString("=", $this->server_id_mysqladmin->CurrentValue, EW_DATATYPE_NUMBER);
+			$sSqlWrk = "SELECT `server_id`, `server_name` AS `DispFld`, '' AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld` FROM `server`";
+			$sWhereWrk = "";
+			if ($sFilterWrk <> "") {
+				ew_AddFilter($sWhereWrk, $sFilterWrk);
+			}
+
+			// Call Lookup selecting
+			$this->Lookup_Selecting($this->server_id_mysqladmin, $sWhereWrk);
+			if ($sWhereWrk <> "") $sSqlWrk .= " WHERE " . $sWhereWrk;
+				$rswrk = $conn->Execute($sSqlWrk);
+				if ($rswrk && !$rswrk->EOF) { // Lookup values found
+					$this->server_id_mysqladmin->ViewValue = $rswrk->fields('DispFld');
+					$rswrk->Close();
+				} else {
+					$this->server_id_mysqladmin->ViewValue = $this->server_id_mysqladmin->CurrentValue;
+				}
+			} else {
+				$this->server_id_mysqladmin->ViewValue = NULL;
+			}
 			$this->server_id_mysqladmin->ViewCustomAttributes = "";
 
 			// datetime
@@ -504,19 +524,28 @@ class cstop_task_add extends cstop_task {
 
 			// server_id_mysqladmin
 			$this->server_id_mysqladmin->EditCustomAttributes = "";
-			$this->server_id_mysqladmin->EditValue = ew_HtmlEncode($this->server_id_mysqladmin->CurrentValue);
-			$this->server_id_mysqladmin->PlaceHolder = ew_HtmlEncode(ew_RemoveHtml($this->server_id_mysqladmin->FldCaption()));
+			if (trim(strval($this->server_id_mysqladmin->CurrentValue)) == "") {
+				$sFilterWrk = "0=1";
+			} else {
+				$sFilterWrk = "`server_id`" . ew_SearchString("=", $this->server_id_mysqladmin->CurrentValue, EW_DATATYPE_NUMBER);
+			}
+			$sSqlWrk = "SELECT `server_id`, `server_name` AS `DispFld`, '' AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld`, '' AS `SelectFilterFld`, '' AS `SelectFilterFld2`, '' AS `SelectFilterFld3`, '' AS `SelectFilterFld4` FROM `server`";
+			$sWhereWrk = "";
+			if ($sFilterWrk <> "") {
+				ew_AddFilter($sWhereWrk, $sFilterWrk);
+			}
+
+			// Call Lookup selecting
+			$this->Lookup_Selecting($this->server_id_mysqladmin, $sWhereWrk);
+			if ($sWhereWrk <> "") $sSqlWrk .= " WHERE " . $sWhereWrk;
+			$rswrk = $conn->Execute($sSqlWrk);
+			$arwrk = ($rswrk) ? $rswrk->GetRows() : array();
+			if ($rswrk) $rswrk->Close();
+			array_unshift($arwrk, array("", $Language->Phrase("PleaseSelect"), "", "", "", "", "", "", ""));
+			$this->server_id_mysqladmin->EditValue = $arwrk;
 
 			// datetime
-			$this->datetime->EditCustomAttributes = "";
-			$this->datetime->EditValue = ew_HtmlEncode($this->datetime->CurrentValue);
-			$this->datetime->PlaceHolder = ew_HtmlEncode(ew_RemoveHtml($this->datetime->FldCaption()));
-
 			// username
-			$this->username->EditCustomAttributes = "";
-			$this->username->EditValue = ew_HtmlEncode($this->username->CurrentValue);
-			$this->username->PlaceHolder = ew_HtmlEncode(ew_RemoveHtml($this->username->FldCaption()));
-
 			// Edit refer script
 			// server_id_mysqladmin
 
@@ -552,12 +581,6 @@ class cstop_task_add extends cstop_task {
 		if (!$this->server_id_mysqladmin->FldIsDetailKey && !is_null($this->server_id_mysqladmin->FormValue) && $this->server_id_mysqladmin->FormValue == "") {
 			ew_AddMessage($gsFormError, $Language->Phrase("EnterRequiredField") . " - " . $this->server_id_mysqladmin->FldCaption());
 		}
-		if (!$this->datetime->FldIsDetailKey && !is_null($this->datetime->FormValue) && $this->datetime->FormValue == "") {
-			ew_AddMessage($gsFormError, $Language->Phrase("EnterRequiredField") . " - " . $this->datetime->FldCaption());
-		}
-		if (!$this->username->FldIsDetailKey && !is_null($this->username->FormValue) && $this->username->FormValue == "") {
-			ew_AddMessage($gsFormError, $Language->Phrase("EnterRequiredField") . " - " . $this->username->FldCaption());
-		}
 
 		// Return validate result
 		$ValidateForm = ($gsFormError == "");
@@ -585,10 +608,12 @@ class cstop_task_add extends cstop_task {
 		$this->server_id_mysqladmin->SetDbValueDef($rsnew, $this->server_id_mysqladmin->CurrentValue, "", FALSE);
 
 		// datetime
-		$this->datetime->SetDbValueDef($rsnew, $this->datetime->CurrentValue, ew_CurrentDate(), FALSE);
+		$this->datetime->SetDbValueDef($rsnew, ew_CurrentDateTime(), ew_CurrentDate());
+		$rsnew['datetime'] = &$this->datetime->DbValue;
 
 		// username
-		$this->username->SetDbValueDef($rsnew, $this->username->CurrentValue, "", FALSE);
+		$this->username->SetDbValueDef($rsnew, CurrentUserName(), "");
+		$rsnew['username'] = &$this->username->DbValue;
 
 		// Call Row Inserting event
 		$rs = ($rsold == NULL) ? NULL : $rsold->fields;
@@ -752,12 +777,6 @@ fstop_taskadd.Validate = function() {
 			elm = this.GetElements("x" + infix + "_server_id_mysqladmin");
 			if (elm && !ew_HasValue(elm))
 				return this.OnError(elm, ewLanguage.Phrase("EnterRequiredField") + " - <?php echo ew_JsEncode2($stop_task->server_id_mysqladmin->FldCaption()) ?>");
-			elm = this.GetElements("x" + infix + "_datetime");
-			if (elm && !ew_HasValue(elm))
-				return this.OnError(elm, ewLanguage.Phrase("EnterRequiredField") + " - <?php echo ew_JsEncode2($stop_task->datetime->FldCaption()) ?>");
-			elm = this.GetElements("x" + infix + "_username");
-			if (elm && !ew_HasValue(elm))
-				return this.OnError(elm, ewLanguage.Phrase("EnterRequiredField") + " - <?php echo ew_JsEncode2($stop_task->username->FldCaption()) ?>");
 
 			// Set up row object
 			ew_ElementsToRow(fobj);
@@ -794,8 +813,9 @@ fstop_taskadd.ValidateRequired = false;
 <?php } ?>
 
 // Dynamic selection lists
-// Form object for search
+fstop_taskadd.Lists["x_server_id_mysqladmin"] = {"LinkField":"x_server_id","Ajax":true,"AutoFill":false,"DisplayFields":["x_server_name","","",""],"ParentFields":[],"FilterFields":[],"Options":[]};
 
+// Form object for search
 </script>
 <script type="text/javascript">
 
@@ -816,29 +836,35 @@ $stop_task_add->ShowMessage();
 		<td><span id="elh_stop_task_server_id_mysqladmin"><?php echo $stop_task->server_id_mysqladmin->FldCaption() ?><?php echo $Language->Phrase("FieldRequiredIndicator") ?></span></td>
 		<td<?php echo $stop_task->server_id_mysqladmin->CellAttributes() ?>>
 <span id="el_stop_task_server_id_mysqladmin" class="control-group">
-<input type="text" data-field="x_server_id_mysqladmin" name="x_server_id_mysqladmin" id="x_server_id_mysqladmin" size="30" maxlength="255" placeholder="<?php echo $stop_task->server_id_mysqladmin->PlaceHolder ?>" value="<?php echo $stop_task->server_id_mysqladmin->EditValue ?>"<?php echo $stop_task->server_id_mysqladmin->EditAttributes() ?>>
+<select data-field="x_server_id_mysqladmin" id="x_server_id_mysqladmin" name="x_server_id_mysqladmin"<?php echo $stop_task->server_id_mysqladmin->EditAttributes() ?>>
+<?php
+if (is_array($stop_task->server_id_mysqladmin->EditValue)) {
+	$arwrk = $stop_task->server_id_mysqladmin->EditValue;
+	$rowswrk = count($arwrk);
+	$emptywrk = TRUE;
+	for ($rowcntwrk = 0; $rowcntwrk < $rowswrk; $rowcntwrk++) {
+		$selwrk = (strval($stop_task->server_id_mysqladmin->CurrentValue) == strval($arwrk[$rowcntwrk][0])) ? " selected=\"selected\"" : "";
+		if ($selwrk <> "") $emptywrk = FALSE;
+?>
+<option value="<?php echo ew_HtmlEncode($arwrk[$rowcntwrk][0]) ?>"<?php echo $selwrk ?>>
+<?php echo $arwrk[$rowcntwrk][1] ?>
+</option>
+<?php
+	}
+}
+?>
+</select>
+<?php
+$sSqlWrk = "SELECT `server_id`, `server_name` AS `DispFld`, '' AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld` FROM `server`";
+$sWhereWrk = "";
+
+// Call Lookup selecting
+$stop_task->Lookup_Selecting($stop_task->server_id_mysqladmin, $sWhereWrk);
+if ($sWhereWrk <> "") $sSqlWrk .= " WHERE " . $sWhereWrk;
+?>
+<input type="hidden" name="s_x_server_id_mysqladmin" id="s_x_server_id_mysqladmin" value="s=<?php echo ew_Encrypt($sSqlWrk) ?>&f0=<?php echo ew_Encrypt("`server_id` = {filter_value}"); ?>&t0=3">
 </span>
 <?php echo $stop_task->server_id_mysqladmin->CustomMsg ?></td>
-	</tr>
-<?php } ?>
-<?php if ($stop_task->datetime->Visible) { // datetime ?>
-	<tr id="r_datetime">
-		<td><span id="elh_stop_task_datetime"><?php echo $stop_task->datetime->FldCaption() ?><?php echo $Language->Phrase("FieldRequiredIndicator") ?></span></td>
-		<td<?php echo $stop_task->datetime->CellAttributes() ?>>
-<span id="el_stop_task_datetime" class="control-group">
-<input type="text" data-field="x_datetime" name="x_datetime" id="x_datetime" placeholder="<?php echo $stop_task->datetime->PlaceHolder ?>" value="<?php echo $stop_task->datetime->EditValue ?>"<?php echo $stop_task->datetime->EditAttributes() ?>>
-</span>
-<?php echo $stop_task->datetime->CustomMsg ?></td>
-	</tr>
-<?php } ?>
-<?php if ($stop_task->username->Visible) { // username ?>
-	<tr id="r_username">
-		<td><span id="elh_stop_task_username"><?php echo $stop_task->username->FldCaption() ?><?php echo $Language->Phrase("FieldRequiredIndicator") ?></span></td>
-		<td<?php echo $stop_task->username->CellAttributes() ?>>
-<span id="el_stop_task_username" class="control-group">
-<input type="text" data-field="x_username" name="x_username" id="x_username" size="30" maxlength="255" placeholder="<?php echo $stop_task->username->PlaceHolder ?>" value="<?php echo $stop_task->username->EditValue ?>"<?php echo $stop_task->username->EditAttributes() ?>>
-</span>
-<?php echo $stop_task->username->CustomMsg ?></td>
 	</tr>
 <?php } ?>
 </table>

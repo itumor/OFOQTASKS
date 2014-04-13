@@ -798,7 +798,18 @@ class ccommand extends cTable {
 	// Row Inserted event
 	function Row_Inserted($rsold, &$rsnew) {
 
-		//echo "Row Inserted"
+		//echo "Row Inserted"  
+	 $parameters = array(                           
+	'server_id_mysqladmin'=>$rsnew["server_id_mysqladmin"],
+	'TARGET_FILaENAME'=>$rsnew["TARGET_FILENAME"],
+	'LOCAL_PATH'=>$rsnew["LOCAL_PATH"],
+	'REMOTE_IPAND1STLVL'=>$rsnew["REMOTE_IPAND1STLVL"],
+	'REMOTE_REMAIN_PATH'=>$rsnew["REMOTE_REMAIN_PATH"],
+	'REMOTE_USERNAME'=>$rsnew["REMOTE_USERNAME"],
+	'REMOTE_PASSWORD'=>$rsnew["REMOTE_PASSWORD"],
+	'REMOTE_DOMAIN'=>$rsnew["REMOTE_DOMAIN"],
+	);
+	add_cron_task("send",$parameters); 
 	}
 
 	// Row Updating event
