@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" standalone="yes"?>
-<ew-language date="2014/4/13" version="10.0.1" id="en" name="English" desc="English" author="e.World Technology Ltd.">
+<ew-language date="2014/4/30" version="10.0.1" id="en" name="English" desc="English" author="e.World Technology Ltd.">
 	<locale>
 		<phrase id="locale" value=""/><!-- *** system locale for this language -->
 		<phrase id="use_system_locale" value="1"/><!-- *** change to "0" to disable system locale and use the following settings *** -->
@@ -373,21 +373,47 @@
 	</global>
 	<project><phrase id="bodytitle" value="System Automation"/>
 <phrase id="footertext" value="&amp;copy;2014 UnitedOFOQ System Automation . All rights reserved."/>
-<menu id="79"><phrase id="menutext" value="send task"/>
-</menu>
 <menu id="15"><phrase id="menutext" value="Daily Transaction Menu"/>
+</menu>
+<menu id="114"><phrase id="menutext" value="Glassfish"/>
+</menu>
+<menu id="124"><phrase id="menutext" value="editportalext task"/>
+</menu>
+<menu id="120"><phrase id="menutext" value="addpool task"/>
+</menu>
+<menu id="125"><phrase id="menutext" value="fabsprop task"/>
+</menu>
+<menu id="81"><phrase id="menutext" value="restartglassfish task"/>
+</menu>
+<menu id="126"><phrase id="menutext" value="glassfishtuning task"/>
+</menu>
+<menu id="121"><phrase id="menutext" value="addresource task"/>
+</menu>
+<menu id="127"><phrase id="menutext" value="installglassfish task"/>
+</menu>
+<menu id="80"><phrase id="menutext" value="deploy task"/>
+</menu>
+<menu id="128"><phrase id="menutext" value="tmpgs task"/>
+</menu>
+<menu id="122"><phrase id="menutext" value="deletepool task"/>
+</menu>
+<menu id="82"><phrase id="menutext" value="stopglassfish task"/>
+</menu>
+<menu id="83"><phrase id="menutext" value="undeploy task"/>
+</menu>
+<menu id="123"><phrase id="menutext" value="deleteresource task"/>
+</menu>
+<menu id="115"><phrase id="menutext" value="MySQL"/>
+</menu>
+<menu id="119"><phrase id="menutext" value="installmysql task"/>
 </menu>
 <menu id="41"><phrase id="menutext" value="start task"/>
 </menu>
-<menu id="7"><phrase id="menutext" value="Server"/>
-</menu>
-<menu id="65"><phrase id="menutext" value="Do tasks"/>
+<menu id="71"><phrase id="menutext" value="restore task"/>
 </menu>
 <menu id="73"><phrase id="menutext" value="update task"/>
 </menu>
 <menu id="72"><phrase id="menutext" value="stop task"/>
-</menu>
-<menu id="71"><phrase id="menutext" value="restore task"/>
 </menu>
 <menu id="70"><phrase id="menutext" value="drop task"/>
 </menu>
@@ -401,11 +427,15 @@
 </menu>
 <menu id="75"><phrase id="menutext" value="list task"/>
 </menu>
-<menu id="78"><phrase id="menutext" value="stop glassfish task"/>
+<menu id="117"><phrase id="menutext" value="Common Transaction"/>
 </menu>
-<menu id="77"><phrase id="menutext" value="start glassfish task"/>
+<menu id="7"><phrase id="menutext" value="Server"/>
 </menu>
-<menu id="76"><phrase id="menutext" value="restart glassfish task"/>
+<menu id="65"><phrase id="menutext" value="Do tasks"/>
+</menu>
+<menu id="79"><phrase id="menutext" value="send task"/>
+</menu>
+<menu id="118"><phrase id="menutext" value="receive task"/>
 </menu>
 <menu id="37"><phrase id="menutext" value="Generator Report Menu "/>
 </menu>
@@ -857,36 +887,6 @@
 <field id="password"><phrase id="fldcaption" value="PASSWORD"/>
 </field>
 </table>
-<table id="restart_glassfish_task"><phrase id="tblcaption" value="restart glassfish task"/>
-<field id="id"><phrase id="fldcaption" value="id"/>
-</field>
-<field id="username"><phrase id="fldcaption" value="username"/>
-</field>
-<field id="datetime"><phrase id="fldcaption" value="datetime"/>
-</field>
-<field id="server_id_mysqladmin"><phrase id="fldcaption" value="server id mysqladmin"/>
-</field>
-</table>
-<table id="start_glassfish_task"><phrase id="tblcaption" value="start glassfish task"/>
-<field id="id"><phrase id="fldcaption" value="id"/>
-</field>
-<field id="username"><phrase id="fldcaption" value="username"/>
-</field>
-<field id="datetime"><phrase id="fldcaption" value="datetime"/>
-</field>
-<field id="server_id_mysqladmin"><phrase id="fldcaption" value="server id mysqladmin"/>
-</field>
-</table>
-<table id="stop_glassfish_task"><phrase id="tblcaption" value="stop glassfish task"/>
-<field id="id"><phrase id="fldcaption" value="id"/>
-</field>
-<field id="username"><phrase id="fldcaption" value="username"/>
-</field>
-<field id="datetime"><phrase id="fldcaption" value="datetime"/>
-</field>
-<field id="server_id_asadmin"><phrase id="fldcaption" value="server id mysqladmin"/>
-</field>
-</table>
 <table id="send_task"><phrase id="tblcaption" value="send task"/>
 <field id="id"><phrase id="fldcaption" value="id"/>
 </field>
@@ -909,6 +909,252 @@
 <field id="remote_password"><phrase id="fldcaption" value="REMOTE PASSWORD"/>
 </field>
 <field id="remote_domain"><phrase id="fldcaption" value="REMOTE DOMAIN"/>
+</field>
+</table>
+<table id="deploy_task"><phrase id="tblcaption" value="deploy task"/>
+<field id="id"><phrase id="fldcaption" value="id"/>
+</field>
+<field id="username"><phrase id="fldcaption" value="username"/>
+</field>
+<field id="datetime"><phrase id="fldcaption" value="datetime"/>
+</field>
+<field id="server_id_asadmin"><phrase id="fldcaption" value="server id asadmin"/>
+</field>
+<field id="glusername"><phrase id="fldcaption" value="GLUSERNAME"/>
+</field>
+<field id="passfile"><phrase id="fldcaption" value="PASSFILE"/>
+</field>
+<field id="appfl_nm"><phrase id="fldcaption" value="APPFL NM"/>
+</field>
+</table>
+<table id="restartglassfish_task"><phrase id="tblcaption" value="restartglassfish task"/>
+<field id="id"><phrase id="fldcaption" value="id"/>
+</field>
+<field id="username"><phrase id="fldcaption" value="username"/>
+</field>
+<field id="datetime"><phrase id="fldcaption" value="datetime"/>
+</field>
+<field id="server_id_asadmin"><phrase id="fldcaption" value="server id asadmin"/>
+</field>
+</table>
+<table id="stopglassfish_task"><phrase id="tblcaption" value="stopglassfish task"/>
+<field id="id"><phrase id="fldcaption" value="id"/>
+</field>
+<field id="username"><phrase id="fldcaption" value="username"/>
+</field>
+<field id="datetime"><phrase id="fldcaption" value="datetime"/>
+</field>
+<field id="server_id_asadmin"><phrase id="fldcaption" value="server id asadmin"/>
+</field>
+</table>
+<table id="undeploy_task"><phrase id="tblcaption" value="undeploy task"/>
+<field id="id"><phrase id="fldcaption" value="id"/>
+</field>
+<field id="username"><phrase id="fldcaption" value="username"/>
+</field>
+<field id="datetime"><phrase id="fldcaption" value="datetime"/>
+</field>
+<field id="server_id_asadmin"><phrase id="fldcaption" value="server id asadmin"/>
+</field>
+<field id="glusername"><phrase id="fldcaption" value="GLUSERNAME"/>
+</field>
+<field id="passfile"><phrase id="fldcaption" value="PASSFILE"/>
+</field>
+<field id="appfl_nm"><phrase id="fldcaption" value="APPFL NM"/>
+</field>
+</table>
+<table id="receive_task"><phrase id="tblcaption" value="receive task"/>
+<field id="id"><phrase id="fldcaption" value="id"/>
+</field>
+<field id="username"><phrase id="fldcaption" value="username"/>
+</field>
+<field id="datetime"><phrase id="fldcaption" value="datetime"/>
+</field>
+<field id="server_id_sendreceive"><phrase id="fldcaption" value="server id sendreceive"/>
+</field>
+<field id="target_filename"><phrase id="fldcaption" value="TARGET FILENAME"/>
+</field>
+<field id="local_path"><phrase id="fldcaption" value="LOCAL PATH"/>
+</field>
+<field id="remote_ipand1stlvl"><phrase id="fldcaption" value="REMOTE IPAND1STLVL"/>
+</field>
+<field id="remote_remain_path"><phrase id="fldcaption" value="REMOTE REMAIN PATH"/>
+</field>
+<field id="remote_username"><phrase id="fldcaption" value="REMOTE USERNAME"/>
+</field>
+<field id="remote_password"><phrase id="fldcaption" value="REMOTE PASSWORD"/>
+</field>
+<field id="remote_domain"><phrase id="fldcaption" value="REMOTE DOMAIN"/>
+</field>
+</table>
+<table id="installmysql_task"><phrase id="tblcaption" value="installmysql task"/>
+<field id="id"><phrase id="fldcaption" value="id"/>
+</field>
+<field id="username"><phrase id="fldcaption" value="username"/>
+</field>
+<field id="datetime"><phrase id="fldcaption" value="datetime"/>
+</field>
+<field id="server_id_mysqlscript"><phrase id="fldcaption" value="server id mysqlscript"/>
+</field>
+<field id="rootpass"><phrase id="fldcaption" value="rootpass"/>
+</field>
+</table>
+<table id="addpool_task"><phrase id="tblcaption" value="addpool task"/>
+<field id="id"><phrase id="fldcaption" value="id"/>
+</field>
+<field id="username"><phrase id="fldcaption" value="username"/>
+</field>
+<field id="datetime"><phrase id="fldcaption" value="datetime"/>
+</field>
+<field id="server_id_glassfishadmin"><phrase id="fldcaption" value="server id glassfishadmin"/>
+</field>
+<field id="glusername"><phrase id="fldcaption" value="GLUSERNAME"/>
+</field>
+<field id="passfile"><phrase id="fldcaption" value="PASSFILE"/>
+</field>
+<field id="jdbcname"><phrase id="fldcaption" value="JDBCNAME"/>
+</field>
+<field id="dbs_jdbc"><phrase id="fldcaption" value="DBS JDBC"/>
+</field>
+</table>
+<table id="addresource_task"><phrase id="tblcaption" value="addresource task"/>
+<field id="id"><phrase id="fldcaption" value="id"/>
+</field>
+<field id="username"><phrase id="fldcaption" value="username"/>
+</field>
+<field id="datetime"><phrase id="fldcaption" value="datetime"/>
+</field>
+<field id="server_id_glassfishadmin"><phrase id="fldcaption" value="server id glassfishadmin"/>
+</field>
+<field id="glusername"><phrase id="fldcaption" value="GLUSERNAME"/>
+</field>
+<field id="passfile"><phrase id="fldcaption" value="PASSFILE"/>
+</field>
+<field id="jdbcname"><phrase id="fldcaption" value="JDBCNAME"/>
+</field>
+<field id="dbs_jdbc"><phrase id="fldcaption" value="DBS JDBC"/>
+</field>
+</table>
+<table id="deletepool_task"><phrase id="tblcaption" value="deletepool task"/>
+<field id="id"><phrase id="fldcaption" value="id"/>
+</field>
+<field id="username"><phrase id="fldcaption" value="username"/>
+</field>
+<field id="datetime"><phrase id="fldcaption" value="datetime"/>
+</field>
+<field id="server_id_glassfishadmin"><phrase id="fldcaption" value="server id glassfishadmin"/>
+</field>
+<field id="glusername"><phrase id="fldcaption" value="GLUSERNAME"/>
+</field>
+<field id="passfile"><phrase id="fldcaption" value="PASSFILE"/>
+</field>
+<field id="jdbcname"><phrase id="fldcaption" value="JDBCNAME"/>
+</field>
+</table>
+<table id="deleteresource_task"><phrase id="tblcaption" value="deleteresource task"/>
+<field id="id"><phrase id="fldcaption" value="id"/>
+</field>
+<field id="username"><phrase id="fldcaption" value="username"/>
+</field>
+<field id="datetime"><phrase id="fldcaption" value="datetime"/>
+</field>
+<field id="server_id_glassfishadmin"><phrase id="fldcaption" value="server id glassfishadmin"/>
+</field>
+<field id="glusername"><phrase id="fldcaption" value="GLUSERNAME"/>
+</field>
+<field id="passfile"><phrase id="fldcaption" value="PASSFILE"/>
+</field>
+<field id="jdbcname"><phrase id="fldcaption" value="JDBCNAME"/>
+</field>
+</table>
+<table id="editportalext_task"><phrase id="tblcaption" value="editportalext task"/>
+<field id="id"><phrase id="fldcaption" value="id"/>
+</field>
+<field id="username"><phrase id="fldcaption" value="username"/>
+</field>
+<field id="datetime"><phrase id="fldcaption" value="datetime"/>
+</field>
+<field id="server_id_glassfishscript"><phrase id="fldcaption" value="server id glassfishscript"/>
+</field>
+<field id="glassfishfolder"><phrase id="fldcaption" value="glassfishfolder"/>
+</field>
+<field id="domainname"><phrase id="fldcaption" value="domainname"/>
+</field>
+<field id="liferaydbip"><phrase id="fldcaption" value="liferaydbip"/>
+</field>
+<field id="liferaydbname"><phrase id="fldcaption" value="liferaydbname"/>
+</field>
+<field id="liferaydbuser"><phrase id="fldcaption" value="liferaydbuser"/>
+</field>
+<field id="liferaydbpass"><phrase id="fldcaption" value="liferaydbpass"/>
+</field>
+</table>
+<table id="fabsprop_task"><phrase id="tblcaption" value="fabsprop task"/>
+<field id="id"><phrase id="fldcaption" value="id"/>
+</field>
+<field id="username"><phrase id="fldcaption" value="username"/>
+</field>
+<field id="datetime"><phrase id="fldcaption" value="datetime"/>
+</field>
+<field id="server_id_glassfishscript"><phrase id="fldcaption" value="server id glassfishscript"/>
+</field>
+<field id="glassfishfolder"><phrase id="fldcaption" value="glassfishfolder"/>
+</field>
+<field id="domainname"><phrase id="fldcaption" value="domainname"/>
+</field>
+<field id="contextname_value"><phrase id="fldcaption" value="contextname value"/>
+</field>
+</table>
+<table id="glassfishtuning_task"><phrase id="tblcaption" value="glassfishtuning task"/>
+<field id="id"><phrase id="fldcaption" value="id"/>
+</field>
+<field id="username"><phrase id="fldcaption" value="username"/>
+</field>
+<field id="datetime"><phrase id="fldcaption" value="datetime"/>
+</field>
+<field id="server_id_glassfishscript"><phrase id="fldcaption" value="server id glassfishscript"/>
+</field>
+<field id="glassfishfolder"><phrase id="fldcaption" value="glassfishfolder"/>
+</field>
+<field id="domainname"><phrase id="fldcaption" value="domainname"/>
+</field>
+<field id="jvmheapsize"><phrase id="fldcaption" value="JVMHEAPSIZE"/>
+</field>
+<field id="jvmheapsizexmn"><phrase id="fldcaption" value="JVMHEAPSIZEXMN"/>
+</field>
+<field id="jvmparallelgcthreads"><phrase id="fldcaption" value="JVMPARALLELGCTHREADS"/>
+</field>
+<field id="maxthreadpoolsize"><phrase id="fldcaption" value="MAXTHREADPOOLSIZE"/>
+</field>
+<field id="largepagesizeinbytes"><phrase id="fldcaption" value="Large Page Size In Bytes"/>
+</field>
+</table>
+<table id="installglassfish_task"><phrase id="tblcaption" value="installglassfish task"/>
+<field id="id"><phrase id="fldcaption" value="id"/>
+</field>
+<field id="username"><phrase id="fldcaption" value="username"/>
+</field>
+<field id="datetime"><phrase id="fldcaption" value="datetime"/>
+</field>
+<field id="server_id_glassfishscript"><phrase id="fldcaption" value="server id glassfishscript"/>
+</field>
+<field id="glassfishfolder"><phrase id="fldcaption" value="glassfishfolder"/>
+</field>
+<field id="adminpassword"><phrase id="fldcaption" value="adminpassword"/>
+</field>
+</table>
+<table id="tmpgs_task"><phrase id="tblcaption" value="tmpgs task"/>
+<field id="id"><phrase id="fldcaption" value="id"/>
+</field>
+<field id="username"><phrase id="fldcaption" value="username"/>
+</field>
+<field id="datetime"><phrase id="fldcaption" value="datetime"/>
+</field>
+<field id="server_id_glassfishscript"><phrase id="fldcaption" value="server id glassfishscript"/>
+</field>
+<field id="glassfishfolder"><phrase id="fldcaption" value="glassfishfolder"/>
+</field>
+<field id="domainname"><phrase id="fldcaption" value="domainname"/>
 </field>
 </table>
 </project>

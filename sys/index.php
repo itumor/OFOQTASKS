@@ -245,14 +245,38 @@ class cdefault {
 			$this->Page_Terminate("script_function_parameter_relationlist.php");
 		if ($Security->AllowList(CurrentProjectID() . 'list_task'))
 			$this->Page_Terminate("list_tasklist.php");
-		if ($Security->AllowList(CurrentProjectID() . 'restart_glassfish_task'))
-			$this->Page_Terminate("restart_glassfish_tasklist.php");
-		if ($Security->AllowList(CurrentProjectID() . 'start_glassfish_task'))
-			$this->Page_Terminate("start_glassfish_tasklist.php");
-		if ($Security->AllowList(CurrentProjectID() . 'stop_glassfish_task'))
-			$this->Page_Terminate("stop_glassfish_tasklist.php");
 		if ($Security->AllowList(CurrentProjectID() . 'send_task'))
 			$this->Page_Terminate("send_tasklist.php");
+		if ($Security->AllowList(CurrentProjectID() . 'deploy_task'))
+			$this->Page_Terminate("deploy_tasklist.php");
+		if ($Security->AllowList(CurrentProjectID() . 'restartglassfish_task'))
+			$this->Page_Terminate("restartglassfish_tasklist.php");
+		if ($Security->AllowList(CurrentProjectID() . 'stopglassfish_task'))
+			$this->Page_Terminate("stopglassfish_tasklist.php");
+		if ($Security->AllowList(CurrentProjectID() . 'undeploy_task'))
+			$this->Page_Terminate("undeploy_tasklist.php");
+		if ($Security->AllowList(CurrentProjectID() . 'receive_task'))
+			$this->Page_Terminate("receive_tasklist.php");
+		if ($Security->AllowList(CurrentProjectID() . 'installmysql_task'))
+			$this->Page_Terminate("installmysql_tasklist.php");
+		if ($Security->AllowList(CurrentProjectID() . 'addpool_task'))
+			$this->Page_Terminate("addpool_tasklist.php");
+		if ($Security->AllowList(CurrentProjectID() . 'addresource_task'))
+			$this->Page_Terminate("addresource_tasklist.php");
+		if ($Security->AllowList(CurrentProjectID() . 'deletepool_task'))
+			$this->Page_Terminate("deletepool_tasklist.php");
+		if ($Security->AllowList(CurrentProjectID() . 'deleteresource_task'))
+			$this->Page_Terminate("deleteresource_tasklist.php");
+		if ($Security->AllowList(CurrentProjectID() . 'editportalext_task'))
+			$this->Page_Terminate("editportalext_tasklist.php");
+		if ($Security->AllowList(CurrentProjectID() . 'fabsprop_task'))
+			$this->Page_Terminate("fabsprop_tasklist.php");
+		if ($Security->AllowList(CurrentProjectID() . 'glassfishtuning_task'))
+			$this->Page_Terminate("glassfishtuning_tasklist.php");
+		if ($Security->AllowList(CurrentProjectID() . 'installglassfish_task'))
+			$this->Page_Terminate("installglassfish_tasklist.php");
+		if ($Security->AllowList(CurrentProjectID() . 'tmpgs_task'))
+			$this->Page_Terminate("tmpgs_tasklist.php");
 		if ($Security->IsLoggedIn()) {
 			$this->setFailureMessage($Language->Phrase("NoPermission") . "<br><br><a href=\"logout.php\">" . $Language->Phrase("BackToLogin") . "</a>");
 		} else {

@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0"?>
-<configuration date="2014/04/13" author="e.World Technology Ltd.">
-<project id="{3246B9FA-4C51-4733-8040-34B188FCD87E}" file="E:\ofoq_tasks\OFOQTASKS\project1.pmp" name="project1" product="PHPMaker" version="10.0" datetime="2014/04/13 19:00:56" languagefolder="phplang" userlevel="0,&quot;Default&quot;,0">
+<configuration date="2014/04/30" author="e.World Technology Ltd.">
+<project id="{3246B9FA-4C51-4733-8040-34B188FCD87E}" file="C:\project1.pmp" name="project1" product="PHPMaker" version="10.0" datetime="2014/04/30 14:55:40" languagefolder="phplang" userlevel="0,&quot;Default&quot;,0">
 <table id="command" name="command" caption="command" userlevel="0,&quot;Default&quot;,0" priv="1"/>
 <table id="function_group" name="function_group" caption="function group" userlevel="0,&quot;Default&quot;,0" priv="1"/>
 <table id="function_group_relation" name="function_group_relation" caption="function group relation" userlevel="0,&quot;Default&quot;,0" priv="1"/>
@@ -27,8 +27,20 @@
 <table id="update_task" name="update_task" caption="update task" userlevel="0,&quot;Default&quot;,0" priv="1"/>
 <table id="script_function_parameter_relation" name="script_function_parameter_relation" caption="script function parameter relation" userlevel="0,&quot;Default&quot;,0" priv="1"/>
 <table id="list_task" name="list_task" caption="list task" userlevel="0,&quot;Default&quot;,0" priv="1"/>
-<table id="restart_glassfish_task" name="restart_glassfish_task" caption="restart glassfish task" userlevel="0,&quot;Default&quot;,0" priv="1"/>
-<table id="start_glassfish_task" name="start_glassfish_task" caption="start glassfish task" userlevel="0,&quot;Default&quot;,0" priv="1"/>
-<table id="stop_glassfish_task" name="stop_glassfish_task" caption="stop glassfish task" userlevel="0,&quot;Default&quot;,0" priv="1"/>
 <table id="send_task" name="send_task" caption="send task" userlevel="0,&quot;Default&quot;,0" priv="1"/>
+<table id="deploy_task" name="deploy_task" caption="deploy task" userlevel="0,&quot;Default&quot;,0" priv="1"/>
+<table id="restartglassfish_task" name="restartglassfish_task" caption="restartglassfish task" userlevel="0,&quot;Default&quot;,0" priv="1"/>
+<table id="stopglassfish_task" name="stopglassfish_task" caption="stopglassfish task" userlevel="0,&quot;Default&quot;,0" priv="1"/>
+<table id="undeploy_task" name="undeploy_task" caption="undeploy task" userlevel="0,&quot;Default&quot;,0" priv="1"/>
+<table id="receive_task" name="receive_task" caption="receive task" userlevel="0,&quot;Default&quot;,0" priv="1"/>
+<table id="installmysql_task" name="installmysql_task" caption="installmysql task" userlevel="0,&quot;Default&quot;,0" priv="1"/>
+<table id="addpool_task" name="addpool_task" caption="addpool task" userlevel="0,&quot;Default&quot;,0" priv="1"/>
+<table id="addresource_task" name="addresource_task" caption="addresource task" userlevel="0,&quot;Default&quot;,0" priv="1"/>
+<table id="deletepool_task" name="deletepool_task" caption="deletepool task" userlevel="0,&quot;Default&quot;,0" priv="1"/>
+<table id="deleteresource_task" name="deleteresource_task" caption="deleteresource task" userlevel="0,&quot;Default&quot;,0" priv="1"/>
+<table id="editportalext_task" name="editportalext_task" caption="editportalext task" userlevel="0,&quot;Default&quot;,0" priv="1"/>
+<table id="fabsprop_task" name="fabsprop_task" caption="fabsprop task" userlevel="0,&quot;Default&quot;,0" priv="1"/>
+<table id="glassfishtuning_task" name="glassfishtuning_task" caption="glassfishtuning task" userlevel="0,&quot;Default&quot;,0" priv="1"/>
+<table id="installglassfish_task" name="installglassfish_task" caption="installglassfish task" userlevel="0,&quot;Default&quot;,0" priv="1"/>
+<table id="tmpgs_task" name="tmpgs_task" caption="tmpgs task" userlevel="0,&quot;Default&quot;,0" priv="1"/>
 </project></configuration>
